@@ -1,0 +1,7 @@
+[workspace]
+members = [
+  "idalib",
+  "idalib-build",
+  "idalib-sys",
+]
+resolver = "2"

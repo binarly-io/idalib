@@ -1,0 +1,2 @@
+tests filter=lfs diff=lfs merge=lfs -text
+tests/ls filter=lfs diff=lfs merge=lfs -text
