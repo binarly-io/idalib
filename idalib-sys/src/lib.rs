@@ -41,6 +41,7 @@ include_cpp! {
     #include "ida/segment.hpp"
     #include "ida/ua.hpp"
     #include "ida/xref.hpp"
+    #include "ida/hexrays.hpp"
 
     generate!("qstring")
 
@@ -119,6 +120,19 @@ include_cpp! {
     generate!("FC_CALL_ENDS")
     generate!("FC_NOPREDS")
     generate!("FC_OUTLINES")
+
+    // hexrays
+    generate!("init_hexrays_plugin")
+    generate!("term_hexrays_plugin")
+
+    generate!("decompile_func")
+    generate!("cfuncptr_t")
+    generate!("hexrays_failure_t")
+
+    extern_cpp_type!("cfunc_t", crate::hexrays::cfunc_t)
+    extern_cpp_type!("cinsn_t", crate::hexrays::cinsn_t)
+    extern_cpp_type!("citem_t", crate::hexrays::citem_t)
+    extern_cpp_type!("cexpr_t", crate::hexrays::cexpr_t)
 
     // idalib
     generate!("open_database")
@@ -239,6 +253,43 @@ include_cpp! {
     generate!("has_external_refs")
 }
 
+pub mod hexrays {
+    mod __impl {
+        #![allow(non_camel_case_types)]
+        #![allow(non_upper_case_globals)]
+        #![allow(unused)]
+        #![allow(rustdoc::all)]
+
+        include!(concat!(env!("OUT_DIR"), "/hexrays.rs"));
+    }
+
+    pub use __impl::{cfunc_t, cinsn_t, citem_t, cexpr_t};
+
+    pub use super::ffi::{init_hexrays_plugin, term_hexrays_plugin, cfuncptr_t};
+    pub use super::ffix::idalib_hexrays_cfuncptr_inner;
+
+    unsafe impl cxx::ExternType for cfunc_t {
+        type Id = cxx::type_id!("cfunc_t");
+        type Kind = cxx::kind::Opaque;
+    }
+
+    pub fn decompile_func(f: *mut super::ffi::func_t) -> Option<cxx::UniquePtr<cfuncptr_t>> {
+        let result = unsafe {
+            super::ffi::decompile_func(
+                f,
+                std::ptr::null_mut(),
+                ((__impl::DECOMP_NO_WAIT | __impl::DECOMP_NO_CACHE) as i32).into(),
+            )
+        };
+
+        if result.is_null() {
+            return None;
+        }
+
+        Some(result)
+    }
+}
+
 pub mod idp {
     #![allow(non_camel_case_types)]
     #![allow(non_upper_case_globals)]
@@ -350,6 +401,7 @@ mod ffix {
         include!("bytes_extras.h");
         include!("entry_extras.h");
         include!("func_extras.h");
+        include!("hexrays_extras.h");
         include!("inf_extras.h");
         include!("ph_extras.h");
         include!("segm_extras.h");
@@ -373,6 +425,10 @@ mod ffix {
         type qbasic_block_t = super::ffi::qbasic_block_t;
         type segment_t = super::ffi::segment_t;
 
+        // cfuncptr_t
+        type qrefcnt_t_cfunc_t_AutocxxConcrete = super::ffi::qrefcnt_t_cfunc_t_AutocxxConcrete;
+        type cfunc_t = super::hexrays::cfunc_t;
+
         unsafe fn init_library(argc: c_int, argv: *mut *mut c_char) -> c_int;
 
         // NOTE: we can't use uval_t here due to it resolving to c_ulonglong,
@@ -386,6 +442,10 @@ mod ffix {
             f: *mut func_t,
             flags: c_int,
         ) -> Result<UniquePtr<qflow_chart_t>>;
+
+        unsafe fn idalib_hexrays_cfuncptr_inner(
+            f: *const qrefcnt_t_cfunc_t_AutocxxConcrete,
+        ) -> *mut cfunc_t;
 
         unsafe fn idalib_inf_get_version() -> u16;
         unsafe fn idalib_inf_get_genflags() -> u16;

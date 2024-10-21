@@ -6,9 +6,10 @@ use bitflags::bitflags;
 use cxx::UniquePtr;
 
 use crate::ffi::func::*;
+use crate::ffi::hexrays::{cfunc_t, cfuncptr_t, idalib_hexrays_cfuncptr_inner};
+use crate::ffi::xref::has_external_refs;
 use crate::ffi::{range_t, IDAError, BADADDR};
 use crate::idb::IDB;
-use crate::ffi::xref::has_external_refs;
 use crate::Address;
 
 pub struct Function<'a> {
@@ -25,6 +26,11 @@ pub struct BasicBlock<'a> {
     block: *const qbasic_block_t,
     kind: fc_block_type_t,
     _marker: PhantomData<&'a FunctionCFG<'a>>,
+}
+
+pub struct DecompiledFunction<'a> {
+    ptr: UniquePtr<cfuncptr_t>,
+    _marker: PhantomData<&'a IDB>,
 }
 
 impl<'a> BasicBlock<'a> {
@@ -167,6 +173,10 @@ impl<'a> Function<'a> {
         }
     }
 
+    pub(crate) fn as_ptr(&self) -> *mut func_t {
+        self.ptr
+    }
+
     fn as_range_t(&self) -> *const range_t {
         self.ptr.cast()
     }
@@ -243,6 +253,19 @@ impl<'a> Function<'a> {
             flow_chart: ptr.map_err(IDAError::ffi)?,
             _marker: PhantomData,
         })
+    }
+}
+
+impl<'a> DecompiledFunction<'a> {
+    pub(crate) fn new(inner: UniquePtr<cfuncptr_t>) -> Self {
+        Self {
+            ptr: inner,
+            _marker: PhantomData,
+        }
+    }
+
+    pub fn as_cfunc(&self) -> *mut cfunc_t {
+        unsafe { idalib_hexrays_cfuncptr_inner(self.ptr.as_ref().expect("valid pointer")) }
     }
 }
 

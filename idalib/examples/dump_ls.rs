@@ -4,6 +4,8 @@ use idalib::idb::*;
 fn main() -> anyhow::Result<()> {
     let idb = IDB::open("./tests/ls")?;
 
+    println!("decompiler available: {}", idb.decompiler_available());
+
     println!(
         "proc (short/long): {}/{}",
         idb.processor().short_name(),
@@ -45,10 +47,13 @@ fn main() -> anyhow::Result<()> {
         let addr = f.start_address();
         let fcfg = f.cfg()?;
 
+        let decompiled = idb.decompile(&f);
+
         println!(
-            "function {fid} @ {addr:x}: {:?} (blocks: {})",
+            "function {fid} @ {addr:x}: {:?} (blocks: {}) (decompiled: {})",
             f.name(),
-            fcfg.blocks_count()
+            fcfg.blocks_count(),
+            decompiled.is_some(),
         );
 
         for (id, blk) in fcfg.blocks().enumerate() {

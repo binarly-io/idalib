@@ -158,6 +158,28 @@ fn main() {
         configure_and_generate(arch, &ida, output);
     }
 
+    let hexrays = autocxx_bindgen::builder()
+        .header(ida.join("pro.h").to_str().expect("path is valid string"))
+        .header(
+            ida.join("typeinf.hpp")
+                .to_str()
+                .expect("path is valid string"),
+        )
+        .header(ida.join("hexrays.hpp").to_str().expect("path is valid string"))
+        .opaque_type("carg_t")
+        .allowlist_item("cfunc_t")
+        .allowlist_item("cinsn_t")
+        .allowlist_item("cexpr_t")
+        .allowlist_item("citem_t")
+        .allowlist_item("cnumber_t")
+        .allowlist_item("lvar_t")
+        .allowlist_item("lvar_locator_t")
+        .allowlist_item("vdloc_t")
+        .allowlist_item("CV_.*")
+        .allowlist_item("DECOMP_.*");
+
+    configure_and_generate(hexrays, &ida, "hexrays.rs");
+
     println!(
         "cargo::rerun-if-changed={}",
         ffi_path.join("lib.rs").display()
