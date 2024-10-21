@@ -57,6 +57,7 @@ fn main() -> anyhow::Result<()> {
         );
 
         if let Some(df) = decompiled.as_ref() {
+            println!("statements: {} / {}", df.body().len(), df.body().iter().count());
             println!("{}", df.pseudocode());
         }
 

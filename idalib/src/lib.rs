@@ -1,5 +1,6 @@
 use std::sync::{Mutex, MutexGuard, OnceLock};
 
+pub mod decompiler;
 pub mod func;
 pub mod idb;
 pub mod insn;

@@ -15,7 +15,8 @@ use crate::ffi::util::{is_align_insn, next_head, prev_head, str2reg};
 use crate::ffi::xref::{xrefblk_t, xrefblk_t_first_from, xrefblk_t_first_to};
 use crate::ffi::BADADDR;
 
-use crate::func::{DecompiledFunction, Function, FunctionId};
+use crate::decompiler::CFunction;
+use crate::func::{Function, FunctionId};
 use crate::insn::{Insn, Register};
 use crate::meta::Metadata;
 use crate::processor::Processor;
@@ -132,7 +133,7 @@ impl IDB {
         Some(Insn::from_repr(insn))
     }
 
-    pub fn decompile<'a>(&'a self, f: &Function<'a>) -> Option<DecompiledFunction<'a>> {
+    pub fn decompile<'a>(&'a self, f: &Function<'a>) -> Option<CFunction<'a>> {
         self.decompile_with(f, false)
     }
 
@@ -140,12 +141,12 @@ impl IDB {
         &'a self,
         f: &Function<'a>,
         all_blocks: bool,
-    ) -> Option<DecompiledFunction<'a>> {
+    ) -> Option<CFunction<'a>> {
         if !self.decompiler {
             return None;
         }
 
-        decompile_func(f.as_ptr(), all_blocks).and_then(DecompiledFunction::new)
+        decompile_func(f.as_ptr(), all_blocks).and_then(CFunction::new)
     }
 
     pub fn function_by_id<'a>(&'a self, id: FunctionId) -> Option<Function<'a>> {

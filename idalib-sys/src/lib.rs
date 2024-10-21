@@ -129,10 +129,17 @@ include_cpp! {
     generate!("cfuncptr_t")
     generate!("hexrays_failure_t")
 
+    generate!("carg_t")
+    generate!("carglist_t")
+
+    extern_cpp_type!("cblock_t", crate::hexrays::cblock_t)
     extern_cpp_type!("cfunc_t", crate::hexrays::cfunc_t)
-    extern_cpp_type!("cinsn_t", crate::hexrays::cinsn_t)
     extern_cpp_type!("citem_t", crate::hexrays::citem_t)
+    extern_cpp_type!("cinsn_t", crate::hexrays::cinsn_t)
     extern_cpp_type!("cexpr_t", crate::hexrays::cexpr_t)
+    extern_cpp_type!("cswitch_t", crate::hexrays::cswitch_t)
+    extern_cpp_type!("ctry_t", crate::hexrays::ctry_t)
+    extern_cpp_type!("cthrow_t", crate::hexrays::cthrow_t)
 
     // idalib
     generate!("open_database")
@@ -263,13 +270,53 @@ pub mod hexrays {
         include!(concat!(env!("OUT_DIR"), "/hexrays.rs"));
     }
 
-    pub use __impl::{cexpr_t, cfunc_t, cinsn_t, citem_t};
+    pub use __impl::{cblock_t, cexpr_t, cfunc_t, cinsn_t, citem_t, cswitch_t, cthrow_t, ctry_t};
 
-    pub use super::ffi::{cfuncptr_t, init_hexrays_plugin, term_hexrays_plugin};
-    pub use super::ffix::{idalib_hexrays_cfunc_pseudocode, idalib_hexrays_cfuncptr_inner};
+    pub use super::ffi::{
+        carg_t, carglist_t, cfuncptr_t, init_hexrays_plugin, term_hexrays_plugin,
+    };
+    pub use super::ffix::{
+        cblock_iter, idalib_hexrays_cblock_iter, idalib_hexrays_cblock_iter_next,
+        idalib_hexrays_cblock_len, idalib_hexrays_cfunc_pseudocode, idalib_hexrays_cfuncptr_inner,
+    };
 
     unsafe impl cxx::ExternType for cfunc_t {
         type Id = cxx::type_id!("cfunc_t");
+        type Kind = cxx::kind::Opaque;
+    }
+
+    unsafe impl cxx::ExternType for citem_t {
+        type Id = cxx::type_id!("citem_t");
+        type Kind = cxx::kind::Opaque;
+    }
+
+    unsafe impl cxx::ExternType for cinsn_t {
+        type Id = cxx::type_id!("cinsn_t");
+        type Kind = cxx::kind::Opaque;
+    }
+
+    unsafe impl cxx::ExternType for cexpr_t {
+        type Id = cxx::type_id!("cexpr_t");
+        type Kind = cxx::kind::Opaque;
+    }
+
+    unsafe impl cxx::ExternType for cblock_t {
+        type Id = cxx::type_id!("cblock_t");
+        type Kind = cxx::kind::Opaque;
+    }
+
+    unsafe impl cxx::ExternType for cswitch_t {
+        type Id = cxx::type_id!("cswitch_t");
+        type Kind = cxx::kind::Opaque;
+    }
+
+    unsafe impl cxx::ExternType for cthrow_t {
+        type Id = cxx::type_id!("cthrow_t");
+        type Kind = cxx::kind::Opaque;
+    }
+
+    unsafe impl cxx::ExternType for ctry_t {
+        type Id = cxx::type_id!("ctry_t");
         type Kind = cxx::kind::Opaque;
     }
 
@@ -432,6 +479,10 @@ mod ffix {
         // cfuncptr_t
         type qrefcnt_t_cfunc_t_AutocxxConcrete = super::ffi::qrefcnt_t_cfunc_t_AutocxxConcrete;
         type cfunc_t = super::hexrays::cfunc_t;
+        type cblock_t = super::hexrays::cblock_t;
+        type cinsn_t = super::hexrays::cinsn_t;
+
+        type cblock_iter;
 
         unsafe fn init_library(argc: c_int, argv: *mut *mut c_char) -> c_int;
 
@@ -451,6 +502,10 @@ mod ffix {
             f: *const qrefcnt_t_cfunc_t_AutocxxConcrete,
         ) -> *mut cfunc_t;
         unsafe fn idalib_hexrays_cfunc_pseudocode(f: *mut cfunc_t) -> String;
+
+        unsafe fn idalib_hexrays_cblock_iter(b: *mut cblock_t) -> UniquePtr<cblock_iter>;
+        unsafe fn idalib_hexrays_cblock_iter_next(slf: Pin<&mut cblock_iter>) -> *mut cinsn_t;
+        unsafe fn idalib_hexrays_cblock_len(b: *mut cblock_t) -> usize;
 
         unsafe fn idalib_inf_get_version() -> u16;
         unsafe fn idalib_inf_get_genflags() -> u16;
