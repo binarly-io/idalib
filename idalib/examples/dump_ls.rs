@@ -56,6 +56,10 @@ fn main() -> anyhow::Result<()> {
             decompiled.is_some(),
         );
 
+        if let Some(df) = decompiled.as_ref() {
+            println!("{}", df.pseudocode());
+        }
+
         for (id, blk) in fcfg.blocks().enumerate() {
             println!(
                 "--- blk {id} @ {:x}-{:x} ---",

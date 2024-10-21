@@ -133,11 +133,19 @@ impl IDB {
     }
 
     pub fn decompile<'a>(&'a self, f: &Function<'a>) -> Option<DecompiledFunction<'a>> {
+        self.decompile_with(f, false)
+    }
+
+    pub fn decompile_with<'a>(
+        &'a self,
+        f: &Function<'a>,
+        all_blocks: bool,
+    ) -> Option<DecompiledFunction<'a>> {
         if !self.decompiler {
             return None;
         }
 
-        decompile_func(f.as_ptr()).map(DecompiledFunction::new)
+        decompile_func(f.as_ptr(), all_blocks).and_then(DecompiledFunction::new)
     }
 
     pub fn function_by_id<'a>(&'a self, id: FunctionId) -> Option<Function<'a>> {

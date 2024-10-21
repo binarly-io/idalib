@@ -160,11 +160,6 @@ fn main() {
 
     let hexrays = autocxx_bindgen::builder()
         .header(ida.join("pro.h").to_str().expect("path is valid string"))
-        .header(
-            ida.join("typeinf.hpp")
-                .to_str()
-                .expect("path is valid string"),
-        )
         .header(ida.join("hexrays.hpp").to_str().expect("path is valid string"))
         .opaque_type("carg_t")
         .allowlist_item("cfunc_t")

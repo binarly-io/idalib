@@ -263,24 +263,28 @@ pub mod hexrays {
         include!(concat!(env!("OUT_DIR"), "/hexrays.rs"));
     }
 
-    pub use __impl::{cfunc_t, cinsn_t, citem_t, cexpr_t};
+    pub use __impl::{cexpr_t, cfunc_t, cinsn_t, citem_t};
 
-    pub use super::ffi::{init_hexrays_plugin, term_hexrays_plugin, cfuncptr_t};
-    pub use super::ffix::idalib_hexrays_cfuncptr_inner;
+    pub use super::ffi::{cfuncptr_t, init_hexrays_plugin, term_hexrays_plugin};
+    pub use super::ffix::{idalib_hexrays_cfunc_pseudocode, idalib_hexrays_cfuncptr_inner};
 
     unsafe impl cxx::ExternType for cfunc_t {
         type Id = cxx::type_id!("cfunc_t");
         type Kind = cxx::kind::Opaque;
     }
 
-    pub fn decompile_func(f: *mut super::ffi::func_t) -> Option<cxx::UniquePtr<cfuncptr_t>> {
-        let result = unsafe {
-            super::ffi::decompile_func(
-                f,
-                std::ptr::null_mut(),
-                ((__impl::DECOMP_NO_WAIT | __impl::DECOMP_NO_CACHE) as i32).into(),
-            )
-        };
+    pub fn decompile_func(
+        f: *mut super::ffi::func_t,
+        all_blocks: bool,
+    ) -> Option<cxx::UniquePtr<cfuncptr_t>> {
+        let mut flags = __impl::DECOMP_NO_WAIT | __impl::DECOMP_NO_CACHE;
+
+        if all_blocks {
+            flags |= __impl::DECOMP_ALL_BLKS;
+        }
+
+        let result =
+            unsafe { super::ffi::decompile_func(f, std::ptr::null_mut(), (flags as i32).into()) };
 
         if result.is_null() {
             return None;
@@ -446,6 +450,7 @@ mod ffix {
         unsafe fn idalib_hexrays_cfuncptr_inner(
             f: *const qrefcnt_t_cfunc_t_AutocxxConcrete,
         ) -> *mut cfunc_t;
+        unsafe fn idalib_hexrays_cfunc_pseudocode(f: *mut cfunc_t) -> String;
 
         unsafe fn idalib_inf_get_version() -> u16;
         unsafe fn idalib_inf_get_genflags() -> u16;

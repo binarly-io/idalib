@@ -6,7 +6,9 @@ use bitflags::bitflags;
 use cxx::UniquePtr;
 
 use crate::ffi::func::*;
-use crate::ffi::hexrays::{cfunc_t, cfuncptr_t, idalib_hexrays_cfuncptr_inner};
+use crate::ffi::hexrays::{
+    cfunc_t, cfuncptr_t, idalib_hexrays_cfunc_pseudocode, idalib_hexrays_cfuncptr_inner,
+};
 use crate::ffi::xref::has_external_refs;
 use crate::ffi::{range_t, IDAError, BADADDR};
 use crate::idb::IDB;
@@ -29,7 +31,8 @@ pub struct BasicBlock<'a> {
 }
 
 pub struct DecompiledFunction<'a> {
-    ptr: UniquePtr<cfuncptr_t>,
+    ptr: *mut cfunc_t,
+    _obj: UniquePtr<cfuncptr_t>,
     _marker: PhantomData<&'a IDB>,
 }
 
@@ -257,15 +260,27 @@ impl<'a> Function<'a> {
 }
 
 impl<'a> DecompiledFunction<'a> {
-    pub(crate) fn new(inner: UniquePtr<cfuncptr_t>) -> Self {
-        Self {
-            ptr: inner,
-            _marker: PhantomData,
+    pub(crate) fn new(obj: UniquePtr<cfuncptr_t>) -> Option<Self> {
+        let ptr =
+            unsafe { idalib_hexrays_cfuncptr_inner(obj.as_ref().expect("valid pointer")) };
+
+        if ptr.is_null() {
+            return None;
         }
+
+        Some(Self {
+            ptr,
+            _obj: obj,
+            _marker: PhantomData,
+        })
+    }
+
+    pub fn pseudocode(&self) -> String {
+        unsafe { idalib_hexrays_cfunc_pseudocode(self.ptr) }
     }
 
     pub fn as_cfunc(&self) -> *mut cfunc_t {
-        unsafe { idalib_hexrays_cfuncptr_inner(self.ptr.as_ref().expect("valid pointer")) }
+        self.ptr
     }
 }
 
