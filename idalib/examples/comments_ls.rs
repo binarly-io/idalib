@@ -10,6 +10,8 @@ fn main() -> anyhow::Result<()> {
 
     // TODO: append_cmt()
 
+    // TODO: add some meaningful output
+
     // set_cmt(), get_cmt()
     println!("Testing set_cmt() and get_cmt()");
     for (id, f) in idb.functions() {
