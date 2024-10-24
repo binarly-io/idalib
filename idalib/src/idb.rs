@@ -1,9 +1,10 @@
-use std::ffi::CString;
+use std::ffi::{CString, NulError};
 use std::marker::PhantomData;
 use std::mem::MaybeUninit;
 use std::path::{Path, PathBuf};
 
 use crate::ffi::bytes::*;
+use crate::ffi::comments::set_cmt;
 use crate::ffi::entry::{get_entry, get_entry_ordinal, get_entry_qty};
 use crate::ffi::func::{get_func, get_func_qty, getn_func};
 use crate::ffi::ida::{close_database_with, make_signatures, open_database, set_screen_ea};
@@ -211,6 +212,19 @@ impl IDB {
         } else {
             None
         }
+    }
+
+    pub fn set_cmt(
+        &self,
+        ea: Address,
+        comm: impl AsRef<str>,
+        rptble: bool,
+    ) -> Result<(), NulError> {
+        let s = CString::new(comm.as_ref())?;
+        unsafe {
+            set_cmt(ea.into(), s.as_ptr(), rptble);
+        }
+        Ok(())
     }
 
     pub fn get_byte(&self, ea: Address) -> u8 {

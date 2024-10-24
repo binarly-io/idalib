@@ -237,6 +237,9 @@ include_cpp! {
     generate!("XREF_PASTEND")
 
     generate!("has_external_refs")
+
+    // comments
+    generate!("set_cmt")
 }
 
 pub mod idp {
@@ -724,6 +727,10 @@ pub mod xref {
         xrefblk_t_next_from, xrefblk_t_next_to, XREF_ALL, XREF_BASE, XREF_DATA, XREF_FAR,
         XREF_MASK, XREF_PASTEND, XREF_TAIL, XREF_USER,
     };
+}
+
+pub mod comments {
+    pub use super::ffi::set_cmt;
 }
 
 pub mod ida {
