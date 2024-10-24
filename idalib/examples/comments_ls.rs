@@ -1,15 +1,10 @@
 use idalib::idb::IDB;
 
 fn main() -> anyhow::Result<()> {
+    println!("Trying to open IDA database... ");
+
+    // Open IDA database
     let idb = IDB::open_with("./tests/ls", true)?;
-
-    // TODO: has_cmt(), f_has_cmt()
-    // TODO: has_extra_cmts(), f_has_extra_cmts()
-
-    // TODO: get_predef_insn_cmt()
-
-    // TODO: add some meaningful output
-    // TODO: edit also README.md
 
     println!("Testing set_cmt() and get_cmt()");
     for (id, f) in idb.functions() {
@@ -24,7 +19,7 @@ fn main() -> anyhow::Result<()> {
         idb.set_cmt(addr, comm, false)?;
 
         // get_cmt()
-        let read_comment = idb.get_cmt(addr.into(), false);
+        let read_comment = idb.get_cmt(addr, false);
         assert!(read_comment.starts_with("Comment added by idalib"));
     }
 
@@ -37,7 +32,7 @@ fn main() -> anyhow::Result<()> {
         idb.append_cmt(addr, comm, false)?;
 
         // get_cmt()
-        let read_comment = idb.get_cmt(addr.into(), false);
+        let read_comment = idb.get_cmt(addr, false);
         assert!(read_comment.ends_with("appended by idalib"));
     }
 
