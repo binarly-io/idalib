@@ -241,6 +241,7 @@ include_cpp! {
     // comments
     generate!("get_cmt")
     generate!("set_cmt")
+    generate!("append_cmt")
 }
 
 pub mod idp {
@@ -734,7 +735,7 @@ pub mod xref {
 }
 
 pub mod comments {
-    pub use super::ffi::set_cmt;
+    pub use super::ffi::{append_cmt, set_cmt};
     pub use super::ffix::idalib_get_cmt;
 }
 

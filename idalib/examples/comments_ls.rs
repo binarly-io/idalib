@@ -8,22 +8,37 @@ fn main() -> anyhow::Result<()> {
 
     // TODO: get_predef_insn_cmt()
 
-    // TODO: append_cmt()
-
     // TODO: add some meaningful output
+    // TODO: edit also README.md
 
-    // set_cmt(), get_cmt()
     println!("Testing set_cmt() and get_cmt()");
     for (id, f) in idb.functions() {
-        let comment = format!(
+        let addr = f.start_address();
+        let comm = format!(
             "Comment added by idalib: {id} {} {:#x}",
             f.name().unwrap(),
-            f.start_address()
+            addr
         );
-        idb.set_cmt(f.start_address(), comment, true)?;
 
-        let read_comment = idb.get_cmt(f.start_address().into(), true);
+        // set_cmt()
+        idb.set_cmt(addr, comm, false)?;
+
+        // get_cmt()
+        let read_comment = idb.get_cmt(addr.into(), false);
         assert!(read_comment.starts_with("Comment added by idalib"));
+    }
+
+    println!("Testing append_cmt() and get_cmt()");
+    for (_id, f) in idb.functions() {
+        let addr = f.start_address();
+        let comm = "Comment appended by idalib";
+
+        // append_cmt()
+        idb.append_cmt(addr, comm, false)?;
+
+        // get_cmt()
+        let read_comment = idb.get_cmt(addr.into(), false);
+        assert!(read_comment.ends_with("appended by idalib"));
     }
 
     Ok(())
