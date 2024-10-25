@@ -1,4 +1,4 @@
-use std::ffi::{CString, NulError};
+use std::ffi::CString;
 use std::marker::PhantomData;
 use std::mem::MaybeUninit;
 use std::path::{Path, PathBuf};
@@ -214,30 +214,42 @@ impl IDB {
         }
     }
 
-    pub fn get_cmt(&self, ea: Address, rptble: bool) -> String {
+    pub fn get_cmt(&self, ea: Address) -> String {
+        self.get_cmt_with(ea.into(), false)
+    }
+
+    pub fn get_cmt_with(&self, ea: Address, rptble: bool) -> String {
         unsafe { idalib_get_cmt(ea.into(), rptble) }
     }
 
-    pub fn set_cmt(
+    pub fn set_cmt(&self, ea: Address, comm: impl AsRef<str>) -> Result<(), IDAError> {
+        self.set_cmt_with(ea.into(), comm, false)
+    }
+
+    pub fn set_cmt_with(
         &self,
         ea: Address,
         comm: impl AsRef<str>,
         rptble: bool,
-    ) -> Result<(), NulError> {
-        let s = CString::new(comm.as_ref())?;
+    ) -> Result<(), IDAError> {
+        let s = CString::new(comm.as_ref()).map_err(IDAError::ffi)?;
         unsafe {
             set_cmt(ea.into(), s.as_ptr(), rptble);
         }
         Ok(())
     }
 
-    pub fn append_cmt(
+    pub fn append_cmt(&self, ea: Address, comm: impl AsRef<str>) -> Result<(), IDAError> {
+        self.append_cmt_with(ea.into(), comm, false)
+    }
+
+    pub fn append_cmt_with(
         &self,
         ea: Address,
         comm: impl AsRef<str>,
         rptble: bool,
-    ) -> Result<(), NulError> {
-        let s = CString::new(comm.as_ref())?;
+    ) -> Result<(), IDAError> {
+        let s = CString::new(comm.as_ref()).map_err(IDAError::ffi)?;
         unsafe {
             append_cmt(ea.into(), s.as_ptr(), rptble);
         }

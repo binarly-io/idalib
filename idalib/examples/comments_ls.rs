@@ -16,10 +16,10 @@ fn main() -> anyhow::Result<()> {
         );
 
         // set_cmt()
-        idb.set_cmt(addr, comm, false)?;
+        idb.set_cmt(addr, comm)?;
 
         // get_cmt()
-        let read_comment = idb.get_cmt(addr, false);
+        let read_comment = idb.get_cmt(addr);
         assert!(read_comment.starts_with("Comment added by idalib"));
     }
 
@@ -29,10 +29,10 @@ fn main() -> anyhow::Result<()> {
         let comm = "Comment appended by idalib";
 
         // append_cmt()
-        idb.append_cmt(addr, comm, false)?;
+        idb.append_cmt(addr, comm)?;
 
         // get_cmt()
-        let read_comment = idb.get_cmt(addr, false);
+        let read_comment = idb.get_cmt(addr);
         assert!(read_comment.ends_with("appended by idalib"));
     }
 
