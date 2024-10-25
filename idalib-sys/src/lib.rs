@@ -78,6 +78,7 @@ include_cpp! {
 
     // funcs
     generate!("func_t")
+    generate!("lock_func")
     generate!("get_func")
     generate!("get_func_num")
     generate!("get_func_qty")
@@ -130,6 +131,7 @@ include_cpp! {
 
     // segment
     generate!("segment_t")
+    generate!("lock_segment")
     generate!("getseg")
     generate!("getnseg")
     generate!("get_segm_qty")
@@ -666,7 +668,7 @@ pub mod insn {
 pub mod func {
     pub use super::ffi::{
         calc_thunk_func_target, fc_block_type_t, func_t, gdl_graph_t, get_func, get_func_num,
-        get_func_qty, getn_func, qbasic_block_t, qflow_chart_t,
+        get_func_qty, getn_func, lock_func, qbasic_block_t, qflow_chart_t,
     };
     pub use super::ffix::{
         idalib_func_flags, idalib_func_flow_chart, idalib_func_name, idalib_qbasic_block_preds,
@@ -699,12 +701,12 @@ pub mod processor {
 
 pub mod segment {
     pub use super::ffi::{
-        get_segm_by_name, get_segm_qty, getnseg, getseg, saAbs, saGroup, saRel1024Bytes,
-        saRel128Bytes, saRel2048Bytes, saRel32Bytes, saRel4K, saRel512Bytes, saRel64Bytes,
-        saRelByte, saRelDble, saRelPage, saRelPara, saRelQword, saRelWord, saRel_MAX_ALIGN_CODE,
-        segment_t, SEGPERM_EXEC, SEGPERM_MAXVAL, SEGPERM_READ, SEGPERM_WRITE, SEG_ABSSYM, SEG_BSS,
-        SEG_CODE, SEG_COMM, SEG_DATA, SEG_GRP, SEG_IMEM, SEG_IMP, SEG_MAX_SEGTYPE_CODE, SEG_NORM,
-        SEG_NULL, SEG_UNDF, SEG_XTRN,
+        get_segm_by_name, get_segm_qty, getnseg, getseg, lock_segment, saAbs, saGroup,
+        saRel1024Bytes, saRel128Bytes, saRel2048Bytes, saRel32Bytes, saRel4K, saRel512Bytes,
+        saRel64Bytes, saRelByte, saRelDble, saRelPage, saRelPara, saRelQword, saRelWord,
+        saRel_MAX_ALIGN_CODE, segment_t, SEGPERM_EXEC, SEGPERM_MAXVAL, SEGPERM_READ, SEGPERM_WRITE,
+        SEG_ABSSYM, SEG_BSS, SEG_CODE, SEG_COMM, SEG_DATA, SEG_GRP, SEG_IMEM, SEG_IMP,
+        SEG_MAX_SEGTYPE_CODE, SEG_NORM, SEG_NULL, SEG_UNDF, SEG_XTRN,
     };
 
     pub use super::ffix::{

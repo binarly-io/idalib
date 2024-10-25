@@ -1,7 +1,9 @@
 use std::marker::PhantomData;
 use std::mem;
+use std::pin::Pin;
 use std::ptr;
 
+use autocxx::moveit::Emplace;
 use bitflags::bitflags;
 use cxx::UniquePtr;
 
@@ -13,6 +15,7 @@ use crate::Address;
 
 pub struct Function<'a> {
     ptr: *mut func_t,
+    _lock: Pin<Box<lock_func>>,
     _marker: PhantomData<&'a IDB>,
 }
 
@@ -161,8 +164,10 @@ bitflags! {
 
 impl<'a> Function<'a> {
     pub(crate) fn from_ptr(ptr: *mut func_t) -> Self {
+        let lock = unsafe { Box::emplace(lock_func::new(ptr)) };
         Self {
             ptr,
+            _lock: lock,
             _marker: PhantomData,
         }
     }

@@ -1,6 +1,8 @@
 use std::marker::PhantomData;
 use std::mem;
+use std::pin::Pin;
 
+use autocxx::moveit::Emplace;
 use bitflags::bitflags;
 
 use crate::ffi::range_t;
@@ -10,6 +12,7 @@ use crate::Address;
 
 pub struct Segment<'a> {
     ptr: *mut segment_t,
+    _lock: Pin<Box<lock_segment>>,
     _marker: PhantomData<&'a IDB>,
 }
 
@@ -63,8 +66,10 @@ pub enum SegmentType {
 
 impl<'a> Segment<'a> {
     pub(crate) fn from_ptr(ptr: *mut segment_t) -> Self {
+        let lock = unsafe { Box::emplace(lock_segment::new(ptr)) };
         Self {
             ptr,
+            _lock: lock,
             _marker: PhantomData,
         }
     }
