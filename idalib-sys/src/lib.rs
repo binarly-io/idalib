@@ -237,6 +237,11 @@ include_cpp! {
     generate!("XREF_PASTEND")
 
     generate!("has_external_refs")
+
+    // comments
+    generate!("get_cmt")
+    generate!("set_cmt")
+    generate!("append_cmt")
 }
 
 pub mod idp {
@@ -348,6 +353,7 @@ mod ffix {
 
         include!("types.h");
         include!("bytes_extras.h");
+        include!("comments_extras.h");
         include!("entry_extras.h");
         include!("func_extras.h");
         include!("inf_extras.h");
@@ -578,6 +584,8 @@ mod ffix {
         unsafe fn idalib_segm_bitness(s: *const segment_t) -> u8;
         unsafe fn idalib_segm_type(s: *const segment_t) -> u8;
 
+        unsafe fn idalib_get_cmt(ea: c_ulonglong, rptble: bool) -> String;
+
         unsafe fn idalib_get_byte(ea: c_ulonglong) -> u8;
         unsafe fn idalib_get_word(ea: c_ulonglong) -> u16;
         unsafe fn idalib_get_dword(ea: c_ulonglong) -> u32;
@@ -724,6 +732,11 @@ pub mod xref {
         xrefblk_t_next_from, xrefblk_t_next_to, XREF_ALL, XREF_BASE, XREF_DATA, XREF_FAR,
         XREF_MASK, XREF_PASTEND, XREF_TAIL, XREF_USER,
     };
+}
+
+pub mod comments {
+    pub use super::ffi::{append_cmt, set_cmt};
+    pub use super::ffix::idalib_get_cmt;
 }
 
 pub mod ida {
