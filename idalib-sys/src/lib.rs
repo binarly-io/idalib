@@ -24,6 +24,13 @@ impl IDAError {
     {
         Self::Ffi(anyhow::Error::from(e))
     }
+
+    pub fn ffi_with<M>(m: M) -> Self
+    where
+        M: std::fmt::Debug + std::fmt::Display + Send + Sync + 'static,
+    {
+        Self::Ffi(anyhow::Error::msg(m))
+    }
 }
 
 include_cpp! {

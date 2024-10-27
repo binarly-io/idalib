@@ -6,6 +6,18 @@ fn main() -> anyhow::Result<()> {
     // Open IDA database
     let idb = IDB::open_with("./tests/ls", true)?;
 
+    println!("Testing remove_cmt() and get_cmt() (pass 1; clear old comments)");
+    for (_id, f) in idb.functions() {
+        let addr = f.start_address();
+
+        // remove_cmt()
+        idb.remove_cmt(addr)?;
+
+        // get_cmt()
+        let read_comment = idb.get_cmt(addr);
+        assert!(read_comment.is_empty());
+    }
+
     println!("Testing set_cmt() and get_cmt()");
     for (id, f) in idb.functions() {
         let addr = f.start_address();
@@ -35,6 +47,19 @@ fn main() -> anyhow::Result<()> {
         let read_comment = idb.get_cmt(addr);
         assert!(read_comment.ends_with("appended by idalib"));
     }
+
+    println!("Testing remove_cmt() and get_cmt() (pass 2)");
+    for (_id, f) in idb.functions() {
+        let addr = f.start_address();
+
+        // remove_cmt()
+        idb.remove_cmt(addr)?;
+
+        // get_cmt()
+        let read_comment = idb.get_cmt(addr);
+        assert!(read_comment.is_empty());
+    }
+
 
     Ok(())
 }

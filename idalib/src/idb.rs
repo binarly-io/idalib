@@ -215,7 +215,7 @@ impl IDB {
     }
 
     pub fn get_cmt(&self, ea: Address) -> String {
-        self.get_cmt_with(ea.into(), false)
+        self.get_cmt_with(ea, false)
     }
 
     pub fn get_cmt_with(&self, ea: Address, rptble: bool) -> String {
@@ -223,7 +223,7 @@ impl IDB {
     }
 
     pub fn set_cmt(&self, ea: Address, comm: impl AsRef<str>) -> Result<(), IDAError> {
-        self.set_cmt_with(ea.into(), comm, false)
+        self.set_cmt_with(ea, comm, false)
     }
 
     pub fn set_cmt_with(
@@ -233,10 +233,13 @@ impl IDB {
         rptble: bool,
     ) -> Result<(), IDAError> {
         let s = CString::new(comm.as_ref()).map_err(IDAError::ffi)?;
-        unsafe {
-            set_cmt(ea.into(), s.as_ptr(), rptble);
+        if unsafe { set_cmt(ea.into(), s.as_ptr(), rptble) } {
+            Ok(())
+        } else {
+            Err(IDAError::ffi_with(format!(
+                "failed to set comment at {ea:#x}"
+            )))
         }
-        Ok(())
     }
 
     pub fn append_cmt(&self, ea: Address, comm: impl AsRef<str>) -> Result<(), IDAError> {
@@ -250,10 +253,28 @@ impl IDB {
         rptble: bool,
     ) -> Result<(), IDAError> {
         let s = CString::new(comm.as_ref()).map_err(IDAError::ffi)?;
-        unsafe {
-            append_cmt(ea.into(), s.as_ptr(), rptble);
+        if unsafe { append_cmt(ea.into(), s.as_ptr(), rptble) } {
+            Ok(())
+        } else {
+            Err(IDAError::ffi_with(format!(
+                "failed to append comment at {ea:#x}"
+            )))
         }
-        Ok(())
+    }
+
+    pub fn remove_cmt(&self, ea: Address) -> Result<(), IDAError> {
+        self.remove_cmt_with(ea, false)
+    }
+
+    pub fn remove_cmt_with(&self, ea: Address, rptble: bool) -> Result<(), IDAError> {
+        let s = CString::new("").map_err(IDAError::ffi)?;
+        if unsafe { set_cmt(ea.into(), s.as_ptr(), rptble) } {
+            Ok(())
+        } else {
+            Err(IDAError::ffi_with(format!(
+                "failed to remove comment at {ea:#x}"
+            )))
+        }
     }
 
     pub fn get_byte(&self, ea: Address) -> u8 {
