@@ -24,6 +24,10 @@ locate the SDK and IDA installation using the following environment variables:
   `$HOME/ida-pro-9.0` for Linux). If not set, the build script will check
   common locations.
 
+### Projects using idalib
+
+- [xorpse/idalib-mp]: example project demonstrating idalib + multi-processing.
+
 ### Examples
 
 A minimal project to working with `idalib` requires the following components:
