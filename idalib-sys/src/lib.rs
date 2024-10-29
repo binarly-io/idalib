@@ -24,6 +24,13 @@ impl IDAError {
     {
         Self::Ffi(anyhow::Error::from(e))
     }
+
+    pub fn ffi_with<M>(m: M) -> Self
+    where
+        M: std::fmt::Debug + std::fmt::Display + Send + Sync + 'static,
+    {
+        Self::Ffi(anyhow::Error::msg(m))
+    }
 }
 
 include_cpp! {
@@ -79,6 +86,7 @@ include_cpp! {
 
     // funcs
     generate!("func_t")
+    generate!("lock_func")
     generate!("get_func")
     generate!("get_func_num")
     generate!("get_func_qty")
@@ -151,6 +159,7 @@ include_cpp! {
 
     // segment
     generate!("segment_t")
+    generate!("lock_segment")
     generate!("getseg")
     generate!("getnseg")
     generate!("get_segm_qty")
@@ -258,6 +267,11 @@ include_cpp! {
     generate!("XREF_PASTEND")
 
     generate!("has_external_refs")
+
+    // comments
+    generate!("get_cmt")
+    generate!("set_cmt")
+    generate!("append_cmt")
 }
 
 pub mod hexrays {
@@ -450,6 +464,7 @@ mod ffix {
 
         include!("types.h");
         include!("bytes_extras.h");
+        include!("comments_extras.h");
         include!("entry_extras.h");
         include!("func_extras.h");
         include!("hexrays_extras.h");
@@ -698,6 +713,8 @@ mod ffix {
         unsafe fn idalib_segm_bitness(s: *const segment_t) -> u8;
         unsafe fn idalib_segm_type(s: *const segment_t) -> u8;
 
+        unsafe fn idalib_get_cmt(ea: c_ulonglong, rptble: bool) -> String;
+
         unsafe fn idalib_get_byte(ea: c_ulonglong) -> u8;
         unsafe fn idalib_get_word(ea: c_ulonglong) -> u16;
         unsafe fn idalib_get_dword(ea: c_ulonglong) -> u32;
@@ -778,7 +795,7 @@ pub mod insn {
 pub mod func {
     pub use super::ffi::{
         calc_thunk_func_target, fc_block_type_t, func_t, gdl_graph_t, get_func, get_func_num,
-        get_func_qty, getn_func, qbasic_block_t, qflow_chart_t,
+        get_func_qty, getn_func, lock_func, qbasic_block_t, qflow_chart_t,
     };
     pub use super::ffix::{
         idalib_func_flags, idalib_func_flow_chart, idalib_func_name, idalib_qbasic_block_preds,
@@ -811,12 +828,12 @@ pub mod processor {
 
 pub mod segment {
     pub use super::ffi::{
-        get_segm_by_name, get_segm_qty, getnseg, getseg, saAbs, saGroup, saRel1024Bytes,
-        saRel128Bytes, saRel2048Bytes, saRel32Bytes, saRel4K, saRel512Bytes, saRel64Bytes,
-        saRelByte, saRelDble, saRelPage, saRelPara, saRelQword, saRelWord, saRel_MAX_ALIGN_CODE,
-        segment_t, SEGPERM_EXEC, SEGPERM_MAXVAL, SEGPERM_READ, SEGPERM_WRITE, SEG_ABSSYM, SEG_BSS,
-        SEG_CODE, SEG_COMM, SEG_DATA, SEG_GRP, SEG_IMEM, SEG_IMP, SEG_MAX_SEGTYPE_CODE, SEG_NORM,
-        SEG_NULL, SEG_UNDF, SEG_XTRN,
+        get_segm_by_name, get_segm_qty, getnseg, getseg, lock_segment, saAbs, saGroup,
+        saRel1024Bytes, saRel128Bytes, saRel2048Bytes, saRel32Bytes, saRel4K, saRel512Bytes,
+        saRel64Bytes, saRelByte, saRelDble, saRelPage, saRelPara, saRelQword, saRelWord,
+        saRel_MAX_ALIGN_CODE, segment_t, SEGPERM_EXEC, SEGPERM_MAXVAL, SEGPERM_READ, SEGPERM_WRITE,
+        SEG_ABSSYM, SEG_BSS, SEG_CODE, SEG_COMM, SEG_DATA, SEG_GRP, SEG_IMEM, SEG_IMP,
+        SEG_MAX_SEGTYPE_CODE, SEG_NORM, SEG_NULL, SEG_UNDF, SEG_XTRN,
     };
 
     pub use super::ffix::{
@@ -844,6 +861,11 @@ pub mod xref {
         xrefblk_t_next_from, xrefblk_t_next_to, XREF_ALL, XREF_BASE, XREF_DATA, XREF_FAR,
         XREF_MASK, XREF_PASTEND, XREF_TAIL, XREF_USER,
     };
+}
+
+pub mod comments {
+    pub use super::ffi::{append_cmt, set_cmt};
+    pub use super::ffix::idalib_get_cmt;
 }
 
 pub mod ida {

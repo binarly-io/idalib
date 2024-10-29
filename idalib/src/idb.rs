@@ -4,6 +4,7 @@ use std::mem::MaybeUninit;
 use std::path::{Path, PathBuf};
 
 use crate::ffi::bytes::*;
+use crate::ffi::comments::{append_cmt, idalib_get_cmt, set_cmt};
 use crate::ffi::entry::{get_entry, get_entry_ordinal, get_entry_qty};
 use crate::ffi::func::{get_func, get_func_qty, getn_func};
 use crate::ffi::hexrays::{decompile_func, init_hexrays_plugin, term_hexrays_plugin};
@@ -236,6 +237,69 @@ impl IDB {
             Some(XRef::from_repr(unsafe { xref.assume_init() }))
         } else {
             None
+        }
+    }
+
+    pub fn get_cmt(&self, ea: Address) -> String {
+        self.get_cmt_with(ea, false)
+    }
+
+    pub fn get_cmt_with(&self, ea: Address, rptble: bool) -> String {
+        unsafe { idalib_get_cmt(ea.into(), rptble) }
+    }
+
+    pub fn set_cmt(&self, ea: Address, comm: impl AsRef<str>) -> Result<(), IDAError> {
+        self.set_cmt_with(ea, comm, false)
+    }
+
+    pub fn set_cmt_with(
+        &self,
+        ea: Address,
+        comm: impl AsRef<str>,
+        rptble: bool,
+    ) -> Result<(), IDAError> {
+        let s = CString::new(comm.as_ref()).map_err(IDAError::ffi)?;
+        if unsafe { set_cmt(ea.into(), s.as_ptr(), rptble) } {
+            Ok(())
+        } else {
+            Err(IDAError::ffi_with(format!(
+                "failed to set comment at {ea:#x}"
+            )))
+        }
+    }
+
+    pub fn append_cmt(&self, ea: Address, comm: impl AsRef<str>) -> Result<(), IDAError> {
+        self.append_cmt_with(ea.into(), comm, false)
+    }
+
+    pub fn append_cmt_with(
+        &self,
+        ea: Address,
+        comm: impl AsRef<str>,
+        rptble: bool,
+    ) -> Result<(), IDAError> {
+        let s = CString::new(comm.as_ref()).map_err(IDAError::ffi)?;
+        if unsafe { append_cmt(ea.into(), s.as_ptr(), rptble) } {
+            Ok(())
+        } else {
+            Err(IDAError::ffi_with(format!(
+                "failed to append comment at {ea:#x}"
+            )))
+        }
+    }
+
+    pub fn remove_cmt(&self, ea: Address) -> Result<(), IDAError> {
+        self.remove_cmt_with(ea, false)
+    }
+
+    pub fn remove_cmt_with(&self, ea: Address, rptble: bool) -> Result<(), IDAError> {
+        let s = CString::new("").map_err(IDAError::ffi)?;
+        if unsafe { set_cmt(ea.into(), s.as_ptr(), rptble) } {
+            Ok(())
+        } else {
+            Err(IDAError::ffi_with(format!(
+                "failed to remove comment at {ea:#x}"
+            )))
         }
     }
 
