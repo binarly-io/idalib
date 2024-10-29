@@ -44,6 +44,7 @@ include_cpp! {
     #include "ida/ida.hpp"
     #include "ida/idalib.hpp"
     #include "ida/idp.hpp"
+    #include "ida/moves.hpp"
     #include "ida/pro.h"
     #include "ida/segment.hpp"
     #include "ida/ua.hpp"
@@ -251,6 +252,15 @@ include_cpp! {
     generate!("get_cmt")
     generate!("set_cmt")
     generate!("append_cmt")
+
+    // bookmarks
+    generate!("bookmarks_t") // TODO: is this needed?
+
+    generate!("bookmarks_t_mark") // TODO
+    generate!("bookmarks_t_get") // TODO
+    generate!("bookmarks_t_size") // TODO
+
+    generate!("MAX_MARK_SLOT") // TODO
 }
 
 pub mod idp {
