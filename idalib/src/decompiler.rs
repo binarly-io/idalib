@@ -1,5 +1,4 @@
 use std::marker::PhantomData;
-use std::mem;
 
 use crate::ffi::hexrays::{
     cblock_iter, cblock_t, cfunc_t, cfuncptr_t, cinsn_t, idalib_hexrays_cblock_iter,
@@ -42,6 +41,7 @@ impl<'a> Iterator for CBlockIter<'a> {
 }
 
 pub struct CInsn<'a> {
+    #[allow(unused)]
     ptr: *mut cinsn_t,
     _marker: PhantomData<&'a ()>,
 }
@@ -67,10 +67,6 @@ impl<'a> CFunction<'a> {
 
     fn as_cfunc(&self) -> &cfunc_t {
         unsafe { self.ptr.as_ref().expect("valid pointer") }
-    }
-
-    fn as_cfunc_mut(&self) -> &mut cfunc_t {
-        unsafe { self.ptr.as_mut().expect("valid pointer") }
     }
 
     pub fn body(&self) -> CBlock {
