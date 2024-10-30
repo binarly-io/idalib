@@ -4,8 +4,8 @@ use std::mem::MaybeUninit;
 use std::path::{Path, PathBuf};
 
 use crate::ffi::bookmarks::{
-    idalib_bookmarks_t_find_index, idalib_bookmarks_t_get_desc, idalib_bookmarks_t_mark,
-    idalib_bookmarks_t_size,
+    idalib_bookmarks_t_erase, idalib_bookmarks_t_find_index, idalib_bookmarks_t_get_desc,
+    idalib_bookmarks_t_mark, idalib_bookmarks_t_size,
 };
 use crate::ffi::bytes::*;
 use crate::ffi::comments::{append_cmt, idalib_get_cmt, set_cmt};
@@ -304,7 +304,7 @@ impl IDB {
             Ok(slot)
         } else {
             Err(IDAError::ffi_with(format!(
-                "failed to set bookmark at {ea:#x}"
+                "failed to set bookmark at address {ea:#x}, index {index}"
             )))
         }
     }
@@ -318,7 +318,17 @@ impl IDB {
             Ok(index)
         } else {
             Err(IDAError::ffi_with(format!(
-                "failed to find bookmark index for {ea:#x}"
+                "failed to find bookmark index for address {ea:#x}"
+            )))
+        }
+    }
+
+    pub fn bookmarks_erase(&self, index: u32) -> Result<(), IDAError> {
+        if unsafe { idalib_bookmarks_t_erase(index.into()) } {
+            Ok(())
+        } else {
+            Err(IDAError::ffi_with(format!(
+                "failed to erase bookmark at index {index}"
             )))
         }
     }

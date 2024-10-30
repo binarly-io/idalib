@@ -1,8 +1,11 @@
+use idalib::enable_console_messages;
 use idalib::idb::IDB;
 
 // TODO
 fn main() -> anyhow::Result<()> {
     println!("Trying to open IDA database...");
+
+    enable_console_messages(true);
 
     // Open IDA database
     let idb = IDB::open_with("./tests/ls", true)?;
@@ -40,7 +43,21 @@ fn main() -> anyhow::Result<()> {
 
     for (id, f) in idb.functions() {
         let addr = f.start_address();
-        println!("{addr:#x} {}", idb.bookmarks_find_index(addr)?);
+        let index = idb.bookmarks_find_index(addr)?;
+        println!("{addr:#x} {index}");
+
+        //idb.bookmarks_erase(index)?;
+    }
+
+    idb.bookmarks_erase(1)?; // TODO: beware that indexes are translated left when an entry is deleted...
+                             //idb.bookmarks_erase(1000)?; // TODO: this causes internal error 1312 with leftover project files... Implement a check that index is not higher than size
+    idb.bookmarks_erase(idb.bookmarks_size() - 1)?; //
+
+    for i in 0..idb.bookmarks_size() {
+        let read_desc = idb.bookmarks_get_desc(i);
+        println!("XXX {read_desc}");
+
+        //idb.bookmarks_erase(i)?;
     }
 
     /*

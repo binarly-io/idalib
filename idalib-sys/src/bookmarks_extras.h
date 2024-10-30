@@ -46,7 +46,6 @@ rust::u32 idalib_bookmarks_t_mark(ea_t ea, uint32 index, const char *desc) {
   return bookmarks_t_mark(e, index, nullptr, desc, nullptr);
 }
 
-// TODO
 rust::u32 idalib_bookmarks_t_find_index(ea_t ea) {
   idaplace_t ipl(ea, 0);
   renderer_info_t rinfo;
@@ -58,7 +57,6 @@ rust::u32 idalib_bookmarks_t_find_index(ea_t ea) {
   return bookmarks_t_find_index(e, nullptr);
 }
 
-// TODO
 bool idalib_bookmarks_t_erase(uint32 index) {
   ea_t ea = 0;
 
