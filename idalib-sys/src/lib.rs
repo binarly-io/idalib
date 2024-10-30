@@ -253,7 +253,7 @@ include_cpp! {
     generate!("append_cmt")
 
     // bookmarks
-    generate!("MAX_MARK_SLOT")
+    generate!("MAX_MARK_SLOT") // TODO: check this?
 }
 
 pub mod idp {

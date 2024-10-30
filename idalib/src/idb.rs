@@ -289,6 +289,8 @@ impl IDB {
         title: impl AsRef<str>,
         desc: impl AsRef<str>,
     ) -> Result<u32, IDAError> {
+        const BOOKMARKS_BAD_INDEX: u32 = 0xffffffff; // (uint32(-1))
+
         let title = CString::new(title.as_ref()).map_err(IDAError::ffi)?;
         let desc = CString::new(desc.as_ref()).map_err(IDAError::ffi)?;
 
@@ -296,8 +298,7 @@ impl IDB {
             idalib_bookmarks_t_mark(ea.into(), index.into(), title.as_ptr(), desc.as_ptr())
         };
 
-        // TODO: this doesn't work when bookmarks are overwritten...
-        if slot <= MAX_MARK_SLOT {
+        if slot != BOOKMARKS_BAD_INDEX {
             Ok(slot)
         } else {
             Err(IDAError::ffi_with(format!(
