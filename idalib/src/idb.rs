@@ -3,6 +3,7 @@ use std::marker::PhantomData;
 use std::mem::MaybeUninit;
 use std::path::{Path, PathBuf};
 
+use crate::ffi::bookmarks::idalib_bookmarks_t_size;
 use crate::ffi::bytes::*;
 use crate::ffi::comments::{append_cmt, idalib_get_cmt, set_cmt};
 use crate::ffi::entry::{get_entry, get_entry_ordinal, get_entry_qty};
@@ -275,6 +276,10 @@ impl IDB {
                 "failed to remove comment at {ea:#x}"
             )))
         }
+    }
+
+    pub fn bookmarks_size(&self, ea: Address) -> u32 {
+        unsafe { idalib_bookmarks_t_size(ea.into()) }
     }
 
     pub fn get_byte(&self, ea: Address) -> u8 {

@@ -254,13 +254,16 @@ include_cpp! {
     generate!("append_cmt")
 
     // bookmarks
-    generate!("bookmarks_t") // TODO: is this needed?
+    //generate!("idaplace_t")
+    //generate!("renderer_info_t")
+    //generate!("lochist_entry_t")
+    //generate!("bookmarks_t") // TODO: is this needed?
 
-    generate!("bookmarks_t_mark") // TODO
-    generate!("bookmarks_t_get") // TODO
     generate!("bookmarks_t_size") // TODO
+    //generate!("bookmarks_t_mark") // TODO
+    //generate!("bookmarks_t_get") // TODO
 
-    generate!("MAX_MARK_SLOT") // TODO
+    //generate!("MAX_MARK_SLOT") // TODO
 }
 
 pub mod idp {
@@ -371,6 +374,7 @@ mod ffix {
         include!("ida/idalib.hpp");
 
         include!("types.h");
+        include!("bookmarks_extras.h");
         include!("bytes_extras.h");
         include!("comments_extras.h");
         include!("entry_extras.h");
@@ -605,6 +609,8 @@ mod ffix {
 
         unsafe fn idalib_get_cmt(ea: c_ulonglong, rptble: bool) -> String;
 
+        unsafe fn idalib_bookmarks_t_size(ea: c_ulonglong) -> u32;
+
         unsafe fn idalib_get_byte(ea: c_ulonglong) -> u8;
         unsafe fn idalib_get_word(ea: c_ulonglong) -> u16;
         unsafe fn idalib_get_dword(ea: c_ulonglong) -> u32;
@@ -756,6 +762,10 @@ pub mod xref {
 pub mod comments {
     pub use super::ffi::{append_cmt, set_cmt};
     pub use super::ffix::idalib_get_cmt;
+}
+
+pub mod bookmarks {
+    pub use super::ffix::idalib_bookmarks_t_size;
 }
 
 pub mod ida {
