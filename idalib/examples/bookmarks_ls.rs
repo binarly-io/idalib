@@ -14,6 +14,8 @@ fn main() -> anyhow::Result<()> {
         let n = idb.bookmarks_size(addr);
         println!("{n}");
 
+        idb.bookmarks_mark(addr, n, "test_title", "test_description")?;
+
         // get_cmt()
         //let read_comment = idb.get_cmt(addr);
         //assert!(read_comment.is_empty());
