@@ -251,9 +251,6 @@ include_cpp! {
     // comments
     generate!("set_cmt")
     generate!("append_cmt")
-
-    // bookmarks
-    generate!("MAX_MARK_SLOT") // TODO: check this?
 }
 
 pub mod idp {
@@ -599,11 +596,11 @@ mod ffix {
 
         unsafe fn idalib_get_cmt(ea: c_ulonglong, rptble: bool) -> String;
 
-        unsafe fn idalib_bookmarks_t_size(ea: c_ulonglong) -> u32;
+        unsafe fn idalib_bookmarks_t_size() -> u32;
+        unsafe fn idalib_bookmarks_t_get_desc(index: c_uint) -> String;
         unsafe fn idalib_bookmarks_t_mark(
             ea: c_ulonglong,
             index: c_uint,
-            title: *const c_char,
             desc: *const c_char,
         ) -> u32;
 
@@ -761,8 +758,9 @@ pub mod comments {
 }
 
 pub mod bookmarks {
-    pub use super::ffi::MAX_MARK_SLOT;
-    pub use super::ffix::{idalib_bookmarks_t_mark, idalib_bookmarks_t_size};
+    pub use super::ffix::{
+        idalib_bookmarks_t_get_desc, idalib_bookmarks_t_mark, idalib_bookmarks_t_size,
+    };
 }
 
 pub mod ida {

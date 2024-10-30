@@ -3,7 +3,9 @@ use std::marker::PhantomData;
 use std::mem::MaybeUninit;
 use std::path::{Path, PathBuf};
 
-use crate::ffi::bookmarks::{idalib_bookmarks_t_mark, idalib_bookmarks_t_size, MAX_MARK_SLOT};
+use crate::ffi::bookmarks::{
+    idalib_bookmarks_t_get_desc, idalib_bookmarks_t_mark, idalib_bookmarks_t_size,
+};
 use crate::ffi::bytes::*;
 use crate::ffi::comments::{append_cmt, idalib_get_cmt, set_cmt};
 use crate::ffi::entry::{get_entry, get_entry_ordinal, get_entry_qty};
@@ -278,25 +280,24 @@ impl IDB {
         }
     }
 
-    pub fn bookmarks_size(&self, ea: Address) -> u32 {
-        unsafe { idalib_bookmarks_t_size(ea.into()) }
+    pub fn bookmarks_size(&self) -> u32 {
+        unsafe { idalib_bookmarks_t_size() }
+    }
+
+    pub fn bookmarks_get_desc(&self, index: u32) -> String {
+        unsafe { idalib_bookmarks_t_get_desc(index.into()) }
     }
 
     pub fn bookmarks_mark(
         &self,
         ea: Address,
         index: u32,
-        title: impl AsRef<str>,
         desc: impl AsRef<str>,
     ) -> Result<u32, IDAError> {
         const BOOKMARKS_BAD_INDEX: u32 = 0xffffffff; // (uint32(-1))
-
-        let title = CString::new(title.as_ref()).map_err(IDAError::ffi)?;
         let desc = CString::new(desc.as_ref()).map_err(IDAError::ffi)?;
 
-        let slot = unsafe {
-            idalib_bookmarks_t_mark(ea.into(), index.into(), title.as_ptr(), desc.as_ptr())
-        };
+        let slot = unsafe { idalib_bookmarks_t_mark(ea.into(), index.into(), desc.as_ptr()) };
 
         if slot != BOOKMARKS_BAD_INDEX {
             Ok(slot)

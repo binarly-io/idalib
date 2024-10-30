@@ -1,25 +1,49 @@
 use idalib::idb::IDB;
 
+// TODO
 fn main() -> anyhow::Result<()> {
-    println!("Trying to open IDA database... ");
+    println!("Trying to open IDA database...");
 
     // Open IDA database
     let idb = IDB::open_with("./tests/ls", true)?;
 
-    println!("Testing bookmarks_size()");
-    for (_id, f) in idb.functions() {
+    //println!("Testing remove_cmt() and get_cmt() (pass 1; clear old comments)");
+    for (id, f) in idb.functions() {
         let addr = f.start_address();
+        let desc = format!(
+            "Bookmark added by idalib: {id} {} {:#x}",
+            f.name().unwrap(),
+            addr
+        );
+
+        println!("{}", idb.bookmarks_size());
+
+        idb.bookmarks_mark(addr, idb.bookmarks_size(), &desc)?;
 
         // bookmarks_size()
-        let n = idb.bookmarks_size(addr);
-        println!("{n}");
-
-        idb.bookmarks_mark(addr, n, "test_title", "test_description")?;
-
-        // get_cmt()
-        //let read_comment = idb.get_cmt(addr);
-        //assert!(read_comment.is_empty());
+        /*
+        let mut i = 0;
+        while i < idb.bookmarks_size() {
+            if idb.bookmarks_get_desc(i).is_empty() {
+                break;
+            }
+            i += 1;
+        }
+        idb.bookmarks_mark(addr, i, &desc)?;
+         */
     }
+
+    for i in 0..idb.bookmarks_size() {
+        let read_desc = idb.bookmarks_get_desc(i);
+        println!("{read_desc}");
+    }
+
+    /*
+    println!("Testing bookmarks_size()");
+    for i in 0..idb.bookmarks_size() {
+        println!("{i}");
+    }
+    */
 
     /*
     println!("Testing set_cmt() and get_cmt()");
