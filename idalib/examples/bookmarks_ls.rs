@@ -18,7 +18,7 @@ fn main() -> anyhow::Result<()> {
 
         println!("{}", idb.bookmarks_size());
 
-        idb.bookmarks_mark(addr, idb.bookmarks_size(), &desc)?;
+        idb.bookmarks_mark(addr, idb.bookmarks_size(), &desc)?; // TODO: print returned slot
 
         // bookmarks_size()
         /*
