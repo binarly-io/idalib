@@ -4,7 +4,8 @@ use std::mem::MaybeUninit;
 use std::path::{Path, PathBuf};
 
 use crate::ffi::bookmarks::{
-    idalib_bookmarks_t_get_desc, idalib_bookmarks_t_mark, idalib_bookmarks_t_size,
+    idalib_bookmarks_t_find_index, idalib_bookmarks_t_get_desc, idalib_bookmarks_t_mark,
+    idalib_bookmarks_t_size,
 };
 use crate::ffi::bytes::*;
 use crate::ffi::comments::{append_cmt, idalib_get_cmt, set_cmt};
@@ -304,6 +305,20 @@ impl IDB {
         } else {
             Err(IDAError::ffi_with(format!(
                 "failed to set bookmark at {ea:#x}"
+            )))
+        }
+    }
+
+    pub fn bookmarks_find_index(&self, ea: Address) -> Result<u32, IDAError> {
+        const BOOKMARKS_BAD_INDEX: u32 = 0xffffffff; // (uint32(-1))
+
+        let index = unsafe { idalib_bookmarks_t_find_index(ea.into()) };
+
+        if index != BOOKMARKS_BAD_INDEX {
+            Ok(index)
+        } else {
+            Err(IDAError::ffi_with(format!(
+                "failed to find bookmark index for {ea:#x}"
             )))
         }
     }

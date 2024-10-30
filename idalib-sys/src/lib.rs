@@ -603,6 +603,7 @@ mod ffix {
             index: c_uint,
             desc: *const c_char,
         ) -> u32;
+        unsafe fn idalib_bookmarks_t_find_index(ea: c_ulonglong) -> u32;
 
         unsafe fn idalib_get_byte(ea: c_ulonglong) -> u8;
         unsafe fn idalib_get_word(ea: c_ulonglong) -> u16;
@@ -759,7 +760,8 @@ pub mod comments {
 
 pub mod bookmarks {
     pub use super::ffix::{
-        idalib_bookmarks_t_get_desc, idalib_bookmarks_t_mark, idalib_bookmarks_t_size,
+        idalib_bookmarks_t_find_index, idalib_bookmarks_t_get_desc, idalib_bookmarks_t_mark,
+        idalib_bookmarks_t_size,
     };
 }
 

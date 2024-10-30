@@ -16,7 +16,7 @@ fn main() -> anyhow::Result<()> {
             addr
         );
 
-        println!("{}", idb.bookmarks_size());
+        //println!("{}", idb.bookmarks_size());
 
         idb.bookmarks_mark(addr, idb.bookmarks_size(), &desc)?; // TODO: print returned slot
 
@@ -36,6 +36,11 @@ fn main() -> anyhow::Result<()> {
     for i in 0..idb.bookmarks_size() {
         let read_desc = idb.bookmarks_get_desc(i);
         println!("{read_desc}");
+    }
+
+    for (id, f) in idb.functions() {
+        let addr = f.start_address();
+        println!("{addr:#x} {}", idb.bookmarks_find_index(addr)?);
     }
 
     /*
