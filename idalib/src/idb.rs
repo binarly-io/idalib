@@ -323,7 +323,14 @@ impl IDB {
         }
     }
 
+    // Note: when a bookmark is erased, all the following indexes are decremented to fill the gap
     pub fn bookmarks_erase(&self, index: u32) -> Result<(), IDAError> {
+        // Prevent IDA Pro's internal error 1312 that triggers when an invalid index is supplied
+        if index >= self.bookmarks_size() {
+            return Err(IDAError::ffi_with(format!(
+                "failed to erase bookmark at index {index}"
+            )));
+        }
         if unsafe { idalib_bookmarks_t_erase(index.into()) } {
             Ok(())
         } else {
