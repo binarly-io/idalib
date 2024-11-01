@@ -16,10 +16,10 @@ fn main() -> anyhow::Result<()> {
         // bookmarks_get_desc()
         let result = idb.bookmarks_get_desc(addr);
         assert!(result.is_err());
-
-        // bookmarks_size()
-        assert_eq!(idb.bookmarks_size(), 0);
     }
+
+    // bookmarks_size()
+    assert_eq!(idb.bookmarks_size(), 0);
 
     println!("Testing bookmarks_mark() and bookmarks_get_desc()");
     for (id, f) in idb.functions() {
