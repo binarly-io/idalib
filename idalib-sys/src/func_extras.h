@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ida/pro.h"
-#include "ida/funcs.hpp"
-#include "ida/gdl.hpp"
+#include "pro.h"
+#include "funcs.hpp"
+#include "gdl.hpp"
 
 #include <cstdint>
 #include <exception>

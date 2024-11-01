@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ida/pro.h"
-#include "ida/bytes.hpp"
-#include "ida/segment.hpp"
+#include "pro.h"
+#include "bytes.hpp"
+#include "segment.hpp"
 
 #include <cstdint>
 #include <exception>

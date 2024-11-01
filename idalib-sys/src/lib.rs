@@ -37,18 +37,18 @@ include_cpp! {
     // NOTE: this fixes autocxx's inability to detect ea_t, optype_t as POD...
     #include "types.h"
 
-    #include "ida/bytes.hpp"
-    #include "ida/entry.hpp"
-    #include "ida/funcs.hpp"
-    #include "ida/gdl.hpp"
-    #include "ida/ida.hpp"
-    #include "ida/idalib.hpp"
-    #include "ida/idp.hpp"
-    #include "ida/pro.h"
-    #include "ida/segment.hpp"
-    #include "ida/ua.hpp"
-    #include "ida/xref.hpp"
-    #include "ida/hexrays.hpp"
+    #include "bytes.hpp"
+    #include "entry.hpp"
+    #include "funcs.hpp"
+    #include "gdl.hpp"
+    #include "ida.hpp"
+    #include "idalib.hpp"
+    #include "idp.hpp"
+    #include "pro.h"
+    #include "segment.hpp"
+    #include "ua.hpp"
+    #include "xref.hpp"
+    #include "hexrays.hpp"
 
     generate!("qstring")
 
@@ -460,7 +460,7 @@ pub mod pod {
 mod ffix {
     unsafe extern "C++" {
         include!("autocxxgen_ffi.h");
-        include!("ida/idalib.hpp");
+        include!("idalib.hpp");
 
         include!("types.h");
         include!("bytes_extras.h");
