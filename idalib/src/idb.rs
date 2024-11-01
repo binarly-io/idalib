@@ -319,8 +319,14 @@ impl IDB {
         unsafe { idalib_bookmarks_t_get_desc(index.into()) }
     }
 
-    // Note: When a bookmark is erased, all the following indexes are decremented to fill the gap
-    pub fn bookmarks_erase(&self, index: u32) -> Result<(), IDAError> {
+    pub fn bookmarks_erase(&self, ea: Address) -> Result<(), IDAError> {
+        self.bookmarks_erase_with(self.bookmarks_find_index(ea)?)
+    }
+
+    // Notes:
+    // * When a bookmark is erased, all the following indexes are decremented to fill the gap
+    // * The address parameter has been removed because it is unused by IDA Pro's API
+    pub fn bookmarks_erase_with(&self, index: u32) -> Result<(), IDAError> {
         // Prevent IDA Pro's internal error 1312 that triggers when an invalid index is supplied
         if index >= self.bookmarks_size() {
             return Err(IDAError::ffi_with(format!(

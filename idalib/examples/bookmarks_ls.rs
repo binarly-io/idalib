@@ -42,24 +42,31 @@ fn main() -> anyhow::Result<()> {
          */
     }
 
-    for i in 0..idb.bookmarks_size() {
-        let slot = idb.bookmarks_mark_with(0xc380, 0, "test")?;
-        //let read_desc = idb.bookmarks_get_desc(i);
-        //let read_desc = idb.bookmarks_get_desc_with(0xc380);
-        //println!("{i} {read_desc}");
-    }
+    for (id, f) in idb.functions() {
+        let addr = f.start_address();
+        let desc = format!(
+            "Bookmark added by idalib: {id} {} {:#x}",
+            f.name().unwrap(),
+            addr
+        );
 
-    for i in 0..=10 {
-        idb.bookmarks_erase(i)?;
+        idb.bookmarks_erase(addr)?;
         println!("bookmarks_size => {}", idb.bookmarks_size());
     }
 
-    for i in 0..idb.bookmarks_size() {
-        //let read_desc = idb.bookmarks_get_desc(i);
-        //println!("bookmarks_get_desc => {i} {read_desc}");
+    for (id, f) in idb.functions() {
+        let addr = f.start_address();
+        let desc = format!(
+            "Bookmark added by idalib: {id} {} {:#x}",
+            f.name().unwrap(),
+            addr
+        );
+
+        let read_desc = idb.bookmarks_get_desc(addr)?;
+        println!("bookmarks_get_desc => {addr} {read_desc}");
     }
 
-    idb.bookmarks_erase(idb.bookmarks_size() - 1)?;
+    idb.bookmarks_erase_with(idb.bookmarks_size() - 1)?;
 
     /*
     for (id, f) in idb.functions() {
