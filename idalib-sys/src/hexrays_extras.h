@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ida/hexrays.hpp"
-#include "ida/lines.hpp"
-#include "ida/pro.h"
+#include "hexrays.hpp"
+#include "lines.hpp"
+#include "pro.h"
 
 #include <cstdint>
 #include <memory>
