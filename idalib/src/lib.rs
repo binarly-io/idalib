@@ -24,7 +24,7 @@ extern "C" {
 
 pub(crate) type IDARuntimeHandle = MutexGuard<'static, ()>;
 
-fn force_batch_mode() {
+pub fn force_batch_mode() {
     unsafe {
         batch = 1;
     }
