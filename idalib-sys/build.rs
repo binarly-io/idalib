@@ -1,5 +1,4 @@
 use std::env;
-use std::fs;
 use std::path::{Path, PathBuf};
 
 use autocxx_bindgen::Builder as BindgenBuilder;
@@ -27,32 +26,15 @@ fn configure_and_generate(builder: BindgenBuilder, ida: &Path, output: impl AsRe
 }
 
 fn main() {
-    let headers = PathBuf::from(env::var("OUT_DIR").unwrap()).join("headers");
-
-    cxx_build::CFG.exported_header_dirs.push(&headers);
-
     let sdk_path = PathBuf::from(env::var("IDASDKDIR").expect("IDASDKDIR should be set"));
-    let sdk_includes = sdk_path.join("include");
+    let ida = sdk_path.join("include");
 
-    let ida = headers.join("ida");
-
-    fs::create_dir_all(&ida).unwrap();
-
-    for header in fs::read_dir(&sdk_includes).unwrap() {
-        let header = header.unwrap();
-        let typ = header.file_type().unwrap();
-
-        if !typ.is_file() {
-            continue;
-        }
-
-        fs::copy(header.path(), ida.join(header.file_name())).unwrap();
-    }
+    cxx_build::CFG.exported_header_dirs.push(&ida);
 
     let ffi_path = PathBuf::from("src");
 
     let mut builder =
-        autocxx_build::Builder::new(ffi_path.join("lib.rs"), &[&ffi_path, &headers, &ida])
+        autocxx_build::Builder::new(ffi_path.join("lib.rs"), &[&ffi_path, &ida])
             .extra_clang_args(
                 #[cfg(target_os = "linux")]
                 &["-std=c++17", "-D__LINUX__=1", "-D__EA64__=1"],
