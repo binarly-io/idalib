@@ -1,7 +1,7 @@
 use idalib::idb::IDB;
 
 fn main() -> anyhow::Result<()> {
-    println!("Trying to open IDA database... ");
+    println!("Trying to open IDA database...");
 
     // Open IDA database
     let idb = IDB::open_with("./tests/ls", true)?;
@@ -59,7 +59,6 @@ fn main() -> anyhow::Result<()> {
         let read_comment = idb.get_cmt(addr);
         assert!(read_comment.is_empty());
     }
-
 
     Ok(())
 }

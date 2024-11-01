@@ -1,47 +1,27 @@
-use idalib::enable_console_messages;
 use idalib::idb::IDB;
 
-// TODO
 fn main() -> anyhow::Result<()> {
     println!("Trying to open IDA database...");
-
-    enable_console_messages(true);
 
     // Open IDA database
     let idb = IDB::open_with("./tests/ls", true)?;
 
-    println!("bookmarks_size => {}", idb.bookmarks_size());
-
-    //println!("Testing remove_cmt() and get_cmt() (pass 1; clear old comments)");
-    for (id, f) in idb.functions() {
+    println!("Testing bookmarks_erase(), bookmarks_get_desc(), and bookmarks_size() (pass 1; clear old bookmarks)");
+    for (_id, f) in idb.functions() {
         let addr = f.start_address();
-        let desc = format!(
-            "Bookmark added by idalib: {id} {} {:#x}",
-            f.name().unwrap(),
-            addr
-        );
 
-        //println!("{}", idb.bookmarks_size());
+        // bookmarks_erase(), ignore errors
+        let _ = idb.bookmarks_erase(addr);
 
-        let slot = idb.bookmarks_mark(addr, &desc)?;
-        println!("bookmarks_mark => {slot}");
-
-        let read_desc = idb.bookmarks_get_desc(addr)?;
-        println!("{addr:#x} {read_desc}");
+        // bookmarks_get_desc()
+        let result = idb.bookmarks_get_desc(addr);
+        assert!(result.is_err());
 
         // bookmarks_size()
-        /*
-        let mut i = 0;
-        while i < idb.bookmarks_size() {
-            if idb.bookmarks_get_desc(i).is_empty() {
-                break;
-            }
-            i += 1;
-        }
-        idb.bookmarks_mark(addr, i, &desc)?;
-         */
+        assert_eq!(idb.bookmarks_size(), 0);
     }
 
+    println!("Testing bookmarks_mark() and bookmarks_get_desc()");
     for (id, f) in idb.functions() {
         let addr = f.start_address();
         let desc = format!(
@@ -50,95 +30,28 @@ fn main() -> anyhow::Result<()> {
             addr
         );
 
-        idb.bookmarks_erase(addr)?;
-        println!("bookmarks_size => {}", idb.bookmarks_size());
-    }
+        // bookmarks_mark()
+        let _slot = idb.bookmarks_mark(addr, &desc)?;
 
-    for (id, f) in idb.functions() {
-        let addr = f.start_address();
-        let desc = format!(
-            "Bookmark added by idalib: {id} {} {:#x}",
-            f.name().unwrap(),
-            addr
-        );
-
+        // bookmarks_get_desc()
         let read_desc = idb.bookmarks_get_desc(addr)?;
-        println!("bookmarks_get_desc => {addr} {read_desc}");
+        assert_eq!(read_desc, desc);
     }
 
-    idb.bookmarks_erase_with(idb.bookmarks_size() - 1)?;
-
-    /*
-    for (id, f) in idb.functions() {
-        let addr = f.start_address();
-        let index = idb.bookmarks_find_index(addr)?;
-        println!("{addr:#x} {index}");
-
-        //idb.bookmarks_erase(index)?;
-    }
-
-    idb.bookmarks_erase(1)?; // TODO: beware that indexes are translated left when an entry is deleted...
-                             //idb.bookmarks_erase(1000)?; // TODO: this causes internal error 1312 with leftover project files... Implement a check that index is not higher than size
-    idb.bookmarks_erase(idb.bookmarks_size() - 1)?; //
-
-    for i in 0..idb.bookmarks_size() {
-        let read_desc = idb.bookmarks_get_desc(i);
-        println!("XXX {read_desc}");
-
-        //idb.bookmarks_erase(i)?;
-    }
-    */
-
-    /*
-    println!("Testing bookmarks_size()");
-    for i in 0..idb.bookmarks_size() {
-        println!("{i}");
-    }
-    */
-
-    /*
-    println!("Testing set_cmt() and get_cmt()");
-    for (id, f) in idb.functions() {
-        let addr = f.start_address();
-        let comm = format!(
-            "Comment added by idalib: {id} {} {:#x}",
-            f.name().unwrap(),
-            addr
-        );
-
-        // set_cmt()
-        idb.set_cmt(addr, comm)?;
-
-        // get_cmt()
-        let read_comment = idb.get_cmt(addr);
-        assert!(read_comment.starts_with("Comment added by idalib"));
-    }
-
-    println!("Testing append_cmt() and get_cmt()");
-    for (_id, f) in idb.functions() {
-        let addr = f.start_address();
-        let comm = "Comment appended by idalib";
-
-        // append_cmt()
-        idb.append_cmt(addr, comm)?;
-
-        // get_cmt()
-        let read_comment = idb.get_cmt(addr);
-        assert!(read_comment.ends_with("appended by idalib"));
-    }
-
-    println!("Testing remove_cmt() and get_cmt() (pass 2)");
+    println!("Testing bookmarks_erase(), bookmarks_get_desc(), and bookmarks_size() (pass 2)");
     for (_id, f) in idb.functions() {
         let addr = f.start_address();
 
-        // remove_cmt()
-        idb.remove_cmt(addr)?;
+        // bookmarks_erase()
+        idb.bookmarks_erase(addr)?;
 
-        // get_cmt()
-        let read_comment = idb.get_cmt(addr);
-        assert!(read_comment.is_empty());
+        // bookmarks_get_desc()
+        let result = idb.bookmarks_get_desc(addr);
+        assert!(result.is_err());
     }
-    */
+
+    // bookmarks_size()
+    assert_eq!(idb.bookmarks_size(), 0);
 
     Ok(())
 }
