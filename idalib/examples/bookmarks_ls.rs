@@ -10,6 +10,9 @@ fn main() -> anyhow::Result<()> {
     // Open IDA database
     let idb = IDB::open_with("./tests/ls", true)?;
 
+    let slot = idb.bookmarks_mark_with(0xc380, 100, "test")?;
+    println!("bookmarks_size => {}", idb.bookmarks_size());
+
     //println!("Testing remove_cmt() and get_cmt() (pass 1; clear old comments)");
     for (id, f) in idb.functions() {
         let addr = f.start_address();
@@ -21,7 +24,7 @@ fn main() -> anyhow::Result<()> {
 
         //println!("{}", idb.bookmarks_size());
 
-        let slot = idb.bookmarks_mark(addr, idb.bookmarks_size(), &desc)?;
+        let slot = idb.bookmarks_mark(addr, &desc)?;
         println!("bookmarks_mark => {slot}");
 
         // bookmarks_size()
@@ -38,18 +41,19 @@ fn main() -> anyhow::Result<()> {
     }
 
     for i in 0..idb.bookmarks_size() {
+        let slot = idb.bookmarks_mark_with(0xc380, 0, "test")?;
         let read_desc = idb.bookmarks_get_desc(i);
-        println!("{read_desc}");
+        println!("{i} {read_desc}");
     }
 
     for i in 0..=10 {
         idb.bookmarks_erase(i)?;
-        println!("{}", idb.bookmarks_size());
+        println!("bookmarks_size => {}", idb.bookmarks_size());
     }
 
     for i in 0..idb.bookmarks_size() {
         let read_desc = idb.bookmarks_get_desc(i);
-        println!("{read_desc}");
+        println!("bookmarks_get_desc => {i} {read_desc}");
     }
 
     idb.bookmarks_erase(idb.bookmarks_size() - 1)?;
