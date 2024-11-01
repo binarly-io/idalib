@@ -287,7 +287,7 @@ impl IDB {
 
     // Notes:
     // * Adding a bookmark at an already marked address creates an overlaid bookmark
-    // * Adding a bookmark at an already used index has no effect
+    // * Adding a bookmark at an already used index has no effect and no error is returned
     // * Adding a bookmark at an index > `bookmarks_size()` increments `bookmarks_size()`
     //   accordingly, while leaving the unused bookmark slots empty
     pub fn bookmarks_mark_with(
@@ -310,7 +310,12 @@ impl IDB {
         }
     }
 
-    pub fn bookmarks_get_desc(&self, index: u32) -> String {
+    pub fn bookmarks_get_desc(&self, ea: Address) -> Result<String, IDAError> {
+        Ok(self.bookmarks_get_desc_with(self.bookmarks_find_index(ea)?.into()))
+    }
+
+    // Note: The address parameter has been removed because it is unused by IDA Pro's API
+    pub fn bookmarks_get_desc_with(&self, index: u32) -> String {
         unsafe { idalib_bookmarks_t_get_desc(index.into()) }
     }
 

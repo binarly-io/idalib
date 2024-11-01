@@ -596,15 +596,15 @@ mod ffix {
 
         unsafe fn idalib_get_cmt(ea: c_ulonglong, rptble: bool) -> String;
 
-        unsafe fn idalib_bookmarks_t_size() -> u32;
-        unsafe fn idalib_bookmarks_t_get_desc(index: c_uint) -> String;
         unsafe fn idalib_bookmarks_t_mark(
             ea: c_ulonglong,
             index: c_uint,
             desc: *const c_char,
         ) -> u32;
-        unsafe fn idalib_bookmarks_t_find_index(ea: c_ulonglong) -> u32;
+        unsafe fn idalib_bookmarks_t_get_desc(index: c_uint) -> String;
         unsafe fn idalib_bookmarks_t_erase(index: c_uint) -> bool;
+        unsafe fn idalib_bookmarks_t_size() -> u32;
+        unsafe fn idalib_bookmarks_t_find_index(ea: c_ulonglong) -> u32;
 
         unsafe fn idalib_get_byte(ea: c_ulonglong) -> u8;
         unsafe fn idalib_get_word(ea: c_ulonglong) -> u16;
