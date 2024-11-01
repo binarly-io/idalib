@@ -37,6 +37,7 @@ include_cpp! {
     // NOTE: this fixes autocxx's inability to detect ea_t, optype_t as POD...
     #include "types.h"
 
+    #include "auto.hpp"
     #include "bytes.hpp"
     #include "entry.hpp"
     #include "funcs.hpp"
@@ -49,6 +50,7 @@ include_cpp! {
     #include "ua.hpp"
     #include "xref.hpp"
 
+
     generate!("qstring")
 
     // generate_pod!("cm_t")
@@ -58,6 +60,9 @@ include_cpp! {
     generate_pod!("filetype_t")
     generate_pod!("range_t")
     generate_pod!("uval_t")
+
+    // auto
+    generate!("auto_wait")
 
     // entry
     generate!("get_entry")
@@ -365,6 +370,7 @@ mod ffix {
         include!("comments_extras.h");
         include!("entry_extras.h");
         include!("func_extras.h");
+        include!("kernwin_extras.h");
         include!("inf_extras.h");
         include!("ph_extras.h");
         include!("segm_extras.h");
@@ -389,6 +395,8 @@ mod ffix {
         type segment_t = super::ffi::segment_t;
 
         unsafe fn init_library(argc: c_int, argv: *mut *mut c_char) -> c_int;
+
+        unsafe fn open_database_quiet(name: *const c_char, auto_analysis: bool) -> c_int;
 
         // NOTE: we can't use uval_t here due to it resolving to c_ulonglong,
         // which causes `verify_extern_type` to fail...
@@ -759,6 +767,8 @@ pub mod ida {
     use super::platform::is_main_thread;
     use super::{ea_t, ffi, ffix, IDAError};
 
+    pub use ffi::auto_wait;
+
     // NOTE: once; main thread
     pub fn init_library() -> Result<(), IDAError> {
         if !is_main_thread() {
@@ -816,6 +826,22 @@ pub mod ida {
         let path = CString::new(path.as_ref().to_string_lossy().as_ref()).map_err(IDAError::ffi)?;
 
         let res = unsafe { self::ffi::open_database(path.as_ptr(), auto_analysis) };
+
+        if res != c_int(0) {
+            Err(IDAError::OpenDb(res))
+        } else {
+            Ok(())
+        }
+    }
+
+    pub fn open_database_quiet(path: impl AsRef<Path>, auto_analysis: bool) -> Result<(), IDAError> {
+        if !is_main_thread() {
+            panic!("IDA cannot function correctly when not running on the main thread");
+        }
+
+        let path = CString::new(path.as_ref().to_string_lossy().as_ref()).map_err(IDAError::ffi)?;
+
+        let res = unsafe { self::ffix::open_database_quiet(path.as_ptr(), auto_analysis) };
 
         if res != c_int(0) {
             Err(IDAError::OpenDb(res))

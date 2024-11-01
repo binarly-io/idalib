@@ -7,7 +7,9 @@ use crate::ffi::bytes::*;
 use crate::ffi::comments::{append_cmt, idalib_get_cmt, set_cmt};
 use crate::ffi::entry::{get_entry, get_entry_ordinal, get_entry_qty};
 use crate::ffi::func::{get_func, get_func_qty, getn_func};
-use crate::ffi::ida::{close_database_with, make_signatures, open_database, set_screen_ea};
+use crate::ffi::ida::{
+    auto_wait, close_database_with, make_signatures, open_database_quiet, set_screen_ea,
+};
 use crate::ffi::insn::decode;
 use crate::ffi::processor::get_ph;
 use crate::ffi::segment::{get_segm_qty, getnseg, getseg};
@@ -32,14 +34,18 @@ pub struct IDB {
 
 impl IDB {
     pub fn open(path: impl AsRef<Path>) -> Result<Self, IDAError> {
-        Self::open_with(path, false)
+        Self::open_with(path, true, false)
     }
 
-    pub fn open_with(path: impl AsRef<Path>, save: bool) -> Result<Self, IDAError> {
+    pub fn open_with(
+        path: impl AsRef<Path>,
+        auto_analyse: bool,
+        save: bool,
+    ) -> Result<Self, IDAError> {
         let _guard = prepare_library();
         let path = path.as_ref();
 
-        open_database(path)?;
+        open_database_quiet(path, auto_analyse)?;
 
         Ok(Self {
             path: path.to_owned(),
@@ -55,6 +61,10 @@ impl IDB {
 
     pub fn save_on_close(&mut self, status: bool) {
         self.save = status;
+    }
+
+    pub fn auto_wait(&mut self) -> bool {
+        unsafe { auto_wait() }
     }
 
     pub fn set_screen_address(&mut self, ea: Address) {
