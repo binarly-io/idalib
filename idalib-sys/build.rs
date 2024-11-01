@@ -46,7 +46,10 @@ fn main() {
             continue;
         }
 
-        fs::copy(header.path(), ida.join(header.file_name())).unwrap();
+        let target = ida.join(header.file_name());
+        if fs::read(&target).ok() != fs::read(header.path()).ok() {
+            fs::copy(header.path(), target).unwrap();
+        }
     }
 
     let ffi_path = PathBuf::from("src");
