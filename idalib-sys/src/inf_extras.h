@@ -2,8 +2,8 @@
 
 #include <cstdint>
 
-#include "ida/pro.h"
-#include "ida/ida.hpp"
+#include "pro.h"
+#include "ida.hpp"
 
 #include "cxx.h"
 

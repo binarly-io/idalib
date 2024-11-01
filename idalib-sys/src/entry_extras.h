@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ida/pro.h"
-#include "ida/entry.hpp"
+#include "pro.h"
+#include "entry.hpp"
 
 #include "cxx.h"
 
