@@ -336,6 +336,7 @@ impl IDB {
         }
     }
 
+    // Note: The address parameter has been removed because it is unused by IDA Pro's API
     pub fn bookmarks_size(&self) -> u32 {
         unsafe { idalib_bookmarks_t_size() }
     }
