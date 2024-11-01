@@ -290,6 +290,7 @@ impl IDB {
     // * Adding a bookmark at an already used index has no effect and no error is returned
     // * Adding a bookmark at an index > `bookmarks_size()` increments `bookmarks_size()`
     //   accordingly, while leaving the unused bookmark slots empty
+    // * The MAX_MARK_SLOT = 1024 limit doesn't seem to play an actual role ¯\_(ツ)_/¯
     pub fn bookmarks_mark_with(
         &self,
         ea: Address,
