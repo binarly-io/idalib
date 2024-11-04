@@ -6,22 +6,22 @@ fn main() -> anyhow::Result<()> {
     // Open IDA database
     let idb = IDB::open_with("./tests/ls", true)?;
 
-    println!("Testing bookmarks_erase(), bookmarks_get_desc(), and bookmarks_size() (pass 1; clear old bookmarks)");
+    println!("Testing erase(), get_description(), and len() (pass 1; clear old bookmarks)");
     for (_id, f) in idb.functions() {
         let addr = f.start_address();
 
-        // bookmarks_erase(), ignore errors
-        let _ = idb.bookmarks_erase(addr);
+        // erase(), ignore errors
+        let _ = idb.bookmarks().erase(addr);
 
-        // bookmarks_get_desc()
-        let result = idb.bookmarks_get_desc(addr);
-        assert!(result.is_err());
+        // get_description()
+        let read_desc = idb.bookmarks().get_description(addr);
+        assert!(read_desc.is_none());
     }
 
-    // bookmarks_size()
-    assert_eq!(idb.bookmarks_size(), 0);
+    // len()
+    assert_eq!(idb.bookmarks().len(), 0);
 
-    println!("Testing bookmarks_mark() and bookmarks_get_desc()");
+    println!("Testing mark() and get_description()");
     for (id, f) in idb.functions() {
         let addr = f.start_address();
         let desc = format!(
@@ -30,28 +30,28 @@ fn main() -> anyhow::Result<()> {
             addr
         );
 
-        // bookmarks_mark()
-        let _slot = idb.bookmarks_mark(addr, &desc)?;
+        // mark()
+        let _slot = idb.bookmarks().mark(addr, &desc)?;
 
-        // bookmarks_get_desc()
-        let read_desc = idb.bookmarks_get_desc(addr)?;
-        assert_eq!(read_desc, desc);
+        // get_description()
+        let read_desc = idb.bookmarks().get_description(addr);
+        assert_eq!(read_desc.unwrap(), desc);
     }
 
-    println!("Testing bookmarks_erase(), bookmarks_get_desc(), and bookmarks_size() (pass 2)");
+    println!("Testing erase(), get_description(), and len() (pass 2)");
     for (_id, f) in idb.functions() {
         let addr = f.start_address();
 
-        // bookmarks_erase()
-        idb.bookmarks_erase(addr)?;
+        // erase()
+        idb.bookmarks().erase(addr)?;
 
         // bookmarks_get_desc()
-        let result = idb.bookmarks_get_desc(addr);
-        assert!(result.is_err());
+        let read_desc = idb.bookmarks().get_description(addr);
+        assert!(read_desc.is_none());
     }
 
     // bookmarks_size()
-    assert_eq!(idb.bookmarks_size(), 0);
+    assert_eq!(idb.bookmarks().len(), 0);
 
     Ok(())
 }

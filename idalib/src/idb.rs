@@ -3,10 +3,6 @@ use std::marker::PhantomData;
 use std::mem::MaybeUninit;
 use std::path::{Path, PathBuf};
 
-use crate::ffi::bookmarks::{
-    idalib_bookmarks_t_erase, idalib_bookmarks_t_find_index, idalib_bookmarks_t_get_desc,
-    idalib_bookmarks_t_mark, idalib_bookmarks_t_size,
-};
 use crate::ffi::bytes::*;
 use crate::ffi::comments::{append_cmt, idalib_get_cmt, set_cmt};
 use crate::ffi::entry::{get_entry, get_entry_ordinal, get_entry_qty};
@@ -19,6 +15,7 @@ use crate::ffi::util::{is_align_insn, next_head, prev_head, str2reg};
 use crate::ffi::xref::{xrefblk_t, xrefblk_t_first_from, xrefblk_t_first_to};
 use crate::ffi::BADADDR;
 
+use crate::bookmarks::Bookmarks;
 use crate::func::{Function, FunctionId};
 use crate::insn::{Insn, Register};
 use crate::meta::Metadata;
@@ -218,12 +215,18 @@ impl IDB {
         }
     }
 
-    pub fn get_cmt(&self, ea: Address) -> String {
+    pub fn get_cmt(&self, ea: Address) -> Option<String> {
         self.get_cmt_with(ea, false)
     }
 
-    pub fn get_cmt_with(&self, ea: Address, rptble: bool) -> String {
-        unsafe { idalib_get_cmt(ea.into(), rptble) }
+    pub fn get_cmt_with(&self, ea: Address, rptble: bool) -> Option<String> {
+        let s = unsafe { idalib_get_cmt(ea.into(), rptble) };
+
+        if s.is_empty() {
+            None
+        } else {
+            Some(s)
+        }
     }
 
     pub fn set_cmt(&self, ea: Address, comm: impl AsRef<str>) -> Result<(), IDAError> {
@@ -281,85 +284,8 @@ impl IDB {
         }
     }
 
-    pub fn bookmarks_mark(&self, ea: Address, desc: impl AsRef<str>) -> Result<u32, IDAError> {
-        self.bookmarks_mark_with(ea, self.bookmarks_size(), desc)
-    }
-
-    // Notes:
-    // * Adding a bookmark at an already marked address creates an overlaid bookmark
-    // * Adding a bookmark at an already used index has no effect and no error is returned
-    // * Adding a bookmark at an index > `bookmarks_size()` increments `bookmarks_size()`
-    //   accordingly, while leaving the unused bookmark slots empty
-    // * The MAX_MARK_SLOT = 1024 limit doesn't seem to play an actual role ¯\_(ツ)_/¯
-    pub fn bookmarks_mark_with(
-        &self,
-        ea: Address,
-        index: u32,
-        desc: impl AsRef<str>,
-    ) -> Result<u32, IDAError> {
-        const BOOKMARKS_BAD_INDEX: u32 = 0xffffffff; // (uint32(-1))
-        let desc = CString::new(desc.as_ref()).map_err(IDAError::ffi)?;
-
-        let slot = unsafe { idalib_bookmarks_t_mark(ea.into(), index.into(), desc.as_ptr()) };
-
-        if slot != BOOKMARKS_BAD_INDEX {
-            Ok(slot)
-        } else {
-            Err(IDAError::ffi_with(format!(
-                "failed to set bookmark at address {ea:#x}, index {index}"
-            )))
-        }
-    }
-
-    pub fn bookmarks_get_desc(&self, ea: Address) -> Result<String, IDAError> {
-        Ok(self.bookmarks_get_desc_with(self.bookmarks_find_index(ea)?.into()))
-    }
-
-    // Note: The address parameter has been removed because it is unused by IDA Pro's API
-    pub fn bookmarks_get_desc_with(&self, index: u32) -> String {
-        unsafe { idalib_bookmarks_t_get_desc(index.into()) }
-    }
-
-    pub fn bookmarks_erase(&self, ea: Address) -> Result<(), IDAError> {
-        self.bookmarks_erase_with(self.bookmarks_find_index(ea)?)
-    }
-
-    // Notes:
-    // * When a bookmark is erased, all the following indexes are decremented to fill the gap
-    // * The address parameter has been removed because it is unused by IDA Pro's API
-    pub fn bookmarks_erase_with(&self, index: u32) -> Result<(), IDAError> {
-        // Prevent IDA Pro's internal error 1312 that triggers when an invalid index is supplied
-        if index >= self.bookmarks_size() {
-            return Err(IDAError::ffi_with(format!(
-                "failed to erase bookmark at index {index}"
-            )));
-        }
-        if unsafe { idalib_bookmarks_t_erase(index.into()) } {
-            Ok(())
-        } else {
-            Err(IDAError::ffi_with(format!(
-                "failed to erase bookmark at index {index}"
-            )))
-        }
-    }
-
-    // Note: The address parameter has been removed because it is unused by IDA Pro's API
-    pub fn bookmarks_size(&self) -> u32 {
-        unsafe { idalib_bookmarks_t_size() }
-    }
-
-    pub fn bookmarks_find_index(&self, ea: Address) -> Result<u32, IDAError> {
-        const BOOKMARKS_BAD_INDEX: u32 = 0xffffffff; // (uint32(-1))
-
-        let index = unsafe { idalib_bookmarks_t_find_index(ea.into()) };
-
-        if index != BOOKMARKS_BAD_INDEX {
-            Ok(index)
-        } else {
-            Err(IDAError::ffi_with(format!(
-                "failed to find bookmark index for address {ea:#x}"
-            )))
-        }
+    pub fn bookmarks<'a>(&'a self) -> Bookmarks<'a> {
+        Bookmarks::new(self)
     }
 
     pub fn get_byte(&self, ea: Address) -> u8 {

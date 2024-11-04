@@ -15,37 +15,37 @@ fn main() -> anyhow::Result<()> {
 
         // get_cmt()
         let read_comment = idb.get_cmt(addr);
-        assert!(read_comment.is_empty());
+        assert!(read_comment.is_none());
     }
 
     println!("Testing set_cmt() and get_cmt()");
     for (id, f) in idb.functions() {
         let addr = f.start_address();
-        let comm = format!(
+        let comment = format!(
             "Comment added by idalib: {id} {} {:#x}",
             f.name().unwrap(),
             addr
         );
 
         // set_cmt()
-        idb.set_cmt(addr, comm)?;
+        idb.set_cmt(addr, comment)?;
 
         // get_cmt()
         let read_comment = idb.get_cmt(addr);
-        assert!(read_comment.starts_with("Comment added by idalib"));
+        assert!(read_comment.unwrap().starts_with("Comment added by idalib"));
     }
 
     println!("Testing append_cmt() and get_cmt()");
     for (_id, f) in idb.functions() {
         let addr = f.start_address();
-        let comm = "Comment appended by idalib";
+        let comment = "Comment appended by idalib";
 
         // append_cmt()
-        idb.append_cmt(addr, comm)?;
+        idb.append_cmt(addr, comment)?;
 
         // get_cmt()
         let read_comment = idb.get_cmt(addr);
-        assert!(read_comment.ends_with("appended by idalib"));
+        assert!(read_comment.unwrap().ends_with("appended by idalib"));
     }
 
     println!("Testing remove_cmt() and get_cmt() (pass 2)");
@@ -57,7 +57,7 @@ fn main() -> anyhow::Result<()> {
 
         // get_cmt()
         let read_comment = idb.get_cmt(addr);
-        assert!(read_comment.is_empty());
+        assert!(read_comment.is_none());
     }
 
     Ok(())
