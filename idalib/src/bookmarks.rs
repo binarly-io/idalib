@@ -9,9 +9,9 @@ use crate::ffi::bookmarks::{
 use crate::idb::IDB;
 use crate::{Address, IDAError};
 
-const BOOKMARKS_BAD_INDEX: u32 = 0xffffffff; // (uint32(-1))
-
 pub type BookmarkIndex = u32;
+
+const BOOKMARKS_BAD_INDEX: BookmarkIndex = 0xffffffff; // (uint32(-1))
 
 pub struct Bookmarks<'a> {
     _marker: PhantomData<&'a IDB>,
@@ -31,13 +31,13 @@ impl<'a> Bookmarks<'a> {
     // Notes:
     // * Adding a bookmark at an already marked address creates an overlaid bookmark
     // * Adding a bookmark at an already used index has no effect and no error is returned
-    // * Adding a bookmark at an index > `bookmarks_size()` increments `bookmarks_size()`
-    //   accordingly, while leaving the unused bookmark slots empty
-    // * The MAX_MARK_SLOT = 1024 limit doesn't seem to play an actual role ¯\_(ツ)_/¯
+    // * Adding a bookmark at an index > `len()` increments `len()` accordingly, while leaving
+    //   the unused bookmark slots empty
+    // * The `MAX_MARK_SLOT` limit (1024) doesn't seem to play an actual role ¯\_(ツ)_/¯
     pub fn mark_with(
         &self,
         ea: Address,
-        idx: u32,
+        idx: BookmarkIndex,
         desc: impl AsRef<str>,
     ) -> Result<BookmarkIndex, IDAError> {
         let desc = CString::new(desc.as_ref()).map_err(IDAError::ffi)?;
@@ -54,10 +54,10 @@ impl<'a> Bookmarks<'a> {
     }
 
     pub fn get_description(&self, ea: Address) -> Option<String> {
-        self.get_description_by_index(self.find_index(ea)?.into())
+        self.get_description_by_index(self.find_index(ea)?)
     }
 
-    // Note: The address parameter has been removed because it is unused by IDA Pro's API
+    // Note: The address parameter has been removed because it is unused by IDA's API
     pub fn get_description_by_index(&self, idx: BookmarkIndex) -> Option<String> {
         let s = unsafe { idalib_bookmarks_t_get_desc(idx.into()) };
 
@@ -76,9 +76,9 @@ impl<'a> Bookmarks<'a> {
 
     // Notes:
     // * When a bookmark is erased, all the following indexes are decremented to fill the gap
-    // * The address parameter has been removed because it is unused by IDA Pro's API
+    // * The address parameter has been removed because it is unused by IDA's API
     pub fn erase_by_index(&self, idx: BookmarkIndex) -> Result<(), IDAError> {
-        // Prevent IDA Pro's internal error 1312 that triggers when an invalid index is supplied
+        // Prevent IDA's internal error 1312 that triggers when an invalid index is supplied
         if idx >= self.len() {
             return Err(IDAError::ffi_with(format!(
                 "failed to erase bookmark at index {idx}"
@@ -93,12 +93,6 @@ impl<'a> Bookmarks<'a> {
         }
     }
 
-    // Note: The address parameter has been removed because it is unused by IDA Pro's API
-    // TODO: use `usize` (or `BookmarkIndex` or another aliased type) instead of `u32`
-    pub fn len(&self) -> u32 {
-        unsafe { idalib_bookmarks_t_size() }
-    }
-
     pub fn find_index(&self, ea: Address) -> Option<BookmarkIndex> {
         let index = unsafe { idalib_bookmarks_t_find_index(ea.into()) };
 
@@ -110,14 +104,11 @@ impl<'a> Bookmarks<'a> {
     }
 }
 
-/*
+// Note: The address parameter has been removed because it is unused by IDA's API
+pub fn len(&self) -> BookmarkIndex {
+    unsafe { idalib_bookmarks_t_size() }
+}
 
-
-
-
-
-
-
-
-
-*/
+pub fn is_empty(&self) -> bool {
+    self.len() == 0
+}

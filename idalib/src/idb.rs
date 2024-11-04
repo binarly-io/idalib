@@ -250,7 +250,7 @@ impl IDB {
     }
 
     pub fn append_cmt(&self, ea: Address, comm: impl AsRef<str>) -> Result<(), IDAError> {
-        self.append_cmt_with(ea.into(), comm, false)
+        self.append_cmt_with(ea, comm, false)
     }
 
     pub fn append_cmt_with(
