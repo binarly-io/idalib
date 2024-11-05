@@ -16,6 +16,7 @@ use crate::ffi::util::{is_align_insn, next_head, prev_head, str2reg};
 use crate::ffi::xref::{xrefblk_t, xrefblk_t_first_from, xrefblk_t_first_to};
 use crate::ffi::BADADDR;
 
+use crate::bookmarks::Bookmarks;
 use crate::decompiler::CFunction;
 use crate::func::{Function, FunctionId};
 use crate::insn::{Insn, Register};
@@ -240,12 +241,18 @@ impl IDB {
         }
     }
 
-    pub fn get_cmt(&self, ea: Address) -> String {
+    pub fn get_cmt(&self, ea: Address) -> Option<String> {
         self.get_cmt_with(ea, false)
     }
 
-    pub fn get_cmt_with(&self, ea: Address, rptble: bool) -> String {
-        unsafe { idalib_get_cmt(ea.into(), rptble) }
+    pub fn get_cmt_with(&self, ea: Address, rptble: bool) -> Option<String> {
+        let s = unsafe { idalib_get_cmt(ea.into(), rptble) };
+
+        if s.is_empty() {
+            None
+        } else {
+            Some(s)
+        }
     }
 
     pub fn set_cmt(&self, ea: Address, comm: impl AsRef<str>) -> Result<(), IDAError> {
@@ -269,7 +276,7 @@ impl IDB {
     }
 
     pub fn append_cmt(&self, ea: Address, comm: impl AsRef<str>) -> Result<(), IDAError> {
-        self.append_cmt_with(ea.into(), comm, false)
+        self.append_cmt_with(ea, comm, false)
     }
 
     pub fn append_cmt_with(
@@ -301,6 +308,10 @@ impl IDB {
                 "failed to remove comment at {ea:#x}"
             )))
         }
+    }
+
+    pub fn bookmarks<'a>(&'a self) -> Bookmarks<'a> {
+        Bookmarks::new(self)
     }
 
     pub fn get_byte(&self, ea: Address) -> u8 {

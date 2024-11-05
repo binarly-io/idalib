@@ -1,6 +1,7 @@
 use std::ffi::c_char;
 use std::sync::{Mutex, MutexGuard, OnceLock};
 
+pub mod bookmarks;
 pub mod decompiler;
 pub mod func;
 pub mod idb;

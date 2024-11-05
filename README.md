@@ -26,7 +26,8 @@ locate the SDK and IDA installation using the following environment variables:
 
 ### Projects using idalib
 
-- [xorpse/idalib-mp]: example project demonstrating idalib + multi-processing.
+- [xorpse/idalib-mp](https://github.com/xorpse/idalib-mp): example project demonstrating idalib + multi-processing.
+- [xorpse/wegglir](https://github.com/xorpse/wegglir): mass-scan source/decompiled code using weggli rulesets.
 
 ### Examples
 
@@ -104,3 +105,7 @@ To expose unimplemented IDA SDK functionality, modify the `idasdk-sys` crate,
 add appropriate high-level wrappers in `idalib`, and submit a pull request.
 Ensure that the additions are portable and build with the latest SDK. We won't
 accept PRs to support older beta releases.
+
+## Contributors
+
+Please see [CONTRIBUTORS.md](CONTRIBUTORS.md) for a full list of acknowledgments.
