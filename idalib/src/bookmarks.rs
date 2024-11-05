@@ -102,13 +102,13 @@ impl<'a> Bookmarks<'a> {
             None
         }
     }
-}
 
-// Note: The address parameter has been removed because it is unused by IDA's API
-pub fn len(&self) -> BookmarkIndex {
-    unsafe { idalib_bookmarks_t_size() }
-}
+    // Note: The address parameter has been removed because it is unused by IDA's API
+    pub fn len(&self) -> BookmarkIndex {
+        unsafe { idalib_bookmarks_t_size() }
+    }
 
-pub fn is_empty(&self) -> bool {
-    self.len() == 0
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
 }

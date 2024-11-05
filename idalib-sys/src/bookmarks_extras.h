@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ida/moves.hpp"
+#include "moves.hpp"
 
 #include "cxx.h"
 
