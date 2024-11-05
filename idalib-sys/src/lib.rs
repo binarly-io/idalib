@@ -45,6 +45,7 @@ include_cpp! {
     #include "ida.hpp"
     #include "idalib.hpp"
     #include "idp.hpp"
+    #include "moves.hpp"
     #include "pro.h"
     #include "segment.hpp"
     #include "ua.hpp"
@@ -253,7 +254,6 @@ include_cpp! {
     generate!("has_external_refs")
 
     // comments
-    generate!("get_cmt")
     generate!("set_cmt")
     generate!("append_cmt")
 }
@@ -366,6 +366,7 @@ mod ffix {
         include!("idalib.hpp");
 
         include!("types.h");
+        include!("bookmarks_extras.h");
         include!("bytes_extras.h");
         include!("comments_extras.h");
         include!("entry_extras.h");
@@ -603,6 +604,16 @@ mod ffix {
 
         unsafe fn idalib_get_cmt(ea: c_ulonglong, rptble: bool) -> String;
 
+        unsafe fn idalib_bookmarks_t_mark(
+            ea: c_ulonglong,
+            index: c_uint,
+            desc: *const c_char,
+        ) -> u32;
+        unsafe fn idalib_bookmarks_t_get_desc(index: c_uint) -> String;
+        unsafe fn idalib_bookmarks_t_erase(index: c_uint) -> bool;
+        unsafe fn idalib_bookmarks_t_size() -> u32;
+        unsafe fn idalib_bookmarks_t_find_index(ea: c_ulonglong) -> u32;
+
         unsafe fn idalib_get_byte(ea: c_ulonglong) -> u8;
         unsafe fn idalib_get_word(ea: c_ulonglong) -> u16;
         unsafe fn idalib_get_dword(ea: c_ulonglong) -> u32;
@@ -754,6 +765,13 @@ pub mod xref {
 pub mod comments {
     pub use super::ffi::{append_cmt, set_cmt};
     pub use super::ffix::idalib_get_cmt;
+}
+
+pub mod bookmarks {
+    pub use super::ffix::{
+        idalib_bookmarks_t_erase, idalib_bookmarks_t_find_index, idalib_bookmarks_t_get_desc,
+        idalib_bookmarks_t_mark, idalib_bookmarks_t_size,
+    };
 }
 
 pub mod ida {
