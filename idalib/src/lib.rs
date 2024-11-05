@@ -1,3 +1,4 @@
+use std::ffi::c_char;
 use std::sync::{Mutex, MutexGuard, OnceLock};
 
 pub mod bookmarks;
@@ -17,10 +18,21 @@ pub type Address = u64;
 
 static INIT: OnceLock<Mutex<()>> = OnceLock::new();
 
+extern "C" {
+    static mut batch: c_char;
+}
+
 pub(crate) type IDARuntimeHandle = MutexGuard<'static, ()>;
 
-pub(crate) fn init_library() -> &'static Mutex<()> {
+pub fn force_batch_mode() {
+    unsafe {
+        batch = 1;
+    }
+}
+
+pub fn init_library() -> &'static Mutex<()> {
     INIT.get_or_init(|| {
+        force_batch_mode();
         ffi::ida::init_library().expect("IDA initialised successfully");
         Mutex::new(())
     })
