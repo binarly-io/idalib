@@ -1,6 +1,12 @@
 use idalib::idb::IDB;
+use idalib::is_valid_license;
 
 fn main() -> anyhow::Result<()> {
+    if !is_valid_license() {
+        println!("License is not valid!");
+        return Ok(());
+    }
+
     println!("Trying to open IDA database...");
 
     // Open IDA database

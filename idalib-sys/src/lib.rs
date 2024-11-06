@@ -398,6 +398,7 @@ mod ffix {
         unsafe fn init_library(argc: c_int, argv: *mut *mut c_char) -> c_int;
 
         unsafe fn open_database_quiet(name: *const c_char, auto_analysis: bool) -> c_int;
+        unsafe fn try_check_ida_license() -> bool;
 
         // NOTE: we can't use uval_t here due to it resolving to c_ulonglong,
         // which causes `verify_extern_type` to fail...
@@ -786,6 +787,14 @@ pub mod ida {
     use super::{ea_t, ffi, ffix, IDAError};
 
     pub use ffi::auto_wait;
+
+    pub fn is_license_valid() -> bool {
+        if !is_main_thread() {
+            panic!("IDA cannot function correctly when not running on the main thread");
+        }
+
+        unsafe { self::ffix::try_check_ida_license() }
+    }
 
     // NOTE: once; main thread
     pub fn init_library() -> Result<(), IDAError> {

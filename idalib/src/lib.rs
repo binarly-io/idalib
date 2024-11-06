@@ -47,3 +47,8 @@ pub fn enable_console_messages(enabled: bool) {
     init_library();
     ffi::ida::enable_console_messages(enabled)
 }
+
+pub fn is_valid_license() -> bool {
+    init_library();
+    ffi::ida::is_license_valid()
+}
