@@ -339,10 +339,10 @@ impl IDB {
         let ptr = unsafe { find_plugin(plugin.as_ptr(), load_if_needed) };
 
         if ptr.is_null() {
-            return Err(IDAError::ffi_with(format!(
-                "failed load plugin {}",
+            Err(IDAError::ffi_with(format!(
+                "failed to load {} plugin",
                 name.as_ref()
-            )));
+            )))
         } else {
             Ok(Plugin::from_ptr(ptr))
         }
