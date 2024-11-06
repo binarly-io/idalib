@@ -8,9 +8,9 @@ use bitflags::bitflags;
 use cxx::UniquePtr;
 
 use crate::ffi::func::*;
+use crate::ffi::xref::has_external_refs;
 use crate::ffi::{range_t, IDAError, BADADDR};
 use crate::idb::IDB;
-use crate::ffi::xref::has_external_refs;
 use crate::Address;
 
 pub struct Function<'a> {

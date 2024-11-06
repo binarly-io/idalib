@@ -45,6 +45,7 @@ include_cpp! {
     #include "ida.hpp"
     #include "idalib.hpp"
     #include "idp.hpp"
+    #include "loader.hpp"
     #include "moves.hpp"
     #include "pro.h"
     #include "segment.hpp"
@@ -256,6 +257,11 @@ include_cpp! {
     // comments
     generate!("set_cmt")
     generate!("append_cmt")
+
+    // loader
+    generate!("plugin_t")
+    generate!("find_plugin")
+    generate!("run_plugin")
 }
 
 pub mod idp {
@@ -365,16 +371,16 @@ mod ffix {
         include!("autocxxgen_ffi.h");
         include!("idalib.hpp");
 
-        include!("types.h");
         include!("bookmarks_extras.h");
         include!("bytes_extras.h");
         include!("comments_extras.h");
         include!("entry_extras.h");
         include!("func_extras.h");
-        include!("kernwin_extras.h");
         include!("inf_extras.h");
+        include!("kernwin_extras.h");
         include!("ph_extras.h");
         include!("segm_extras.h");
+        include!("types.h");
 
         type c_short = autocxx::c_short;
         type c_int = autocxx::c_int;
@@ -774,6 +780,10 @@ pub mod bookmarks {
     };
 }
 
+pub mod loader {
+    pub use super::ffi::{find_plugin, plugin_t, run_plugin};
+}
+
 pub mod ida {
     use std::env;
     use std::ffi::CString;
@@ -852,7 +862,10 @@ pub mod ida {
         }
     }
 
-    pub fn open_database_quiet(path: impl AsRef<Path>, auto_analysis: bool) -> Result<(), IDAError> {
+    pub fn open_database_quiet(
+        path: impl AsRef<Path>,
+        auto_analysis: bool,
+    ) -> Result<(), IDAError> {
         if !is_main_thread() {
             panic!("IDA cannot function correctly when not running on the main thread");
         }

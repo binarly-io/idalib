@@ -11,6 +11,7 @@ use crate::ffi::ida::{
     auto_wait, close_database_with, make_signatures, open_database_quiet, set_screen_ea,
 };
 use crate::ffi::insn::decode;
+use crate::ffi::loader::find_plugin;
 use crate::ffi::processor::get_ph;
 use crate::ffi::segment::{get_segm_qty, getnseg, getseg};
 use crate::ffi::util::{is_align_insn, next_head, prev_head, str2reg};
@@ -21,6 +22,7 @@ use crate::bookmarks::Bookmarks;
 use crate::func::{Function, FunctionId};
 use crate::insn::{Insn, Register};
 use crate::meta::Metadata;
+use crate::plugin::Plugin;
 use crate::processor::Processor;
 use crate::segment::{Segment, SegmentId};
 use crate::xref::{XRef, XRefQuery};
@@ -326,6 +328,20 @@ impl IDB {
         }
 
         buf
+    }
+
+    pub fn find_plugin(&self, name: impl AsRef<str>, load: bool) -> Result<Plugin, IDAError> {
+        let plugin = CString::new(name.as_ref()).map_err(IDAError::ffi)?;
+        let ptr = unsafe { find_plugin(plugin.as_ptr(), load) };
+
+        if ptr.is_null() {
+            return Err(IDAError::ffi_with(format!(
+                "failed load plugin {}",
+                name.as_ref()
+            )));
+        } else {
+            Ok(Plugin::from_ptr(ptr))
+        }
     }
 }
 
