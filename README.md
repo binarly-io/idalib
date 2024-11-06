@@ -28,12 +28,14 @@ locate the SDK and IDA installation using the following environment variables:
 
 - [xorpse/idalib-mp](https://github.com/xorpse/idalib-mp): example project demonstrating idalib + multi-processing.
 - [xorpse/wegglir](https://github.com/xorpse/wegglir): mass-scan source/decompiled code using weggli rulesets.
+- [0xdea/rhabdomancer](https://github.com/0xdea/rhabdomancer): locate calls to insecure API functions in a binary file.
 
 ### Examples
 
 A minimal project to working with `idalib` requires the following components:
 
 `Cargo.toml`:
+
 ```toml
 name = "example-analyser"
 
@@ -47,21 +49,23 @@ idalib-build = "0.1.0"
 ```
 
 `build.rs`:
+
 ```rust
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-  idalib_build::configure_linkage()?;
-  Ok(())
+    idalib_build::configure_linkage()?;
+    Ok(())
 }
 ```
 
 `src/main.rs`:
+
 ```rust
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-  let idb = idalib::IDB::open("/path/to/binary")?;
+    let idb = idalib::IDB::open("/path/to/binary")?;
 
-  // ...
+    // ...
 
-  Ok(())
+    Ok(())
 }
 ```
 
