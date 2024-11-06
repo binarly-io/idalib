@@ -45,6 +45,7 @@ include_cpp! {
     #include "ida.hpp"
     #include "idalib.hpp"
     #include "idp.hpp"
+    #include "loader.hpp"
     #include "moves.hpp"
     #include "pro.h"
     #include "segment.hpp"
@@ -256,6 +257,22 @@ include_cpp! {
     // comments
     generate!("set_cmt")
     generate!("append_cmt")
+
+    // loader
+    generate!("plugin_t")
+    generate!("find_plugin")
+    generate!("run_plugin")
+
+    generate!("PLUGIN_MOD")
+    generate!("PLUGIN_DRAW")
+    generate!("PLUGIN_SEG")
+    generate!("PLUGIN_UNL")
+    generate!("PLUGIN_HIDE")
+    generate!("PLUGIN_DBG")
+    generate!("PLUGIN_PROC")
+    generate!("PLUGIN_FIX")
+    generate!("PLUGIN_MULTI")
+    generate!("PLUGIN_SCRIPTED")
 }
 
 pub mod idp {
@@ -371,8 +388,9 @@ mod ffix {
         include!("comments_extras.h");
         include!("entry_extras.h");
         include!("func_extras.h");
-        include!("kernwin_extras.h");
+        include!("loader_extras.h");
         include!("inf_extras.h");
+        include!("kernwin_extras.h");
         include!("ph_extras.h");
         include!("segm_extras.h");
 
@@ -394,6 +412,8 @@ mod ffix {
         type qflow_chart_t = super::ffi::qflow_chart_t;
         type qbasic_block_t = super::ffi::qbasic_block_t;
         type segment_t = super::ffi::segment_t;
+
+        type plugin_t = super::ffi::plugin_t;
 
         unsafe fn init_library(argc: c_int, argv: *mut *mut c_char) -> c_int;
 
@@ -619,6 +639,9 @@ mod ffix {
         unsafe fn idalib_get_dword(ea: c_ulonglong) -> u32;
         unsafe fn idalib_get_qword(ea: c_ulonglong) -> u64;
         unsafe fn idalib_get_bytes(ea: c_ulonglong, buf: &mut Vec<u8>) -> Result<usize>;
+
+        unsafe fn idalib_plugin_version(p: *const plugin_t) -> u64;
+        unsafe fn idalib_plugin_flags(p: *const plugin_t) -> u64;
     }
 }
 
@@ -774,6 +797,18 @@ pub mod bookmarks {
     };
 }
 
+pub mod loader {
+    pub use super::ffi::{find_plugin, plugin_t, run_plugin};
+    pub use super::ffix::{idalib_plugin_flags, idalib_plugin_version};
+
+    pub mod flags {
+        pub use super::super::ffi::{
+            PLUGIN_DBG, PLUGIN_DRAW, PLUGIN_FIX, PLUGIN_HIDE, PLUGIN_MOD, PLUGIN_MULTI,
+            PLUGIN_PROC, PLUGIN_SCRIPTED, PLUGIN_SEG, PLUGIN_UNL,
+        };
+    }
+}
+
 pub mod ida {
     use std::env;
     use std::ffi::CString;
@@ -852,7 +887,10 @@ pub mod ida {
         }
     }
 
-    pub fn open_database_quiet(path: impl AsRef<Path>, auto_analysis: bool) -> Result<(), IDAError> {
+    pub fn open_database_quiet(
+        path: impl AsRef<Path>,
+        auto_analysis: bool,
+    ) -> Result<(), IDAError> {
         if !is_main_thread() {
             panic!("IDA cannot function correctly when not running on the main thread");
         }

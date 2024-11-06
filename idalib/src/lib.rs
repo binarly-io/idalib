@@ -6,6 +6,7 @@ pub mod func;
 pub mod idb;
 pub mod insn;
 pub mod meta;
+pub mod plugin;
 pub mod processor;
 pub mod segment;
 pub mod xref;
