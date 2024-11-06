@@ -330,9 +330,13 @@ impl IDB {
         buf
     }
 
-    pub fn find_plugin(&self, name: impl AsRef<str>, load: bool) -> Result<Plugin, IDAError> {
+    pub fn find_plugin(
+        &self,
+        name: impl AsRef<str>,
+        load_if_needed: bool,
+    ) -> Result<Plugin, IDAError> {
         let plugin = CString::new(name.as_ref()).map_err(IDAError::ffi)?;
-        let ptr = unsafe { find_plugin(plugin.as_ptr(), load) };
+        let ptr = unsafe { find_plugin(plugin.as_ptr(), load_if_needed) };
 
         if ptr.is_null() {
             return Err(IDAError::ffi_with(format!(
@@ -342,6 +346,10 @@ impl IDB {
         } else {
             Ok(Plugin::from_ptr(ptr))
         }
+    }
+
+    pub fn load_plugin(&self, name: impl AsRef<str>) -> Result<Plugin, IDAError> {
+        self.find_plugin(name, true)
     }
 }
 

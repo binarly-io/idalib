@@ -6,7 +6,7 @@ fn main() -> anyhow::Result<()> {
 
     let idb = IDB::open("./tests/ls")?;
 
-    let patfind = idb.find_plugin("patfind", true)?;
+    let patfind = idb.load_plugin("patfind")?;
 
     println!("patfind version: {}", patfind.version());
     println!("patfind flags: {:#?}", patfind.flags());

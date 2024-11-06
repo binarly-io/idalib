@@ -382,6 +382,7 @@ mod ffix {
         include!("autocxxgen_ffi.h");
         include!("idalib.hpp");
 
+        include!("types.h");
         include!("bookmarks_extras.h");
         include!("bytes_extras.h");
         include!("comments_extras.h");
@@ -392,7 +393,6 @@ mod ffix {
         include!("kernwin_extras.h");
         include!("ph_extras.h");
         include!("segm_extras.h");
-        include!("types.h");
 
         type c_short = autocxx::c_short;
         type c_int = autocxx::c_int;
