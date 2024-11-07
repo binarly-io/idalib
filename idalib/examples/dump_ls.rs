@@ -1,6 +1,5 @@
 use idalib::func::FunctionFlags;
 use idalib::idb::*;
-use idalib::is_valid_license;
 
 fn main() -> anyhow::Result<()> {
     let idb = IDB::open("./tests/ls")?;

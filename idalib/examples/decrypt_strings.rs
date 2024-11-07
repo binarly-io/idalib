@@ -5,7 +5,6 @@ use idalib::idb::*;
 use idalib::insn::x86::{NN_lea, NN_mov};
 use idalib::insn::OperandType;
 use idalib::xref::{XRef, XRefQuery};
-use idalib::is_valid_license;
 
 const RCX: u16 = 1;
 const RDX: u16 = 2;
