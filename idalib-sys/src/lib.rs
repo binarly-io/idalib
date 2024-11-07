@@ -13,6 +13,8 @@ pub enum IDAError {
     OpenDb(autocxx::c_int),
     #[error("could not close IDA database: error code {:x}", _0.0)]
     CloseDb(autocxx::c_int),
+    #[error("invalid license")]
+    InvalidLicense,
     #[error("could not generate pattern or signature files")]
     MakeSigs,
 }
@@ -397,8 +399,9 @@ mod ffix {
 
         unsafe fn init_library(argc: c_int, argv: *mut *mut c_char) -> c_int;
 
-        unsafe fn open_database_quiet(name: *const c_char, auto_analysis: bool) -> c_int;
-        unsafe fn try_check_ida_license() -> bool;
+        unsafe fn idalib_open_database_quiet(name: *const c_char, auto_analysis: bool) -> c_int;
+        unsafe fn idalib_check_license() -> bool;
+        unsafe fn idalib_get_license_id(id: &mut [u8; 6]) -> bool;
 
         // NOTE: we can't use uval_t here due to it resolving to c_ulonglong,
         // which causes `verify_extern_type` to fail...
@@ -793,7 +796,20 @@ pub mod ida {
             panic!("IDA cannot function correctly when not running on the main thread");
         }
 
-        unsafe { self::ffix::try_check_ida_license() }
+        unsafe { self::ffix::idalib_check_license() }
+    }
+
+    pub fn license_id() -> Result<[u8; 6], IDAError> {
+        if !is_main_thread() {
+            panic!("IDA cannot function correctly when not running on the main thread");
+        }
+
+        let mut lid = [0u8; 6];
+        if unsafe { self::ffix::idalib_get_license_id(&mut lid) } {
+            Ok(lid)
+        } else {
+            Err(IDAError::InvalidLicense)
+        }
     }
 
     // NOTE: once; main thread
@@ -850,6 +866,10 @@ pub mod ida {
             panic!("IDA cannot function correctly when not running on the main thread");
         }
 
+        if !is_license_valid() {
+            return Err(IDAError::InvalidLicense);
+        }
+
         let path = CString::new(path.as_ref().to_string_lossy().as_ref()).map_err(IDAError::ffi)?;
 
         let res = unsafe { self::ffi::open_database(path.as_ptr(), auto_analysis) };
@@ -861,14 +881,21 @@ pub mod ida {
         }
     }
 
-    pub fn open_database_quiet(path: impl AsRef<Path>, auto_analysis: bool) -> Result<(), IDAError> {
+    pub fn open_database_quiet(
+        path: impl AsRef<Path>,
+        auto_analysis: bool,
+    ) -> Result<(), IDAError> {
         if !is_main_thread() {
             panic!("IDA cannot function correctly when not running on the main thread");
         }
 
+        if !is_license_valid() {
+            return Err(IDAError::InvalidLicense);
+        }
+
         let path = CString::new(path.as_ref().to_string_lossy().as_ref()).map_err(IDAError::ffi)?;
 
-        let res = unsafe { self::ffix::open_database_quiet(path.as_ptr(), auto_analysis) };
+        let res = unsafe { self::ffix::idalib_open_database_quiet(path.as_ptr(), auto_analysis) };
 
         if res != c_int(0) {
             Err(IDAError::OpenDb(res))

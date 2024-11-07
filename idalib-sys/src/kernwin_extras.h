@@ -4,13 +4,16 @@
 #include "kernwin.hpp"
 #include "auto.hpp"
 
+#include <algorithm>
+#include <array>
 #include <cstdint>
 
 struct license_manager_t;
 struct license_manager_t_vtbl;
 
 struct license_result_t {
-  uint64_t v0;
+  uint8_t lid[6];
+  uint16_t pidx;
   uint32_t is_ok;
 };
 
@@ -34,7 +37,7 @@ struct license_manager_t {
 
 extern "C" license_manager_t *get_license_manager();
 
-bool try_check_ida_license() {
+bool idalib_check_license() {
   auto manager = get_license_manager();
   if (!manager) {
     return false;
@@ -58,12 +61,26 @@ bool try_check_ida_license() {
   return !nres;
 }
 
-int open_database_quiet(const char *name, bool auto_analysis) {
-  // first check the license...
-  if (!try_check_ida_license()) {
-    return -1;
+bool idalib_get_license_id(std::array<uint8_t, 6> &id) {
+  if (!idalib_check_license()) {
+    return false;
   }
 
+  auto manager = get_license_manager();
+  if (!manager) {
+    return false;
+  }
+
+  auto res = manager->_vtbl->check(manager, 0, 0);
+  if (res && res->is_ok) {
+    std::copy(std::begin(res->lid), std::end(res->lid), std::begin(id));
+    return true;
+  }
+
+  return false;
+}
+
+int idalib_open_database_quiet(const char *name, bool auto_analysis) {
   auto new_file = 0;
   const char *argv[] = { "idalib", name };
   auto result = init_database(2, argv, &new_file);

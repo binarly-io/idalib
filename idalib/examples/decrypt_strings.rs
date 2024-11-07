@@ -118,11 +118,6 @@ fn handle_xref(idb: &IDB, xref: &XRef) -> Option<EncString> {
 }
 
 fn main() -> anyhow::Result<()> {
-    if !is_valid_license() {
-        println!("License is not valid!");
-        return Ok(());
-    }
-
     let idb =
         IDB::open("./tests/e8cdc0697748e702cf2916a2c5670325a891402ee38c98d91873a0f03e3f9025")?;
 

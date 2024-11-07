@@ -5,6 +5,7 @@ pub mod bookmarks;
 pub mod func;
 pub mod idb;
 pub mod insn;
+pub mod license;
 pub mod meta;
 pub mod processor;
 pub mod segment;
@@ -13,6 +14,7 @@ pub mod xref;
 pub use idalib_sys as ffi;
 
 pub use ffi::IDAError;
+pub use license::{is_valid_license, license_id, LicenseId};
 
 pub type Address = u64;
 
@@ -46,9 +48,4 @@ pub(crate) fn prepare_library() -> IDARuntimeHandle {
 pub fn enable_console_messages(enabled: bool) {
     init_library();
     ffi::ida::enable_console_messages(enabled)
-}
-
-pub fn is_valid_license() -> bool {
-    init_library();
-    ffi::ida::is_license_valid()
 }

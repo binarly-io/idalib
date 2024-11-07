@@ -3,11 +3,6 @@ use idalib::idb::*;
 use idalib::is_valid_license;
 
 fn main() -> anyhow::Result<()> {
-    if !is_valid_license() {
-        println!("License is not valid!");
-        return Ok(());
-    }
-
     let idb = IDB::open("./tests/ls")?;
 
     println!(
