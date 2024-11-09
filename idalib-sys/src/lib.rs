@@ -1,3 +1,5 @@
+#![doc(html_no_source)]
+
 use autocxx::prelude::*;
 use thiserror::Error;
 
