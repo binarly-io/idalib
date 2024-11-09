@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["configure_idalib_linkage","configure_idasdk_linkage","configure_linkage","idalib_install_paths","idalib_library_paths","idalib_sdk_paths"]};

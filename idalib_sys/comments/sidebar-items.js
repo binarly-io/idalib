@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["append_cmt","idalib_get_cmt","set_cmt"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["find_plugin","idalib_plugin_flags","idalib_plugin_version","run_plugin"],"mod":["flags"],"struct":["plugin_t"]};

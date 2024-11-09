@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["SegmentAlignment","SegmentType"],"struct":["Segment","SegmentPermissions"],"type":["SegmentId"]};

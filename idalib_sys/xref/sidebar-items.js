@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["XREF_ALL","XREF_BASE","XREF_DATA","XREF_FAR","XREF_MASK","XREF_PASTEND","XREF_TAIL","XREF_USER"],"enum":["cref_t","dref_t"],"fn":["has_external_refs","xrefblk_t_first_from","xrefblk_t_first_to","xrefblk_t_next_from","xrefblk_t_next_to"],"struct":["xrefblk_t"]};

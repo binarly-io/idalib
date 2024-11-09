@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["get_entry","get_entry_ordinal","get_entry_qty","idalib_entry_name"],"type":["uval_t"]};
