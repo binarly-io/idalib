@@ -4,6 +4,7 @@ authors = ["Sam L. Thomas <sam@binarly.io>", "Yegor Vasilenko <yegor@binarly.io>
 version = "0.1.1+9.0.240930"
 description = "Idiomatic bindings to IDA SDK"
 repository = "https://github.com/binarly-io/idalib"
+documentation = "https://binarly-io.github.io/idalib/idalib"
 license = "MIT OR Apache-2.0"
 readme = "../README.md"
 edition = "2021"
