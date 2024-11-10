@@ -13,6 +13,7 @@ use crate::ffi::ida::{
 use crate::ffi::insn::decode;
 use crate::ffi::loader::find_plugin;
 use crate::ffi::processor::get_ph;
+use crate::ffi::search::idalib_find_text;
 use crate::ffi::segment::{get_segm_qty, getnseg, getseg};
 use crate::ffi::util::{is_align_insn, next_head, prev_head, str2reg};
 use crate::ffi::xref::{xrefblk_t, xrefblk_t_first_from, xrefblk_t_first_to};
@@ -298,6 +299,10 @@ impl IDB {
 
     pub fn bookmarks<'a>(&'a self) -> Bookmarks<'a> {
         Bookmarks::new(self)
+    }
+
+    pub fn find_text(&self, start_ea: Address, text: impl AsRef<str>) -> Address {
+        BADADDR.into()
     }
 
     pub fn get_byte(&self, ea: Address) -> u8 {
