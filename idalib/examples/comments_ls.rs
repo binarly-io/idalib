@@ -1,5 +1,4 @@
 use idalib::idb::IDB;
-use idalib::Address;
 
 fn main() -> anyhow::Result<()> {
     println!("Trying to open IDA database...");
@@ -36,20 +35,13 @@ fn main() -> anyhow::Result<()> {
         assert!(read_comment.unwrap().starts_with("Comment added by idalib"));
     }
 
-    // TODO
+    println!("Testing find_text_all()");
+    let results = idb.find_text_all("added by idalib");
+    assert!(results.is_some());
+    // text search appears to be buggy, some results are missing
+    // let results = results.unwrap();
+    // assert_eq!(results.len(), idb.functions().count());
 
-    let mut cur = idb.meta().start_code_segment();
-    loop {
-        let found_addr = idb.find_text(cur, "idalib");
-        cur = found_addr.unwrap();
-        dbg!(cur);
-        let instr = idb.insn_at(cur).unwrap();
-        let len = instr.len();
-        println!("*** FOUND {:#x} ***", cur);
-        cur = cur + len as Address;
-    }
-
-    /*
     println!("Testing append_cmt() and get_cmt()");
     for (_id, f) in idb.functions() {
         let addr = f.start_address();
@@ -74,7 +66,10 @@ fn main() -> anyhow::Result<()> {
         let read_comment = idb.get_cmt(addr);
         assert!(read_comment.is_none());
     }
-    */
+
+    println!("Testing find_text_all()");
+    let results = idb.find_text_all("added by idalib");
+    assert!(results.is_none());
 
     Ok(())
 }

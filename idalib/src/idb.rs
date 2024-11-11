@@ -301,9 +301,38 @@ impl IDB {
         Bookmarks::new(self)
     }
 
-    pub fn find_text(&self, start_ea: Address, text: impl AsRef<str>) -> Result<Address, IDAError> {
-        let s = CString::new(text.as_ref()).map_err(IDAError::ffi)?;
-        Ok(unsafe { idalib_find_text(start_ea.into(), s.as_ptr()) }.into())
+    pub fn find_text(&self, start_ea: Address, text: impl AsRef<str>) -> Option<Address> {
+        let s = CString::new(text.as_ref()).ok()?;
+        let addr = unsafe { idalib_find_text(start_ea.into(), s.as_ptr()) };
+        if addr == BADADDR {
+            None
+        } else {
+            Some(addr.into())
+        }
+    }
+
+    pub fn find_text_all(&self, text: impl AsRef<str>) -> Option<Vec<Address>> {
+        let mut v = vec![];
+
+        // TODO
+        let mut cur = self.meta().start_code_segment();
+        loop {
+            let found = self.find_text(cur, text.as_ref());
+            if found.is_none() {
+                break;
+            }
+            cur = found.unwrap();
+            v.push(cur);
+            let instr = self.insn_at(cur).unwrap();
+            let len = instr.len();
+            cur = cur + len as Address;
+        }
+
+        if v.is_empty() {
+            None
+        } else {
+            Some(v)
+        }
     }
 
     pub fn get_byte(&self, ea: Address) -> u8 {
