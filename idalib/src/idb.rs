@@ -301,8 +301,9 @@ impl IDB {
         Bookmarks::new(self)
     }
 
-    pub fn find_text(&self, start_ea: Address, text: impl AsRef<str>) -> Address {
-        BADADDR.into()
+    pub fn find_text(&self, start_ea: Address, text: impl AsRef<str>) -> Result<Address, IDAError> {
+        let s = CString::new(text.as_ref()).map_err(IDAError::ffi)?;
+        Ok(unsafe { idalib_find_text(start_ea.into(), s.as_ptr()) }.into())
     }
 
     pub fn get_byte(&self, ea: Address) -> u8 {
