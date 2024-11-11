@@ -25,7 +25,7 @@ struct borrow_arg3 {
 
 struct license_manager_t_vtbl {
   void *_skip_a[4];
-  int (*borrow_license)(license_manager_t *, void *, borrow_arg3 *, int64_t, void **);
+  int (*borrow_license)(license_manager_t *, void *, borrow_arg3 *, int64_t, qstring*);
   void *(*get_field_ptr)(license_manager_t *);
   void *_skip_b[5];
   license_result_t *(*check)(license_manager_t *, bool *, int);
@@ -50,13 +50,12 @@ bool idalib_check_license() {
 
   auto field_ptr = manager->_vtbl->get_field_ptr(manager);
   borrow_arg3 borrow_license_arg3 = { 0, 0, 0x100000001LL };
-  void *ptr = nullptr;
 
-  auto nres = manager->_vtbl->borrow_license(manager, field_ptr, &borrow_license_arg3, 16, &ptr);
+  // NOTE: this will contain a description of any error; we should likely
+  // figure out how to expose it...
+  qstring estr = qstring();
 
-  if (ptr) {
-    qfree(ptr);
-  }
+  auto nres = manager->_vtbl->borrow_license(manager, field_ptr, &borrow_license_arg3, 16, &estr);
 
   return !nres;
 }
