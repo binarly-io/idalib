@@ -314,18 +314,11 @@ impl IDB {
     pub fn find_text_all(&self, text: impl AsRef<str>) -> Option<Vec<Address>> {
         let mut v = vec![];
 
-        // TODO
         let mut cur = self.meta().start_code_segment();
-        loop {
-            let found = self.find_text(cur, text.as_ref());
-            if found.is_none() {
-                break;
-            }
-            cur = found.unwrap();
-            v.push(cur);
-            let instr = self.insn_at(cur).unwrap();
-            let len = instr.len();
-            cur = cur + len as Address;
+        while let Some(found) = self.find_text(cur, text.as_ref()) {
+            v.push(found);
+            let instr = self.insn_at(found).unwrap(); // TODO: replace with `find_defined()`
+            cur = found + instr.len() as Address;
         }
 
         if v.is_empty() {
