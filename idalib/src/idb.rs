@@ -13,7 +13,7 @@ use crate::ffi::ida::{
 use crate::ffi::insn::decode;
 use crate::ffi::loader::find_plugin;
 use crate::ffi::processor::get_ph;
-use crate::ffi::search::idalib_find_text;
+use crate::ffi::search::{idalib_find_defined, idalib_find_text};
 use crate::ffi::segment::{get_segm_qty, getnseg, getseg};
 use crate::ffi::util::{is_align_insn, next_head, prev_head, str2reg};
 use crate::ffi::xref::{xrefblk_t, xrefblk_t_first_from, xrefblk_t_first_to};
@@ -317,14 +317,22 @@ impl IDB {
         let mut cur = self.meta().start_code_segment();
         while let Some(found) = self.find_text(cur, text.as_ref()) {
             v.push(found);
-            let instr = self.insn_at(found).unwrap(); // TODO: replace with `find_defined()`
-            cur = found + instr.len() as Address;
+            cur = self.find_defined(found).unwrap_or(BADADDR.into());
         }
 
         if v.is_empty() {
             None
         } else {
             Some(v)
+        }
+    }
+
+    pub fn find_defined(&self, start_ea: Address) -> Option<Address> {
+        let addr = unsafe { idalib_find_defined(start_ea.into()) };
+        if addr == BADADDR {
+            None
+        } else {
+            Some(addr.into())
         }
     }
 
