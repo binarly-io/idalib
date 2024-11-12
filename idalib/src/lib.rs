@@ -6,7 +6,9 @@ pub mod decompiler;
 pub mod func;
 pub mod idb;
 pub mod insn;
+pub mod license;
 pub mod meta;
+pub mod plugin;
 pub mod processor;
 pub mod segment;
 pub mod xref;
@@ -14,6 +16,7 @@ pub mod xref;
 pub use idalib_sys as ffi;
 
 pub use ffi::IDAError;
+pub use license::{is_valid_license, license_id, LicenseId};
 
 pub type Address = u64;
 

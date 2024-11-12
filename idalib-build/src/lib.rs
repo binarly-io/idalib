@@ -13,10 +13,14 @@ fn link_path() -> PathBuf {
 }
 
 pub fn idalib_sdk_paths() -> (PathBuf, PathBuf, PathBuf, PathBuf) {
+    idalib_sdk_paths_with(true)
+}
+
+pub fn idalib_sdk_paths_with(check: bool) -> (PathBuf, PathBuf, PathBuf, PathBuf) {
     let sdk_path = PathBuf::from(env::var("IDASDKDIR").expect("IDASDKDIR should be set"));
     let pro_h = sdk_path.join("include").join("pro.h");
 
-    if !pro_h.exists() {
+    if check && !pro_h.exists() {
         panic!(
             "`{}` does not exist; SDK specified by `IDASDKDIR` is not usable",
             pro_h.display()
@@ -50,6 +54,10 @@ pub fn idalib_sdk_paths() -> (PathBuf, PathBuf, PathBuf, PathBuf) {
 }
 
 pub fn idalib_install_paths() -> (PathBuf, PathBuf, PathBuf) {
+    idalib_install_paths_with(true)
+}
+
+pub fn idalib_install_paths_with(check: bool) -> (PathBuf, PathBuf, PathBuf) {
     let path = env::var("IDADIR")
         .map(PathBuf::from)
         .unwrap_or_else(|_| link_path());
@@ -64,7 +72,7 @@ pub fn idalib_install_paths() -> (PathBuf, PathBuf, PathBuf) {
         panic!("unsupported platform")
     };
 
-    if !idalib.exists() {
+    if check && !idalib.exists() {
         panic!(
             "`{}` does not exist; cannot find a compatible IDA Pro installation",
             idalib.display()
@@ -75,7 +83,11 @@ pub fn idalib_install_paths() -> (PathBuf, PathBuf, PathBuf) {
 }
 
 pub fn idalib_library_paths() -> (PathBuf, PathBuf) {
-    let (_, idalib, ida) = idalib_install_paths();
+    idalib_library_paths_with(true)
+}
+
+pub fn idalib_library_paths_with(check: bool) -> (PathBuf, PathBuf) {
+    let (_, idalib, ida) = idalib_install_paths_with(check);
     (idalib, ida)
 }
 

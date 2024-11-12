@@ -33,20 +33,19 @@ fn main() {
 
     let ffi_path = PathBuf::from("src");
 
-    let mut builder =
-        autocxx_build::Builder::new(ffi_path.join("lib.rs"), &[&ffi_path, &ida])
-            .extra_clang_args(
-                #[cfg(target_os = "linux")]
-                &["-std=c++17", "-D__LINUX__=1", "-D__EA64__=1"],
-                #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
-                &["-std=c++17", "-D__MACOS__=1", "-D__ARM__=1", "-D__EA64__=1"],
-                #[cfg(all(target_os = "macos", target_arch = "x86_64"))]
-                &["-std=c++17", "-D__MACOS__=1", "-D__EA64__=1"],
-                #[cfg(target_os = "windows")]
-                &["-std=c++17", "-D__NT__=1", "-D__EA64__=1"],
-            )
-            .build()
-            .expect("parsed correctly");
+    let mut builder = autocxx_build::Builder::new(ffi_path.join("lib.rs"), &[&ffi_path, &ida])
+        .extra_clang_args(
+            #[cfg(target_os = "linux")]
+            &["-std=c++17", "-D__LINUX__=1", "-D__EA64__=1"],
+            #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+            &["-std=c++17", "-D__MACOS__=1", "-D__ARM__=1", "-D__EA64__=1"],
+            #[cfg(all(target_os = "macos", target_arch = "x86_64"))]
+            &["-std=c++17", "-D__MACOS__=1", "-D__EA64__=1"],
+            #[cfg(target_os = "windows")]
+            &["-std=c++17", "-D__NT__=1", "-D__EA64__=1"],
+        )
+        .build()
+        .expect("parsed correctly");
 
     #[cfg(target_os = "linux")]
     {

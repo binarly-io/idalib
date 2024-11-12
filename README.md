@@ -1,5 +1,10 @@
 # idalib
 
+[![crates.io](https://img.shields.io/crates/v/idalib)](https://crates.io/crates/idalib)
+[![documentation](https://img.shields.io/badge/documentation-0.1.1%2B9.0.240930-blue?link=https%3A%2F%2Fbinarly-io.github.io%2Fidalib%2Fidalib)](https://binarly-io.github.io/idalib/idalib/)
+[![license](https://img.shields.io/crates/l/idalib)](https://github.com/binarly-io/idalib)
+[![crates.io downloads](https://img.shields.io/crates/d/idalib)](https://crates.io/crates/idalib)
+
 Idiomatic Rust bindings for the IDA SDK, enabling the development of standalone
 analysis tools using IDA v9.0’s idalib.
 
@@ -28,12 +33,14 @@ locate the SDK and IDA installation using the following environment variables:
 
 - [xorpse/idalib-mp](https://github.com/xorpse/idalib-mp): example project demonstrating idalib + multi-processing.
 - [xorpse/wegglir](https://github.com/xorpse/wegglir): mass-scan source/decompiled code using weggli rulesets.
+- [0xdea/rhabdomancer](https://github.com/0xdea/rhabdomancer): locate calls to insecure API functions in a binary file.
 
 ### Examples
 
 A minimal project to working with `idalib` requires the following components:
 
 `Cargo.toml`:
+
 ```toml
 name = "example-analyser"
 
@@ -47,21 +54,23 @@ idalib-build = "0.1.0"
 ```
 
 `build.rs`:
+
 ```rust
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-  idalib_build::configure_linkage()?;
-  Ok(())
+    idalib_build::configure_linkage()?;
+    Ok(())
 }
 ```
 
 `src/main.rs`:
+
 ```rust
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-  let idb = idalib::IDB::open("/path/to/binary")?;
+    let idb = idalib::IDB::open("/path/to/binary")?;
 
-  // ...
+    // ...
 
-  Ok(())
+    Ok(())
 }
 ```
 

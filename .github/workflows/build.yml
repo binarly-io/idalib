@@ -1,0 +1,74 @@
+name: build
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: prepare IDA SDK
+        env:
+          IDASDK90_URL: ${{ secrets.IDASDK90_URL }}
+          IDASDK90_PASSWORD: ${{ secrets.IDASDK90_PASSWORD }}
+        run: |
+          curl -o "${{ runner.temp }}/idasdk90.zip" -L "$IDASDK90_URL"
+          unzip -d "${{ runner.temp }}" -P "$IDASDK90_PASSWORD" "${{ runner.temp }}/idasdk90.zip"
+      - name: build
+        env:
+          IDASDKDIR: "${{ runner.temp }}/idasdk90"
+        run: cargo build
+
+  build-macos:
+    runs-on: macOS-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: prepare IDA SDK
+        env:
+          IDASDK90_URL: ${{ secrets.IDASDK90_URL }}
+          IDASDK90_PASSWORD: ${{ secrets.IDASDK90_PASSWORD }}
+        run: |
+          curl -o "${{ runner.temp }}/idasdk90.zip" -L "$IDASDK90_URL"
+          unzip -d "${{ runner.temp }}" -P "$IDASDK90_PASSWORD" "${{ runner.temp }}/idasdk90.zip"
+      - name: build
+        env:
+          IDASDKDIR: "${{ runner.temp }}/idasdk90"
+        run: cargo build
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: install clang/llvm
+        uses: KyleMayes/install-llvm-action@e0a8dc9cb8a22e8a7696e8a91a4e9581bec13181
+        with:
+          version: "18.1.8"
+          directory: "${{ runner.temp }}/llvm-18"
+      - name: configure clang/llvm environment
+        run: echo "LIBCLANG_PATH=$((gcm clang).source -replace "clang.exe")" >> $env:GITHUB_ENV
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: prepare IDA SDK
+        env:
+          IDASDK90_URL: ${{ secrets.IDASDK90_URL }}
+          IDASDK90_PASSWORD: ${{ secrets.IDASDK90_PASSWORD }}
+        run: |
+          curl -o "${{ runner.temp }}/idasdk90.zip" -L $env:IDASDK90_URL
+          unzip -d "${{ runner.temp }}" -P $env:IDASDK90_PASSWORD "${{ runner.temp }}/idasdk90.zip"
+      - name: build
+        env:
+          IDASDKDIR: "${{ runner.temp }}/idasdk90"
+        run: cargo build

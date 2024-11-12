@@ -1,3 +1,5 @@
+#![doc(html_no_source)]
+
 use autocxx::prelude::*;
 use thiserror::Error;
 
@@ -13,6 +15,8 @@ pub enum IDAError {
     OpenDb(autocxx::c_int),
     #[error("could not close IDA database: error code {:x}", _0.0)]
     CloseDb(autocxx::c_int),
+    #[error("invalid license")]
+    InvalidLicense,
     #[error("could not generate pattern or signature files")]
     MakeSigs,
 }
@@ -45,6 +49,7 @@ include_cpp! {
     #include "ida.hpp"
     #include "idalib.hpp"
     #include "idp.hpp"
+    #include "loader.hpp"
     #include "moves.hpp"
     #include "pro.h"
     #include "segment.hpp"
@@ -277,6 +282,22 @@ include_cpp! {
     // comments
     generate!("set_cmt")
     generate!("append_cmt")
+
+    // loader
+    generate!("plugin_t")
+    generate!("find_plugin")
+    generate!("run_plugin")
+
+    generate!("PLUGIN_MOD")
+    generate!("PLUGIN_DRAW")
+    generate!("PLUGIN_SEG")
+    generate!("PLUGIN_UNL")
+    generate!("PLUGIN_HIDE")
+    generate!("PLUGIN_DBG")
+    generate!("PLUGIN_PROC")
+    generate!("PLUGIN_FIX")
+    generate!("PLUGIN_MULTI")
+    generate!("PLUGIN_SCRIPTED")
 }
 
 pub mod hexrays {
@@ -474,8 +495,9 @@ mod ffix {
         include!("entry_extras.h");
         include!("func_extras.h");
         include!("hexrays_extras.h");
-        include!("kernwin_extras.h");
         include!("inf_extras.h");
+        include!("kernwin_extras.h");
+        include!("loader_extras.h");
         include!("ph_extras.h");
         include!("segm_extras.h");
 
@@ -506,9 +528,13 @@ mod ffix {
 
         type cblock_iter;
 
+        type plugin_t = super::ffi::plugin_t;
+
         unsafe fn init_library(argc: c_int, argv: *mut *mut c_char) -> c_int;
 
-        unsafe fn open_database_quiet(name: *const c_char, auto_analysis: bool) -> c_int;
+        unsafe fn idalib_open_database_quiet(name: *const c_char, auto_analysis: bool) -> c_int;
+        unsafe fn idalib_check_license() -> bool;
+        unsafe fn idalib_get_license_id(id: &mut [u8; 6]) -> bool;
 
         // NOTE: we can't use uval_t here due to it resolving to c_ulonglong,
         // which causes `verify_extern_type` to fail...
@@ -739,6 +765,9 @@ mod ffix {
         unsafe fn idalib_get_dword(ea: c_ulonglong) -> u32;
         unsafe fn idalib_get_qword(ea: c_ulonglong) -> u64;
         unsafe fn idalib_get_bytes(ea: c_ulonglong, buf: &mut Vec<u8>) -> Result<usize>;
+
+        unsafe fn idalib_plugin_version(p: *const plugin_t) -> u64;
+        unsafe fn idalib_plugin_flags(p: *const plugin_t) -> u64;
     }
 }
 
@@ -894,6 +923,18 @@ pub mod bookmarks {
     };
 }
 
+pub mod loader {
+    pub use super::ffi::{find_plugin, plugin_t, run_plugin};
+    pub use super::ffix::{idalib_plugin_flags, idalib_plugin_version};
+
+    pub mod flags {
+        pub use super::super::ffi::{
+            PLUGIN_DBG, PLUGIN_DRAW, PLUGIN_FIX, PLUGIN_HIDE, PLUGIN_MOD, PLUGIN_MULTI,
+            PLUGIN_PROC, PLUGIN_SCRIPTED, PLUGIN_SEG, PLUGIN_UNL,
+        };
+    }
+}
+
 pub mod ida {
     use std::env;
     use std::ffi::CString;
@@ -906,6 +947,27 @@ pub mod ida {
     use super::{ea_t, ffi, ffix, IDAError};
 
     pub use ffi::auto_wait;
+
+    pub fn is_license_valid() -> bool {
+        if !is_main_thread() {
+            panic!("IDA cannot function correctly when not running on the main thread");
+        }
+
+        unsafe { self::ffix::idalib_check_license() }
+    }
+
+    pub fn license_id() -> Result<[u8; 6], IDAError> {
+        if !is_main_thread() {
+            panic!("IDA cannot function correctly when not running on the main thread");
+        }
+
+        let mut lid = [0u8; 6];
+        if unsafe { self::ffix::idalib_get_license_id(&mut lid) } {
+            Ok(lid)
+        } else {
+            Err(IDAError::InvalidLicense)
+        }
+    }
 
     // NOTE: once; main thread
     pub fn init_library() -> Result<(), IDAError> {
@@ -961,6 +1023,10 @@ pub mod ida {
             panic!("IDA cannot function correctly when not running on the main thread");
         }
 
+        if !is_license_valid() {
+            return Err(IDAError::InvalidLicense);
+        }
+
         let path = CString::new(path.as_ref().to_string_lossy().as_ref()).map_err(IDAError::ffi)?;
 
         let res = unsafe { self::ffi::open_database(path.as_ptr(), auto_analysis) };
@@ -972,14 +1038,21 @@ pub mod ida {
         }
     }
 
-    pub fn open_database_quiet(path: impl AsRef<Path>, auto_analysis: bool) -> Result<(), IDAError> {
+    pub fn open_database_quiet(
+        path: impl AsRef<Path>,
+        auto_analysis: bool,
+    ) -> Result<(), IDAError> {
         if !is_main_thread() {
             panic!("IDA cannot function correctly when not running on the main thread");
         }
 
+        if !is_license_valid() {
+            return Err(IDAError::InvalidLicense);
+        }
+
         let path = CString::new(path.as_ref().to_string_lossy().as_ref()).map_err(IDAError::ffi)?;
 
-        let res = unsafe { self::ffix::open_database_quiet(path.as_ptr(), auto_analysis) };
+        let res = unsafe { self::ffix::idalib_open_database_quiet(path.as_ptr(), auto_analysis) };
 
         if res != c_int(0) {
             Err(IDAError::OpenDb(res))
