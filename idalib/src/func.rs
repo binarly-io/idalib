@@ -172,6 +172,10 @@ impl<'a> Function<'a> {
         }
     }
 
+    pub(crate) fn as_ptr(&self) -> *mut func_t {
+        self.ptr
+    }
+
     fn as_range_t(&self) -> *const range_t {
         self.ptr.cast()
     }

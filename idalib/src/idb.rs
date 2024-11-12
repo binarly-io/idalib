@@ -7,6 +7,7 @@ use crate::ffi::bytes::*;
 use crate::ffi::comments::{append_cmt, idalib_get_cmt, set_cmt};
 use crate::ffi::entry::{get_entry, get_entry_ordinal, get_entry_qty};
 use crate::ffi::func::{get_func, get_func_qty, getn_func};
+use crate::ffi::hexrays::{decompile_func, init_hexrays_plugin, term_hexrays_plugin};
 use crate::ffi::ida::{
     auto_wait, close_database_with, make_signatures, open_database_quiet, set_screen_ea,
 };
@@ -19,6 +20,7 @@ use crate::ffi::xref::{xrefblk_t, xrefblk_t_first_from, xrefblk_t_first_to};
 use crate::ffi::BADADDR;
 
 use crate::bookmarks::Bookmarks;
+use crate::decompiler::CFunction;
 use crate::func::{Function, FunctionId};
 use crate::insn::{Insn, Register};
 use crate::meta::Metadata;
@@ -31,6 +33,7 @@ use crate::{prepare_library, Address, IDAError, IDARuntimeHandle};
 pub struct IDB {
     path: PathBuf,
     save: bool,
+    decompiler: bool,
     _guard: IDARuntimeHandle,
     _marker: PhantomData<*const ()>,
 }
@@ -50,9 +53,12 @@ impl IDB {
 
         open_database_quiet(path, auto_analyse)?;
 
+        let decompiler = unsafe { init_hexrays_plugin(0.into()) };
+
         Ok(Self {
             path: path.to_owned(),
             save,
+            decompiler,
             _guard,
             _marker: PhantomData,
         })
@@ -76,6 +82,10 @@ impl IDB {
 
     pub fn make_signatures(&mut self, only_pat: bool) -> Result<(), IDAError> {
         make_signatures(only_pat)
+    }
+
+    pub fn decompiler_available(&self) -> bool {
+        self.decompiler
     }
 
     pub fn meta<'a>(&'a self) -> Metadata<'a> {
@@ -135,6 +145,22 @@ impl IDB {
     pub fn insn_at(&self, ea: Address) -> Option<Insn> {
         let insn = decode(ea.into())?;
         Some(Insn::from_repr(insn))
+    }
+
+    pub fn decompile<'a>(&'a self, f: &Function<'a>) -> Option<CFunction<'a>> {
+        self.decompile_with(f, false)
+    }
+
+    pub fn decompile_with<'a>(
+        &'a self,
+        f: &Function<'a>,
+        all_blocks: bool,
+    ) -> Option<CFunction<'a>> {
+        if !self.decompiler {
+            return None;
+        }
+
+        decompile_func(f.as_ptr(), all_blocks).and_then(CFunction::new)
     }
 
     pub fn function_by_id<'a>(&'a self, id: FunctionId) -> Option<Function<'a>> {
@@ -355,6 +381,11 @@ impl IDB {
 
 impl Drop for IDB {
     fn drop(&mut self) {
+        if self.decompiler {
+            unsafe {
+                term_hexrays_plugin();
+            }
+        }
         close_database_with(self.save);
     }
 }
