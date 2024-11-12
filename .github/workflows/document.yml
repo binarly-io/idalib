@@ -1,0 +1,47 @@
+name: document
+
+permissions:
+  contents: write
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: prepare IDA SDK
+        env:
+          IDASDK90_URL: ${{ secrets.IDASDK90_URL }}
+          IDASDK90_PASSWORD: ${{ secrets.IDASDK90_PASSWORD }}
+        run: |
+          curl -o "${{ runner.temp }}/idasdk90.zip" -L "$IDASDK90_URL"
+          unzip -d "${{ runner.temp }}" -P "$IDASDK90_PASSWORD" "${{ runner.temp }}/idasdk90.zip"
+      - name: generate documentation
+        env:
+          IDASDKDIR: "${{ runner.temp }}/idasdk90"
+        run: cargo doc --no-deps
+      - name: git configuration
+        run: |
+          git config user.name "GitHub Actions for idalib"
+          git config user.email "idalib@binarly.io"
+          git config push.autosetupremote true
+      - name: deploy
+        run: |
+          git fetch --all
+          git checkout gh-pages
+          cp -ru target/doc/* .
+          rm -rf target Cargo.lock
+          git add .
+          git config push.autosetupremote true
+          git commit -m 'update documentation'
+          git push
