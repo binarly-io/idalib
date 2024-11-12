@@ -642,6 +642,7 @@ mod ffix {
         unsafe fn idalib_bookmarks_t_find_index(ea: c_ulonglong) -> u32;
 
         unsafe fn idalib_find_text(ea: c_ulonglong, text: *const c_char) -> c_ulonglong;
+        unsafe fn idalib_find_imm(ea: c_ulonglong, imm: c_uint) -> c_ulonglong;
         unsafe fn idalib_find_defined(ea: c_ulonglong) -> c_ulonglong;
 
         unsafe fn idalib_get_byte(ea: c_ulonglong) -> u8;
@@ -808,7 +809,7 @@ pub mod bookmarks {
 }
 
 pub mod search {
-    pub use super::ffix::{idalib_find_defined, idalib_find_text};
+    pub use super::ffix::{idalib_find_defined, idalib_find_imm, idalib_find_text};
 }
 
 pub mod loader {

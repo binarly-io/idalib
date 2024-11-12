@@ -13,7 +13,7 @@ use crate::ffi::ida::{
 use crate::ffi::insn::decode;
 use crate::ffi::loader::find_plugin;
 use crate::ffi::processor::get_ph;
-use crate::ffi::search::{idalib_find_defined, idalib_find_text};
+use crate::ffi::search::{idalib_find_defined, idalib_find_imm, idalib_find_text};
 use crate::ffi::segment::{get_segm_qty, getnseg, getseg};
 use crate::ffi::util::{is_align_insn, next_head, prev_head, str2reg};
 use crate::ffi::xref::{xrefblk_t, xrefblk_t_first_from, xrefblk_t_first_to};
@@ -324,6 +324,16 @@ impl IDB {
             None
         } else {
             Some(v)
+        }
+    }
+
+    // TODO: test, add `find_imm_all()`?
+    pub fn find_imm(&self, start_ea: Address, imm: u32) -> Option<Address> {
+        let addr = unsafe { idalib_find_imm(start_ea.into(), imm.into()) };
+        if addr == BADADDR {
+            None
+        } else {
+            Some(addr.into())
         }
     }
 
