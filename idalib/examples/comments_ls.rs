@@ -4,7 +4,7 @@ fn main() -> anyhow::Result<()> {
     println!("Trying to open IDA database...");
 
     // Open IDA database
-    let idb = IDB::open_with("./tests/ls", true, true)?;
+    let idb = IDB::open("./tests/ls")?;
 
     println!("Testing remove_cmt() and get_cmt() (pass 1; clear old comments)");
     for (_id, f) in idb.functions() {
@@ -38,8 +38,7 @@ fn main() -> anyhow::Result<()> {
     println!("Testing find_text_iter()");
     let results: Vec<_> = idb.find_text_iter("added by idalib").collect();
     assert!(!results.is_empty());
-    // text search appears to be buggy, some results are missing
-    // let results = results.unwrap();
+    // FIXME: text search doesn't display results located in collapsed functions
     // assert_eq!(results.len(), idb.functions().count());
 
     println!("Testing append_cmt() and get_cmt()");
