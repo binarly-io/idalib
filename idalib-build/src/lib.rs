@@ -112,15 +112,17 @@ pub fn configure_idalib_linkage() {
 pub fn configure_idasdk_linkage() {
     let (_, stubs_path, _, _) = idalib_sdk_paths();
     configure_linkage_aux(&stubs_path);
+
+    if cfg!(target_os = "windows") {
+        // FIXME: this seems to be required otherwise we report missing symbols and bail during
+        // linking (seems to be due to autocxx)...
+        println!("cargo::rustc-link-arg=/FORCE:UNRESOLVED");
+    }
 }
 
 pub fn configure_linkage() -> anyhow::Result<()> {
     if cfg!(target_os = "windows") {
         configure_idasdk_linkage();
-
-        // FIXME: this seems to be required otherwise we report missing symbols and bail during
-        // linking (seems to be due to autocxx)...
-        println!("cargo::rustc-link-arg=/FORCE:UNRESOLVED");
         return Ok(());
     }
 
