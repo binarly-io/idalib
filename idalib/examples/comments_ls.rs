@@ -35,9 +35,9 @@ fn main() -> anyhow::Result<()> {
         assert!(read_comment.unwrap().starts_with("Comment added by idalib"));
     }
 
-    println!("Testing find_text_all()");
-    let results = idb.find_text_all("added by idalib");
-    assert!(results.is_some());
+    println!("Testing find_text_iter()");
+    let results: Vec<_> = idb.find_text_iter("added by idalib").collect();
+    assert!(!results.is_empty());
     // text search appears to be buggy, some results are missing
     // let results = results.unwrap();
     // assert_eq!(results.len(), idb.functions().count());
@@ -67,9 +67,9 @@ fn main() -> anyhow::Result<()> {
         assert!(read_comment.is_none());
     }
 
-    println!("Testing find_text_all()");
-    let results = idb.find_text_all("added by idalib");
-    assert!(results.is_none());
+    println!("Testing find_text_iter()");
+    let results: Vec<_> = idb.find_text_iter("added by idalib").collect();
+    assert!(results.is_empty());
 
     Ok(())
 }

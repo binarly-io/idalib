@@ -311,18 +311,16 @@ impl IDB {
         }
     }
 
-    pub fn find_text_all(&self, text: impl AsRef<str>) -> Option<Vec<Address>> {
-        let mut v = vec![];
+    pub fn find_text_iter<'a, T>(&'a self, text: T) -> impl Iterator<Item = Address> + 'a
+    where
+        T: AsRef<str> + 'a,
+    {
         let mut cur = 0u64;
-        while let Some(found) = self.find_text(cur, text.as_ref()) {
-            v.push(found);
+        std::iter::from_fn(move || {
+            let found = self.find_text(cur, text.as_ref())?;
             cur = self.find_defined(found).unwrap_or(BADADDR.into());
-        }
-        if v.is_empty() {
-            None
-        } else {
-            Some(v)
-        }
+            Some(found)
+        })
     }
 
     pub fn find_imm(&self, start_ea: Address, imm: u32) -> Option<Address> {
@@ -334,18 +332,12 @@ impl IDB {
         }
     }
 
-    pub fn find_imm_all(&self, imm: u32) -> Option<Vec<Address>> {
-        let mut v = vec![];
+    pub fn find_imm_iter<'a>(&'a self, imm: u32) -> impl Iterator<Item = Address> + 'a {
         let mut cur = 0u64;
-        while let Some(found) = self.find_imm(cur, imm) {
-            v.push(found);
-            cur = found;
-        }
-        if v.is_empty() {
-            None
-        } else {
-            Some(v)
-        }
+        std::iter::from_fn(move || {
+            cur = self.find_imm(cur, imm)?;
+            Some(cur)
+        })
     }
 
     pub fn find_defined(&self, start_ea: Address) -> Option<Address> {
