@@ -38,6 +38,7 @@ fn main() -> anyhow::Result<()> {
     }
 
     println!("Testing len(), get_address(), and get_description()");
+    // len()
     for i in 0..idb.bookmarks().len() {
         // get_address()
         let read_addr = idb.bookmarks().get_address(i).unwrap();
