@@ -4,7 +4,7 @@ fn main() -> anyhow::Result<()> {
     println!("Trying to open IDA database...");
 
     // Open IDA database
-    let idb = IDB::open_with("./tests/ls", true, true)?;
+    let idb = IDB::open("./tests/ls")?;
 
     println!("Testing erase(), get_description(), and len() (pass 1; clear old bookmarks)");
     for (_id, f) in idb.functions() {
