@@ -270,7 +270,7 @@ bool idalib_inf_show_hidden_insns() { return inf_show_hidden_insns(); }
 bool idalib_inf_set_show_hidden_insns() { return inf_set_show_hidden_insns(); }
 
 bool idalib_inf_show_hidden_funcs() { return inf_show_hidden_funcs(); }
-bool idalib_inf_set_show_hidden_funcs() { return inf_set_show_hidden_insns(); }
+bool idalib_inf_set_show_hidden_funcs() { return inf_set_show_hidden_funcs(); }
 
 bool idalib_inf_show_hidden_segms() { return inf_show_hidden_segms(); }
 bool idalib_inf_set_show_hidden_segms() { return inf_set_show_hidden_segms(); }

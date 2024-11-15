@@ -44,7 +44,6 @@ fn main() -> anyhow::Result<()> {
     println!("Testing find_text_iter()");
     let results: Vec<_> = idb.find_text_iter("added by idalib").collect();
     assert!(!results.is_empty());
-    // FIXME: text search doesn't display results located in collapsed functions
     assert_eq!(results.len(), idb.functions().count());
 
     println!("Testing append_cmt() and get_cmt()");
