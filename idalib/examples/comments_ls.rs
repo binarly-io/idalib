@@ -22,9 +22,8 @@ fn main() -> anyhow::Result<()> {
     for (id, f) in idb.functions() {
         let addr = f.start_address();
         let comment = format!(
-            "Comment added by idalib: {id} {} {:#x}",
-            f.name().unwrap(),
-            addr
+            "Comment added by idalib: {id} {} {addr:#x}",
+            f.name().unwrap()
         );
 
         // set_cmt()

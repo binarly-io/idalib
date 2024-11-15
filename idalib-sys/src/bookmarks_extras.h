@@ -33,6 +33,26 @@ rust::String idalib_bookmarks_t_get_desc(uint32 index) {
   }
 }
 
+ea_t idalib_bookmarks_t_get(uint32 index) {
+  auto desc = qstring();
+  ea_t ea = 0;
+
+  idaplace_t ipl(ea, 0);
+  renderer_info_t rinfo;
+  rinfo.rtype = TCCRT_FLAT;
+  rinfo.pos.cx = 0;
+  rinfo.pos.cy = 5;
+  lochist_entry_t e(&ipl, rinfo);
+
+  lochist_entry_t loc(e);
+
+  if (bookmarks_t_get(&loc, &desc, &index, nullptr) != 0) {
+    return loc.place()->toea();
+  } else {
+    return BADADDR;
+  }
+}
+
 bool idalib_bookmarks_t_erase(uint32 index) {
   ea_t ea = 0;
 

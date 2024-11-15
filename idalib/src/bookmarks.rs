@@ -2,9 +2,10 @@ use std::ffi::CString;
 use std::marker::PhantomData;
 
 use crate::ffi::bookmarks::{
-    idalib_bookmarks_t_erase, idalib_bookmarks_t_find_index, idalib_bookmarks_t_get_desc,
-    idalib_bookmarks_t_mark, idalib_bookmarks_t_size,
+    idalib_bookmarks_t_erase, idalib_bookmarks_t_find_index, idalib_bookmarks_t_get,
+    idalib_bookmarks_t_get_desc, idalib_bookmarks_t_mark, idalib_bookmarks_t_size,
 };
+use crate::ffi::BADADDR;
 
 use crate::idb::IDB;
 use crate::{Address, IDAError};
@@ -55,6 +56,17 @@ impl<'a> Bookmarks<'a> {
 
     pub fn get_description(&self, ea: Address) -> Option<String> {
         self.get_description_by_index(self.find_index(ea)?)
+    }
+
+    // Note: The `bookmarks_t::get` function is used here only to get the address
+    pub fn get_address(&self, idx: BookmarkIndex) -> Option<Address> {
+        let addr = unsafe { idalib_bookmarks_t_get(idx.into()) };
+
+        if addr == BADADDR {
+            None
+        } else {
+            Some(addr.into())
+        }
     }
 
     // Note: The address parameter has been removed because it is unused by IDA's API
