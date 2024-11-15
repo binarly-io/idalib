@@ -4,7 +4,10 @@ fn main() -> anyhow::Result<()> {
     println!("Trying to open IDA database...");
 
     // Open IDA database
-    let idb = IDB::open_with("./tests/ls", true, true)?;
+    let mut idb = IDB::open_with("./tests/ls", true, true)?;
+
+    // Show all functions
+    idb.meta_mut().set_show_hidden_funcs();
 
     println!("Testing remove_cmt() and get_cmt() (pass 1; clear old comments)");
     for (_id, f) in idb.functions() {
