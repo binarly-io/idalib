@@ -450,7 +450,9 @@ pub mod inf {
         idalib_inf_pack_stkargs, idalib_inf_prefix_show_funcoff, idalib_inf_prefix_show_segaddr,
         idalib_inf_prefix_show_stack, idalib_inf_prefix_truncate_opcode_bytes,
         idalib_inf_propagate_regargs, idalib_inf_propagate_stkargs, idalib_inf_readonly_idb,
-        idalib_inf_rename_jumpfunc, idalib_inf_rename_nullsub, idalib_inf_should_create_stkvars,
+        idalib_inf_rename_jumpfunc, idalib_inf_rename_nullsub, idalib_inf_set_show_all_comments,
+        idalib_inf_set_show_hidden_funcs, idalib_inf_set_show_hidden_insns,
+        idalib_inf_set_show_hidden_segms, idalib_inf_should_create_stkvars,
         idalib_inf_should_trace_sp, idalib_inf_show_all_comments, idalib_inf_show_auto,
         idalib_inf_show_hidden_funcs, idalib_inf_show_hidden_insns, idalib_inf_show_hidden_segms,
         idalib_inf_show_line_pref, idalib_inf_show_repeatables, idalib_inf_show_src_linnum,
@@ -672,12 +674,16 @@ mod ffix {
         unsafe fn idalib_inf_get_cmtflg() -> u8;
         unsafe fn idalib_inf_show_repeatables() -> bool;
         unsafe fn idalib_inf_show_all_comments() -> bool;
+        unsafe fn idalib_inf_set_show_all_comments() -> bool;
         unsafe fn idalib_inf_hide_comments() -> bool;
         unsafe fn idalib_inf_show_src_linnum() -> bool;
         unsafe fn idalib_inf_test_mode() -> bool;
         unsafe fn idalib_inf_show_hidden_insns() -> bool;
+        unsafe fn idalib_inf_set_show_hidden_insns() -> bool;
         unsafe fn idalib_inf_show_hidden_funcs() -> bool;
+        unsafe fn idalib_inf_set_show_hidden_funcs() -> bool;
         unsafe fn idalib_inf_show_hidden_segms() -> bool;
+        unsafe fn idalib_inf_set_show_hidden_segms() -> bool;
         unsafe fn idalib_inf_get_limiter() -> u8;
         unsafe fn idalib_inf_is_limiter_thin() -> bool;
         unsafe fn idalib_inf_is_limiter_thick() -> bool;

@@ -805,3 +805,31 @@ impl<'a> Metadata<'a> {
         unsafe { idalib_inf_get_strlit_pref() }
     }
 }
+
+pub struct MetadataMut<'a> {
+    _marker: PhantomData<&'a mut IDB>,
+}
+
+impl<'a> MetadataMut<'a> {
+    pub(crate) fn new() -> Self {
+        Self {
+            _marker: PhantomData,
+        }
+    }
+
+    pub fn set_show_all_comments(&mut self) -> bool {
+        unsafe { idalib_inf_set_show_all_comments() }
+    }
+
+    pub fn set_show_hidden_insns(&mut self) -> bool {
+        unsafe { idalib_inf_set_show_hidden_insns() }
+    }
+
+    pub fn set_show_hidden_funcs(&mut self) -> bool {
+        unsafe { idalib_inf_set_show_hidden_funcs() }
+    }
+
+    pub fn set_show_hidden_segms(&mut self) -> bool {
+        unsafe { idalib_inf_set_show_hidden_segms() }
+    }
+}
