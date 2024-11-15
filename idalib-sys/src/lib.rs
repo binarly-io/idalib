@@ -500,6 +500,7 @@ mod ffix {
         include!("loader_extras.h");
         include!("ph_extras.h");
         include!("segm_extras.h");
+        include!("search_extras.h");
 
         type c_short = autocxx::c_short;
         type c_int = autocxx::c_int;
@@ -760,6 +761,10 @@ mod ffix {
         unsafe fn idalib_bookmarks_t_size() -> u32;
         unsafe fn idalib_bookmarks_t_find_index(ea: c_ulonglong) -> u32;
 
+        unsafe fn idalib_find_text(ea: c_ulonglong, text: *const c_char) -> c_ulonglong;
+        unsafe fn idalib_find_imm(ea: c_ulonglong, imm: c_uint) -> c_ulonglong;
+        unsafe fn idalib_find_defined(ea: c_ulonglong) -> c_ulonglong;
+
         unsafe fn idalib_get_byte(ea: c_ulonglong) -> u8;
         unsafe fn idalib_get_word(ea: c_ulonglong) -> u16;
         unsafe fn idalib_get_dword(ea: c_ulonglong) -> u32;
@@ -921,6 +926,10 @@ pub mod bookmarks {
         idalib_bookmarks_t_erase, idalib_bookmarks_t_find_index, idalib_bookmarks_t_get_desc,
         idalib_bookmarks_t_mark, idalib_bookmarks_t_size,
     };
+}
+
+pub mod search {
+    pub use super::ffix::{idalib_find_defined, idalib_find_imm, idalib_find_text};
 }
 
 pub mod loader {
