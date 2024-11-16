@@ -24,7 +24,7 @@ use crate::bookmarks::Bookmarks;
 use crate::decompiler::CFunction;
 use crate::func::{Function, FunctionId};
 use crate::insn::{Insn, Register};
-use crate::meta::Metadata;
+use crate::meta::{Metadata, MetadataMut};
 use crate::plugin::Plugin;
 use crate::processor::Processor;
 use crate::segment::{Segment, SegmentId};
@@ -91,6 +91,10 @@ impl IDB {
 
     pub fn meta<'a>(&'a self) -> Metadata<'a> {
         Metadata::new()
+    }
+
+    pub fn meta_mut<'a>(&'a mut self) -> MetadataMut<'a> {
+        MetadataMut::new()
     }
 
     pub fn processor<'a>(&'a self) -> Processor<'a> {

@@ -259,6 +259,7 @@ std::uint8_t idalib_inf_get_cmtflg()  { return inf_get_cmtflg(); }
 bool idalib_inf_show_repeatables() { return inf_show_repeatables(); }
 
 bool idalib_inf_show_all_comments() { return inf_show_all_comments(); }
+bool idalib_inf_set_show_all_comments() { return inf_set_show_all_comments(); }
 
 bool idalib_inf_hide_comments() { return inf_hide_comments(); }
 
@@ -266,10 +267,13 @@ bool idalib_inf_show_src_linnum() { return inf_show_src_linnum(); }
 
 bool idalib_inf_test_mode() { return inf_test_mode(); }
 bool idalib_inf_show_hidden_insns() { return inf_show_hidden_insns(); }
+bool idalib_inf_set_show_hidden_insns() { return inf_set_show_hidden_insns(); }
 
 bool idalib_inf_show_hidden_funcs() { return inf_show_hidden_funcs(); }
+bool idalib_inf_set_show_hidden_funcs() { return inf_set_show_hidden_funcs(); }
 
 bool idalib_inf_show_hidden_segms() { return inf_show_hidden_segms(); }
+bool idalib_inf_set_show_hidden_segms() { return inf_set_show_hidden_segms(); }
 
 
 std::uint8_t idalib_inf_get_limiter()  { return inf_get_limiter(); }
