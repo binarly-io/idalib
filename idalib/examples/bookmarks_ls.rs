@@ -25,9 +25,8 @@ fn main() -> anyhow::Result<()> {
     for (id, f) in idb.functions() {
         let addr = f.start_address();
         let desc = format!(
-            "Bookmark added by idalib: {id} {} {:#x}",
+            "Bookmark added by idalib: {id} {} {addr:#x}",
             f.name().unwrap(),
-            addr
         );
 
         // mark()
@@ -36,6 +35,19 @@ fn main() -> anyhow::Result<()> {
         // get_description()
         let read_desc = idb.bookmarks().get_description(addr);
         assert_eq!(read_desc.unwrap(), desc);
+    }
+
+    println!("Testing len(), get_address(), and get_description()");
+    // len()
+    for i in 0..idb.bookmarks().len() {
+        // get_address()
+        let read_addr = idb.bookmarks().get_address(i).unwrap();
+        let addr_str = format!("{read_addr:#x}");
+
+        // get_description()
+        let read_desc = idb.bookmarks().get_description(read_addr).unwrap();
+
+        assert!(read_desc.ends_with(addr_str.as_str()));
     }
 
     println!("Testing erase(), get_description(), and len() (pass 2)");
