@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["idalib_find_defined","idalib_find_imm","idalib_find_text"]};
