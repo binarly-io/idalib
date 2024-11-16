@@ -148,6 +148,20 @@
 <a href="#148" id="148">148</a>
 <a href="#149" id="149">149</a>
 <a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::env;
 <span class="kw">use </span>std::path::{Path, PathBuf};
 
@@ -163,10 +177,14 @@
 }
 
 <span class="kw">pub fn </span>idalib_sdk_paths() -&gt; (PathBuf, PathBuf, PathBuf, PathBuf) {
+    idalib_sdk_paths_with(<span class="bool-val">true</span>)
+}
+
+<span class="kw">pub fn </span>idalib_sdk_paths_with(check: bool) -&gt; (PathBuf, PathBuf, PathBuf, PathBuf) {
     <span class="kw">let </span>sdk_path = PathBuf::from(env::var(<span class="string">"IDASDKDIR"</span>).expect(<span class="string">"IDASDKDIR should be set"</span>));
     <span class="kw">let </span>pro_h = sdk_path.join(<span class="string">"include"</span>).join(<span class="string">"pro.h"</span>);
 
-    <span class="kw">if </span>!pro_h.exists() {
+    <span class="kw">if </span>check &amp;&amp; !pro_h.exists() {
         <span class="macro">panic!</span>(
             <span class="string">"`{}` does not exist; SDK specified by `IDASDKDIR` is not usable"</span>,
             pro_h.display()
@@ -200,6 +218,10 @@
 }
 
 <span class="kw">pub fn </span>idalib_install_paths() -&gt; (PathBuf, PathBuf, PathBuf) {
+    idalib_install_paths_with(<span class="bool-val">true</span>)
+}
+
+<span class="kw">pub fn </span>idalib_install_paths_with(check: bool) -&gt; (PathBuf, PathBuf, PathBuf) {
     <span class="kw">let </span>path = env::var(<span class="string">"IDADIR"</span>)
         .map(PathBuf::from)
         .unwrap_or_else(|<span class="kw">_</span>| link_path());
@@ -214,7 +236,7 @@
         <span class="macro">panic!</span>(<span class="string">"unsupported platform"</span>)
     };
 
-    <span class="kw">if </span>!idalib.exists() {
+    <span class="kw">if </span>check &amp;&amp; !idalib.exists() {
         <span class="macro">panic!</span>(
             <span class="string">"`{}` does not exist; cannot find a compatible IDA Pro installation"</span>,
             idalib.display()
@@ -225,7 +247,11 @@
 }
 
 <span class="kw">pub fn </span>idalib_library_paths() -&gt; (PathBuf, PathBuf) {
-    <span class="kw">let </span>(<span class="kw">_</span>, idalib, ida) = idalib_install_paths();
+    idalib_library_paths_with(<span class="bool-val">true</span>)
+}
+
+<span class="kw">pub fn </span>idalib_library_paths_with(check: bool) -&gt; (PathBuf, PathBuf) {
+    <span class="kw">let </span>(<span class="kw">_</span>, idalib, ida) = idalib_install_paths_with(check);
     (idalib, ida)
 }
 
@@ -250,15 +276,17 @@
 <span class="kw">pub fn </span>configure_idasdk_linkage() {
     <span class="kw">let </span>(<span class="kw">_</span>, stubs_path, <span class="kw">_</span>, <span class="kw">_</span>) = idalib_sdk_paths();
     configure_linkage_aux(<span class="kw-2">&amp;</span>stubs_path);
+
+    <span class="kw">if </span><span class="macro">cfg!</span>(target_os = <span class="string">"windows"</span>) {
+        <span class="comment">// FIXME: this seems to be required otherwise we report missing symbols and bail during
+        // linking (seems to be due to autocxx)...
+        </span><span class="macro">println!</span>(<span class="string">"cargo::rustc-link-arg=/FORCE:UNRESOLVED"</span>);
+    }
 }
 
 <span class="kw">pub fn </span>configure_linkage() -&gt; anyhow::Result&lt;()&gt; {
     <span class="kw">if </span><span class="macro">cfg!</span>(target_os = <span class="string">"windows"</span>) {
         configure_idasdk_linkage();
-
-        <span class="comment">// FIXME: this seems to be required otherwise we report missing symbols and bail during
-        // linking (seems to be due to autocxx)...
-        </span><span class="macro">println!</span>(<span class="string">"cargo::rustc-link-arg=/FORCE:UNRESOLVED"</span>);
         <span class="kw">return </span><span class="prelude-val">Ok</span>(());
     }
 

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["Compiler","FileType"],"struct":["AnalysisFlags","AnalysisFlags2","Metadata","ShowXRefFlags"]};
+window.SIDEBAR_ITEMS = {"enum":["Compiler","FileType"],"struct":["AnalysisFlags","AnalysisFlags2","Metadata","MetadataMut","ShowXRefFlags"]};

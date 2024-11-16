@@ -112,13 +112,26 @@
 <a href="#112" id="112">112</a>
 <a href="#113" id="113">113</a>
 <a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::ffi::CString;
 <span class="kw">use </span>std::marker::PhantomData;
 
 <span class="kw">use </span><span class="kw">crate</span>::ffi::bookmarks::{
-    idalib_bookmarks_t_erase, idalib_bookmarks_t_find_index, idalib_bookmarks_t_get_desc,
-    idalib_bookmarks_t_mark, idalib_bookmarks_t_size,
+    idalib_bookmarks_t_erase, idalib_bookmarks_t_find_index, idalib_bookmarks_t_get,
+    idalib_bookmarks_t_get_desc, idalib_bookmarks_t_mark, idalib_bookmarks_t_size,
 };
+<span class="kw">use </span><span class="kw">crate</span>::ffi::BADADDR;
 
 <span class="kw">use </span><span class="kw">crate</span>::idb::IDB;
 <span class="kw">use crate</span>::{Address, IDAError};
@@ -169,6 +182,17 @@
 
     <span class="kw">pub fn </span>get_description(<span class="kw-2">&amp;</span><span class="self">self</span>, ea: Address) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
         <span class="self">self</span>.get_description_by_index(<span class="self">self</span>.find_index(ea)<span class="question-mark">?</span>)
+    }
+
+    <span class="comment">// Note: The `bookmarks_t::get` function is used here only to get the address
+    </span><span class="kw">pub fn </span>get_address(<span class="kw-2">&amp;</span><span class="self">self</span>, idx: BookmarkIndex) -&gt; <span class="prelude-ty">Option</span>&lt;Address&gt; {
+        <span class="kw">let </span>addr = <span class="kw">unsafe </span>{ idalib_bookmarks_t_get(idx.into()) };
+
+        <span class="kw">if </span>addr == BADADDR {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="prelude-val">Some</span>(addr.into())
+        }
     }
 
     <span class="comment">// Note: The address parameter has been removed because it is unused by IDA's API

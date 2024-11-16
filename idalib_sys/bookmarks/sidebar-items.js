@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["idalib_bookmarks_t_erase","idalib_bookmarks_t_find_index","idalib_bookmarks_t_get_desc","idalib_bookmarks_t_mark","idalib_bookmarks_t_size"]};
+window.SIDEBAR_ITEMS = {"fn":["idalib_bookmarks_t_erase","idalib_bookmarks_t_find_index","idalib_bookmarks_t_get","idalib_bookmarks_t_get_desc","idalib_bookmarks_t_mark","idalib_bookmarks_t_size"]};
