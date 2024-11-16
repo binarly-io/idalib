@@ -1,7 +1,7 @@
 # idalib
 
 [![crates.io](https://img.shields.io/crates/v/idalib)](https://crates.io/crates/idalib)
-[![documentation](https://img.shields.io/badge/documentation-0.2.0%2B9.0.240925-blue?link=https%3A%2F%2Fbinarly-io.github.io%2Fidalib%2Fidalib)](https://binarly-io.github.io/idalib/idalib/)
+[![documentation](https://img.shields.io/badge/documentation-0.2.1%2B9.0.240925-blue?link=https%3A%2F%2Fbinarly-io.github.io%2Fidalib%2Fidalib)](https://binarly-io.github.io/idalib/idalib/)
 [![license](https://img.shields.io/crates/l/idalib)](https://github.com/binarly-io/idalib)
 [![crates.io downloads](https://img.shields.io/crates/d/idalib)](https://crates.io/crates/idalib)
 
