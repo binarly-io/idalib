@@ -39,7 +39,7 @@ jobs:
         run: |
           git fetch --all
           git checkout gh-pages
-          cp -ru target/doc/* .
+          cp -R target/doc/* .
           rm -rf target Cargo.lock
           git add .
           git config push.autosetupremote true
