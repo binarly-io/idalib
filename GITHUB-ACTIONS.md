@@ -7,14 +7,13 @@ hosting/generation. To help downstream consumers of idalib avoid headaches, we
 have documented how we've setup GitHub Actions for idalib to perform a build a
 viability test on each supported OS, and to generate and deploy documentation.
 
-
 ## Prerequisites
 
 To adapt the workflows in this document in your own project, you need to
 configure two repository secrets via Settings -> Secrets and variables ->
 Actions:
 
-- `IDASDK90_URL`: a publicly accessible encrypted/password protected archive
+- `IDASDK90_URL`: a publicly accessible encrypted/password-protected archive
   containing he latest IDA SDK. We are using a zip in our workflow below, but
   it should be straightforward to use an approach like
   [binexport](https://github.com/google/binexport/blob/23619ba62d88b3b93615d28fe3033489d12b38ac/.github/workflows/cmake.yml#L25),
@@ -129,7 +128,6 @@ a branch to keep the documentation separate from the source code, e.g.,
 `gh-pages`, which can be created via `git switch --orphan gh-pages`. Then
 GitHub Pages needs to be configured via Settings -> Pages by setting "Source"
 to "Deploy from a branch" and "branch" to "gh-pages".
-
 
 ```yml
 name: document

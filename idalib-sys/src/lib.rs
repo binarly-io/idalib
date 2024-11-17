@@ -10,11 +10,11 @@ pub enum IDAError {
     #[error(transparent)]
     Ffi(anyhow::Error),
     #[error("could not initialise IDA: error code {:x}", _0.0)]
-    Init(autocxx::c_int),
+    Init(c_int),
     #[error("could not open IDA database: error code {:x}", _0.0)]
-    OpenDb(autocxx::c_int),
+    OpenDb(c_int),
     #[error("could not close IDA database: error code {:x}", _0.0)]
-    CloseDb(autocxx::c_int),
+    CloseDb(c_int),
     #[error("invalid license")]
     InvalidLicense,
     #[error("could not generate pattern or signature files")]
@@ -969,7 +969,7 @@ pub mod ida {
             panic!("IDA cannot function correctly when not running on the main thread");
         }
 
-        unsafe { self::ffix::idalib_check_license() }
+        unsafe { ffix::idalib_check_license() }
     }
 
     pub fn license_id() -> Result<[u8; 6], IDAError> {
@@ -978,7 +978,7 @@ pub mod ida {
         }
 
         let mut lid = [0u8; 6];
-        if unsafe { self::ffix::idalib_get_license_id(&mut lid) } {
+        if unsafe { ffix::idalib_get_license_id(&mut lid) } {
             Ok(lid)
         } else {
             Err(IDAError::InvalidLicense)
@@ -993,7 +993,7 @@ pub mod ida {
 
         env::set_var("TVHEADLESS", "1");
 
-        let res = unsafe { self::ffix::init_library(c_int(0), ptr::null_mut()) };
+        let res = unsafe { ffix::init_library(c_int(0), ptr::null_mut()) };
 
         if res != c_int(0) {
             Err(IDAError::Init(res))
@@ -1007,7 +1007,7 @@ pub mod ida {
             panic!("IDA cannot function correctly when not running on the main thread");
         }
 
-        if unsafe { self::ffi::make_signatures(only_pat) } {
+        if unsafe { ffi::make_signatures(only_pat) } {
             Ok(())
         } else {
             Err(IDAError::MakeSigs)
@@ -1019,14 +1019,14 @@ pub mod ida {
             panic!("IDA cannot function correctly when not running on the main thread");
         }
 
-        unsafe { self::ffi::enable_console_messages(enable) }
+        unsafe { ffi::enable_console_messages(enable) }
     }
 
     pub fn set_screen_ea(ea: ea_t) {
         if !is_main_thread() {
             panic!("IDA cannot function correctly when not running on the main thread");
         }
-        unsafe { self::ffi::set_screen_ea(ea) }
+        unsafe { ffi::set_screen_ea(ea) }
     }
 
     pub fn open_database(path: impl AsRef<Path>) -> Result<(), IDAError> {
@@ -1045,7 +1045,7 @@ pub mod ida {
 
         let path = CString::new(path.as_ref().to_string_lossy().as_ref()).map_err(IDAError::ffi)?;
 
-        let res = unsafe { self::ffi::open_database(path.as_ptr(), auto_analysis) };
+        let res = unsafe { ffi::open_database(path.as_ptr(), auto_analysis) };
 
         if res != c_int(0) {
             Err(IDAError::OpenDb(res))
@@ -1068,7 +1068,7 @@ pub mod ida {
 
         let path = CString::new(path.as_ref().to_string_lossy().as_ref()).map_err(IDAError::ffi)?;
 
-        let res = unsafe { self::ffix::idalib_open_database_quiet(path.as_ptr(), auto_analysis) };
+        let res = unsafe { ffix::idalib_open_database_quiet(path.as_ptr(), auto_analysis) };
 
         if res != c_int(0) {
             Err(IDAError::OpenDb(res))
@@ -1086,6 +1086,6 @@ pub mod ida {
             panic!("IDA cannot function correctly when not running on the main thread");
         }
 
-        unsafe { self::ffi::close_database(save) }
+        unsafe { ffi::close_database(save) }
     }
 }

@@ -241,11 +241,11 @@ impl<'a> Function<'a> {
         }
     }
 
-    pub fn cfg<'b>(&'b self) -> Result<FunctionCFG<'b>, IDAError> {
+    pub fn cfg(&self) -> Result<FunctionCFG, IDAError> {
         self.cfg_with(FunctionCFGFlags::empty())
     }
 
-    pub fn cfg_with<'b>(&'b self, flags: FunctionCFGFlags) -> Result<FunctionCFG<'b>, IDAError> {
+    pub fn cfg_with(&self, flags: FunctionCFGFlags) -> Result<FunctionCFG, IDAError> {
         let ptr = unsafe { idalib_func_flow_chart(self.ptr, flags.bits().into()) };
 
         Ok(FunctionCFG {
@@ -262,7 +262,7 @@ impl<'a> FunctionCFG<'a> {
             .map(|r| mem::transmute::<&qflow_chart_t, &gdl_graph_t>(r))
     }
 
-    pub fn block_by_id<'b>(&'b self, id: BasicBlockId) -> Option<BasicBlock<'b>> {
+    pub fn block_by_id(&self, id: BasicBlockId) -> Option<BasicBlock> {
         let blk = unsafe {
             idalib_qflow_graph_getn_block(self.flow_chart.as_ref().expect("valid pointer"), id)
         };
@@ -281,7 +281,7 @@ impl<'a> FunctionCFG<'a> {
         Some(BasicBlock::from_parts(blk, kind))
     }
 
-    pub fn entry<'b>(&'b self) -> Option<BasicBlock<'b>> {
+    pub fn entry(&self) -> Option<BasicBlock> {
         let id = unsafe { self.as_gdl_graph().expect("valid pointer").entry() };
 
         if id.0 < 0 {
@@ -291,7 +291,7 @@ impl<'a> FunctionCFG<'a> {
         self.block_by_id(id.0 as _)
     }
 
-    pub fn exit<'b>(&'b self) -> Option<BasicBlock<'b>> {
+    pub fn exit(&self) -> Option<BasicBlock> {
         let id = unsafe { self.as_gdl_graph().expect("valid pointer").exit() };
 
         if id.0 < 0 {
