@@ -57,7 +57,11 @@ fn main() -> anyhow::Result<()> {
         );
 
         if let Some(df) = decompiled.as_ref() {
-            println!("statements: {} / {}", df.body().len(), df.body().iter().count());
+            println!(
+                "statements: {} / {}",
+                df.body().len(),
+                df.body().iter().count()
+            );
             println!("{}", df.pseudocode());
         }
 
@@ -68,7 +72,7 @@ fn main() -> anyhow::Result<()> {
                 blk.end_address()
             );
 
-            if blk.len() != 0 {
+            if !blk.is_empty() {
                 let insn = idb.insn_at(blk.start_address()).expect("first instruction");
                 println!(
                     "- insn: (ea: {:x}, size: {:x}, operands: {}) ",

@@ -78,7 +78,7 @@ impl IDB {
     }
 
     pub fn set_screen_address(&mut self, ea: Address) {
-        set_screen_ea(ea.into())
+        set_screen_ea(ea.into());
     }
 
     pub fn make_signatures(&mut self, only_pat: bool) -> Result<(), IDAError> {

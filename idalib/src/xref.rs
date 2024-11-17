@@ -121,7 +121,7 @@ impl<'a> XRef<'a> {
         self.inner.user == 1
     }
 
-    pub fn next_to(&self) -> Option<XRef<'a>> {
+    pub fn next_to(&self) -> Option<Self> {
         let mut curr = self.clone();
 
         let found = unsafe { xrefblk_t_next_to(&mut curr.inner as *mut _) };
@@ -133,7 +133,7 @@ impl<'a> XRef<'a> {
         }
     }
 
-    pub fn next_from(&self) -> Option<XRef<'a>> {
+    pub fn next_from(&self) -> Option<Self> {
         let mut curr = self.clone();
 
         let found = unsafe { xrefblk_t_next_from(&mut curr.inner as *mut _) };

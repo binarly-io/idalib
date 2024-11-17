@@ -17,11 +17,11 @@ struct EncString {
 
 impl EncString {
     fn set_address(&mut self, address: u64) {
-        self.address = Some(address)
+        self.address = Some(address);
     }
 
     fn set_size(&mut self, size: usize) {
-        self.size = Some(size)
+        self.size = Some(size);
     }
 
     fn ready(self) -> bool {
@@ -52,7 +52,7 @@ impl EncString {
 
         for i in 0..size {
             let kbyte = Self::shrink_byte(enc[2 * (size - i - 1)]);
-            dec[size - i - 1] = kbyte ^ dec[size - i]
+            dec[size - i - 1] = kbyte ^ dec[size - i];
         }
 
         for i in (0..size - 1).step_by(2) {

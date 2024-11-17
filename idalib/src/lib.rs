@@ -49,5 +49,5 @@ pub(crate) fn prepare_library() -> IDARuntimeHandle {
 
 pub fn enable_console_messages(enabled: bool) {
     init_library();
-    ffi::ida::enable_console_messages(enabled)
+    ffi::ida::enable_console_messages(enabled);
 }
