@@ -91,4 +91,8 @@ impl<'a> CBlock<'a> {
     pub fn len(&self) -> usize {
         unsafe { idalib_hexrays_cblock_len(self.ptr) }
     }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
 }

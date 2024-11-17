@@ -125,6 +125,10 @@ impl Insn {
         self.inner.size as _
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
     pub fn is_basic_block_end(&self, call_stops_block: bool) -> bool {
         unsafe { is_basic_block_end(&self.inner, call_stops_block) }
     }

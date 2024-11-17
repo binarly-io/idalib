@@ -58,9 +58,7 @@ pub fn idalib_install_paths() -> (PathBuf, PathBuf, PathBuf) {
 }
 
 pub fn idalib_install_paths_with(check: bool) -> (PathBuf, PathBuf, PathBuf) {
-    let path = env::var("IDADIR")
-        .map(PathBuf::from)
-        .unwrap_or_else(|_| link_path());
+    let path = env::var("IDADIR").map_or_else(|_| link_path(), PathBuf::from);
 
     let (idalib, ida) = if cfg!(target_os = "linux") {
         (path.join("libidalib.so"), path.join("libida.so"))

@@ -125,7 +125,7 @@ fn main() {
         ("MIPS_.*", "insn_mips.rs"),
     ];
 
-    for (prefix, output) in insn_consts.into_iter() {
+    for (prefix, output) in insn_consts {
         let arch = autocxx_bindgen::builder()
             .header(ida.join("pro.h").to_str().expect("path is valid string"))
             .header(

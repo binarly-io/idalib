@@ -44,19 +44,23 @@ impl<'a> BasicBlock<'a> {
     }
 
     pub fn start_address(&self) -> Address {
-        unsafe { (&*self.as_range_t()).start_ea.into() }
+        unsafe { (*self.as_range_t()).start_ea.into() }
     }
 
     pub fn end_address(&self) -> Address {
-        unsafe { (&*self.as_range_t()).end_ea.into() }
+        unsafe { (*self.as_range_t()).end_ea.into() }
     }
 
     pub fn contains_address(&self, addr: Address) -> bool {
-        unsafe { (&*self.as_range_t()).contains(addr.into()) }
+        unsafe { (*self.as_range_t()).contains(addr.into()) }
     }
 
     pub fn len(&self) -> usize {
-        unsafe { (&*self.as_range_t()).size().0 as _ }
+        unsafe { (*self.as_range_t()).size().0 as _ }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 
     pub fn is_normal(&self) -> bool {
@@ -93,7 +97,7 @@ impl<'a> BasicBlock<'a> {
 
     pub fn succs<'b>(&'b self) -> impl ExactSizeIterator<Item = BasicBlockId> + 'b {
         unsafe { idalib_qbasic_block_succs(self.block) }
-            .into_iter()
+            .iter()
             .map(|v| v.0 as _)
     }
 
@@ -107,7 +111,7 @@ impl<'a> BasicBlock<'a> {
 
     pub fn preds<'b>(&'b self) -> impl ExactSizeIterator<Item = BasicBlockId> + 'b {
         unsafe { idalib_qbasic_block_preds(self.block) }
-            .into_iter()
+            .iter()
             .map(|v| v.0 as _)
     }
 
@@ -181,19 +185,23 @@ impl<'a> Function<'a> {
     }
 
     pub fn start_address(&self) -> Address {
-        unsafe { (&*self.as_range_t()).start_ea.into() }
+        unsafe { (*self.as_range_t()).start_ea.into() }
     }
 
     pub fn end_address(&self) -> Address {
-        unsafe { (&*self.as_range_t()).end_ea.into() }
+        unsafe { (*self.as_range_t()).end_ea.into() }
     }
 
     pub fn contains_address(&self, addr: Address) -> bool {
-        unsafe { (&*self.as_range_t()).contains(addr.into()) }
+        unsafe { (*self.as_range_t()).contains(addr.into()) }
     }
 
     pub fn len(&self) -> usize {
-        unsafe { (&*self.as_range_t()).size().0 as _ }
+        unsafe { (*self.as_range_t()).size().0 as _ }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 
     pub fn name(&self) -> Option<String> {
@@ -212,19 +220,19 @@ impl<'a> Function<'a> {
     }
 
     pub fn is_far(&self) -> bool {
-        unsafe { (&*self.ptr).is_far() }
+        unsafe { (*self.ptr).is_far() }
     }
 
     pub fn does_return(&self) -> bool {
-        unsafe { (&*self.ptr).does_return() }
+        unsafe { (*self.ptr).does_return() }
     }
 
     pub fn analyzed_sp(&self) -> bool {
-        unsafe { (&*self.ptr).analyzed_sp() }
+        unsafe { (*self.ptr).analyzed_sp() }
     }
 
     pub fn need_prolog_analysis(&self) -> bool {
-        unsafe { (&*self.ptr).need_prolog_analysis() }
+        unsafe { (*self.ptr).need_prolog_analysis() }
     }
 
     pub fn has_external_refs(&self, ea: Address) -> bool {
