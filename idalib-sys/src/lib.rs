@@ -10,11 +10,11 @@ pub enum IDAError {
     #[error(transparent)]
     Ffi(anyhow::Error),
     #[error("could not initialise IDA: error code {:x}", _0.0)]
-    Init(autocxx::c_int),
+    Init(c_int),
     #[error("could not open IDA database: error code {:x}", _0.0)]
-    OpenDb(autocxx::c_int),
+    OpenDb(c_int),
     #[error("could not close IDA database: error code {:x}", _0.0)]
-    CloseDb(autocxx::c_int),
+    CloseDb(c_int),
     #[error("invalid license")]
     InvalidLicense,
     #[error("could not generate pattern or signature files")]
@@ -965,20 +965,22 @@ pub mod ida {
     pub use ffi::auto_wait;
 
     pub fn is_license_valid() -> bool {
-        if !is_main_thread() {
-            panic!("IDA cannot function correctly when not running on the main thread");
-        }
+        assert!(
+            is_main_thread(),
+            "IDA cannot function correctly when not running on the main thread"
+        );
 
-        unsafe { self::ffix::idalib_check_license() }
+        unsafe { ffix::idalib_check_license() }
     }
 
     pub fn license_id() -> Result<[u8; 6], IDAError> {
-        if !is_main_thread() {
-            panic!("IDA cannot function correctly when not running on the main thread");
-        }
+        assert!(
+            is_main_thread(),
+            "IDA cannot function correctly when not running on the main thread"
+        );
 
         let mut lid = [0u8; 6];
-        if unsafe { self::ffix::idalib_get_license_id(&mut lid) } {
+        if unsafe { ffix::idalib_get_license_id(&mut lid) } {
             Ok(lid)
         } else {
             Err(IDAError::InvalidLicense)
@@ -987,13 +989,14 @@ pub mod ida {
 
     // NOTE: once; main thread
     pub fn init_library() -> Result<(), IDAError> {
-        if !is_main_thread() {
-            panic!("IDA cannot function correctly when not running on the main thread");
-        }
+        assert!(
+            is_main_thread(),
+            "IDA cannot function correctly when not running on the main thread"
+        );
 
         env::set_var("TVHEADLESS", "1");
 
-        let res = unsafe { self::ffix::init_library(c_int(0), ptr::null_mut()) };
+        let res = unsafe { ffix::init_library(c_int(0), ptr::null_mut()) };
 
         if res != c_int(0) {
             Err(IDAError::Init(res))
@@ -1003,11 +1006,12 @@ pub mod ida {
     }
 
     pub fn make_signatures(only_pat: bool) -> Result<(), IDAError> {
-        if !is_main_thread() {
-            panic!("IDA cannot function correctly when not running on the main thread");
-        }
+        assert!(
+            is_main_thread(),
+            "IDA cannot function correctly when not running on the main thread"
+        );
 
-        if unsafe { self::ffi::make_signatures(only_pat) } {
+        if unsafe { ffi::make_signatures(only_pat) } {
             Ok(())
         } else {
             Err(IDAError::MakeSigs)
@@ -1015,18 +1019,21 @@ pub mod ida {
     }
 
     pub fn enable_console_messages(enable: bool) {
-        if !is_main_thread() {
-            panic!("IDA cannot function correctly when not running on the main thread");
-        }
+        assert!(
+            is_main_thread(),
+            "IDA cannot function correctly when not running on the main thread"
+        );
 
-        unsafe { self::ffi::enable_console_messages(enable) }
+        unsafe { ffi::enable_console_messages(enable) }
     }
 
     pub fn set_screen_ea(ea: ea_t) {
-        if !is_main_thread() {
-            panic!("IDA cannot function correctly when not running on the main thread");
-        }
-        unsafe { self::ffi::set_screen_ea(ea) }
+        assert!(
+            is_main_thread(),
+            "IDA cannot function correctly when not running on the main thread"
+        );
+
+        unsafe { ffi::set_screen_ea(ea) }
     }
 
     pub fn open_database(path: impl AsRef<Path>) -> Result<(), IDAError> {
@@ -1035,9 +1042,10 @@ pub mod ida {
 
     // NOTE: main thread
     pub fn open_database_with(path: impl AsRef<Path>, auto_analysis: bool) -> Result<(), IDAError> {
-        if !is_main_thread() {
-            panic!("IDA cannot function correctly when not running on the main thread");
-        }
+        assert!(
+            is_main_thread(),
+            "IDA cannot function correctly when not running on the main thread"
+        );
 
         if !is_license_valid() {
             return Err(IDAError::InvalidLicense);
@@ -1045,7 +1053,7 @@ pub mod ida {
 
         let path = CString::new(path.as_ref().to_string_lossy().as_ref()).map_err(IDAError::ffi)?;
 
-        let res = unsafe { self::ffi::open_database(path.as_ptr(), auto_analysis) };
+        let res = unsafe { ffi::open_database(path.as_ptr(), auto_analysis) };
 
         if res != c_int(0) {
             Err(IDAError::OpenDb(res))
@@ -1058,9 +1066,10 @@ pub mod ida {
         path: impl AsRef<Path>,
         auto_analysis: bool,
     ) -> Result<(), IDAError> {
-        if !is_main_thread() {
-            panic!("IDA cannot function correctly when not running on the main thread");
-        }
+        assert!(
+            is_main_thread(),
+            "IDA cannot function correctly when not running on the main thread"
+        );
 
         if !is_license_valid() {
             return Err(IDAError::InvalidLicense);
@@ -1068,7 +1077,7 @@ pub mod ida {
 
         let path = CString::new(path.as_ref().to_string_lossy().as_ref()).map_err(IDAError::ffi)?;
 
-        let res = unsafe { self::ffix::idalib_open_database_quiet(path.as_ptr(), auto_analysis) };
+        let res = unsafe { ffix::idalib_open_database_quiet(path.as_ptr(), auto_analysis) };
 
         if res != c_int(0) {
             Err(IDAError::OpenDb(res))
@@ -1078,14 +1087,15 @@ pub mod ida {
     }
 
     pub fn close_database() {
-        close_database_with(true)
+        close_database_with(true);
     }
 
     pub fn close_database_with(save: bool) {
-        if !is_main_thread() {
-            panic!("IDA cannot function correctly when not running on the main thread");
-        }
+        assert!(
+            is_main_thread(),
+            "IDA cannot function correctly when not running on the main thread"
+        );
 
-        unsafe { self::ffi::close_database(save) }
+        unsafe { ffi::close_database(save) }
     }
 }

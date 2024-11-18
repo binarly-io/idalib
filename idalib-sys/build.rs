@@ -33,7 +33,7 @@ fn main() {
 
     let ffi_path = PathBuf::from("src");
 
-    let mut builder = autocxx_build::Builder::new(ffi_path.join("lib.rs"), &[&ffi_path, &ida])
+    let mut builder = autocxx_build::Builder::new(ffi_path.join("lib.rs"), [&ffi_path, &ida])
         .extra_clang_args(
             #[cfg(target_os = "linux")]
             &["-std=c++17", "-D__LINUX__=1", "-D__EA64__=1"],
@@ -125,7 +125,7 @@ fn main() {
         ("MIPS_.*", "insn_mips.rs"),
     ];
 
-    for (prefix, output) in insn_consts.into_iter() {
+    for (prefix, output) in insn_consts {
         let arch = autocxx_bindgen::builder()
             .header(ida.join("pro.h").to_str().expect("path is valid string"))
             .header(
@@ -141,7 +141,11 @@ fn main() {
 
     let hexrays = autocxx_bindgen::builder()
         .header(ida.join("pro.h").to_str().expect("path is valid string"))
-        .header(ida.join("hexrays.hpp").to_str().expect("path is valid string"))
+        .header(
+            ida.join("hexrays.hpp")
+                .to_str()
+                .expect("path is valid string"),
+        )
         .opaque_type("std::.*")
         .opaque_type("carglist_t")
         .allowlist_item("cfunc_t")

@@ -44,19 +44,23 @@ impl<'a> BasicBlock<'a> {
     }
 
     pub fn start_address(&self) -> Address {
-        unsafe { (&*self.as_range_t()).start_ea.into() }
+        unsafe { (*self.as_range_t()).start_ea.into() }
     }
 
     pub fn end_address(&self) -> Address {
-        unsafe { (&*self.as_range_t()).end_ea.into() }
+        unsafe { (*self.as_range_t()).end_ea.into() }
     }
 
     pub fn contains_address(&self, addr: Address) -> bool {
-        unsafe { (&*self.as_range_t()).contains(addr.into()) }
+        unsafe { (*self.as_range_t()).contains(addr.into()) }
     }
 
     pub fn len(&self) -> usize {
-        unsafe { (&*self.as_range_t()).size().0 as _ }
+        unsafe { (*self.as_range_t()).size().0 as _ }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 
     pub fn is_normal(&self) -> bool {
@@ -93,7 +97,7 @@ impl<'a> BasicBlock<'a> {
 
     pub fn succs<'b>(&'b self) -> impl ExactSizeIterator<Item = BasicBlockId> + 'b {
         unsafe { idalib_qbasic_block_succs(self.block) }
-            .into_iter()
+            .iter()
             .map(|v| v.0 as _)
     }
 
@@ -107,7 +111,7 @@ impl<'a> BasicBlock<'a> {
 
     pub fn preds<'b>(&'b self) -> impl ExactSizeIterator<Item = BasicBlockId> + 'b {
         unsafe { idalib_qbasic_block_preds(self.block) }
-            .into_iter()
+            .iter()
             .map(|v| v.0 as _)
     }
 
@@ -181,19 +185,23 @@ impl<'a> Function<'a> {
     }
 
     pub fn start_address(&self) -> Address {
-        unsafe { (&*self.as_range_t()).start_ea.into() }
+        unsafe { (*self.as_range_t()).start_ea.into() }
     }
 
     pub fn end_address(&self) -> Address {
-        unsafe { (&*self.as_range_t()).end_ea.into() }
+        unsafe { (*self.as_range_t()).end_ea.into() }
     }
 
     pub fn contains_address(&self, addr: Address) -> bool {
-        unsafe { (&*self.as_range_t()).contains(addr.into()) }
+        unsafe { (*self.as_range_t()).contains(addr.into()) }
     }
 
     pub fn len(&self) -> usize {
-        unsafe { (&*self.as_range_t()).size().0 as _ }
+        unsafe { (*self.as_range_t()).size().0 as _ }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 
     pub fn name(&self) -> Option<String> {
@@ -212,19 +220,19 @@ impl<'a> Function<'a> {
     }
 
     pub fn is_far(&self) -> bool {
-        unsafe { (&*self.ptr).is_far() }
+        unsafe { (*self.ptr).is_far() }
     }
 
     pub fn does_return(&self) -> bool {
-        unsafe { (&*self.ptr).does_return() }
+        unsafe { (*self.ptr).does_return() }
     }
 
     pub fn analyzed_sp(&self) -> bool {
-        unsafe { (&*self.ptr).analyzed_sp() }
+        unsafe { (*self.ptr).analyzed_sp() }
     }
 
     pub fn need_prolog_analysis(&self) -> bool {
-        unsafe { (&*self.ptr).need_prolog_analysis() }
+        unsafe { (*self.ptr).need_prolog_analysis() }
     }
 
     pub fn has_external_refs(&self, ea: Address) -> bool {
@@ -241,11 +249,11 @@ impl<'a> Function<'a> {
         }
     }
 
-    pub fn cfg<'b>(&'b self) -> Result<FunctionCFG<'b>, IDAError> {
+    pub fn cfg(&self) -> Result<FunctionCFG, IDAError> {
         self.cfg_with(FunctionCFGFlags::empty())
     }
 
-    pub fn cfg_with<'b>(&'b self, flags: FunctionCFGFlags) -> Result<FunctionCFG<'b>, IDAError> {
+    pub fn cfg_with(&self, flags: FunctionCFGFlags) -> Result<FunctionCFG, IDAError> {
         let ptr = unsafe { idalib_func_flow_chart(self.ptr, flags.bits().into()) };
 
         Ok(FunctionCFG {
@@ -262,7 +270,7 @@ impl<'a> FunctionCFG<'a> {
             .map(|r| mem::transmute::<&qflow_chart_t, &gdl_graph_t>(r))
     }
 
-    pub fn block_by_id<'b>(&'b self, id: BasicBlockId) -> Option<BasicBlock<'b>> {
+    pub fn block_by_id(&self, id: BasicBlockId) -> Option<BasicBlock> {
         let blk = unsafe {
             idalib_qflow_graph_getn_block(self.flow_chart.as_ref().expect("valid pointer"), id)
         };
@@ -281,7 +289,7 @@ impl<'a> FunctionCFG<'a> {
         Some(BasicBlock::from_parts(blk, kind))
     }
 
-    pub fn entry<'b>(&'b self) -> Option<BasicBlock<'b>> {
+    pub fn entry(&self) -> Option<BasicBlock> {
         let id = unsafe { self.as_gdl_graph().expect("valid pointer").entry() };
 
         if id.0 < 0 {
@@ -291,7 +299,7 @@ impl<'a> FunctionCFG<'a> {
         self.block_by_id(id.0 as _)
     }
 
-    pub fn exit<'b>(&'b self) -> Option<BasicBlock<'b>> {
+    pub fn exit(&self) -> Option<BasicBlock> {
         let id = unsafe { self.as_gdl_graph().expect("valid pointer").exit() };
 
         if id.0 < 0 {

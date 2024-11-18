@@ -502,7 +502,7 @@ impl<'a> Metadata<'a> {
     }
 
     pub fn nametype(&self) -> i8 {
-        unsafe { idalib_inf_get_nametype().into() }
+        unsafe { idalib_inf_get_nametype() }
     }
 
     pub fn short_demnames(&self) -> u32 {
@@ -686,7 +686,7 @@ impl<'a> Metadata<'a> {
     }
 
     pub fn strlit_zeroes(&self) -> i8 {
-        unsafe { idalib_inf_get_strlit_zeroes().into() }
+        unsafe { idalib_inf_get_strlit_zeroes() }
     }
 
     pub fn strtype(&self) -> i32 {

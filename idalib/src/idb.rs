@@ -78,7 +78,7 @@ impl IDB {
     }
 
     pub fn set_screen_address(&mut self, ea: Address) {
-        set_screen_ea(ea.into())
+        set_screen_ea(ea.into());
     }
 
     pub fn make_signatures(&mut self, only_pat: bool) -> Result<(), IDAError> {
@@ -89,20 +89,20 @@ impl IDB {
         self.decompiler
     }
 
-    pub fn meta<'a>(&'a self) -> Metadata<'a> {
+    pub fn meta(&self) -> Metadata {
         Metadata::new()
     }
 
-    pub fn meta_mut<'a>(&'a mut self) -> MetadataMut<'a> {
+    pub fn meta_mut(&mut self) -> MetadataMut {
         MetadataMut::new()
     }
 
-    pub fn processor<'a>(&'a self) -> Processor<'a> {
+    pub fn processor(&self) -> Processor {
         let ptr = unsafe { get_ph() };
         Processor::from_ptr(ptr)
     }
 
-    pub fn entries<'a>(&'a self) -> EntryPointIter<'a> {
+    pub fn entries(&self) -> EntryPointIter {
         let limit = unsafe { get_entry_qty() };
         EntryPointIter {
             index: 0,
@@ -111,7 +111,7 @@ impl IDB {
         }
     }
 
-    pub fn function_at<'a>(&'a self, ea: Address) -> Option<Function<'a>> {
+    pub fn function_at(&self, ea: Address) -> Option<Function> {
         let ptr = unsafe { get_func(ea.into()) };
 
         if ptr.is_null() {
@@ -168,7 +168,7 @@ impl IDB {
         decompile_func(f.as_ptr(), all_blocks).and_then(CFunction::new)
     }
 
-    pub fn function_by_id<'a>(&'a self, id: FunctionId) -> Option<Function<'a>> {
+    pub fn function_by_id(&self, id: FunctionId) -> Option<Function> {
         let ptr = unsafe { getn_func(id) };
 
         if ptr.is_null() {
@@ -186,7 +186,7 @@ impl IDB {
         unsafe { get_func_qty() }
     }
 
-    pub fn segment_at<'a>(&'a self, ea: Address) -> Option<Segment<'a>> {
+    pub fn segment_at(&self, ea: Address) -> Option<Segment> {
         let ptr = unsafe { getseg(ea.into()) };
 
         if ptr.is_null() {
@@ -196,7 +196,7 @@ impl IDB {
         Some(Segment::from_ptr(ptr))
     }
 
-    pub fn segment_by_id<'a>(&'a self, id: SegmentId) -> Option<Segment<'a>> {
+    pub fn segment_by_id(&self, id: SegmentId) -> Option<Segment> {
         let ptr = unsafe { getnseg((id as i32).into()) };
 
         if ptr.is_null() {
@@ -327,7 +327,7 @@ impl IDB {
         }
     }
 
-    pub fn bookmarks<'a>(&'a self) -> Bookmarks<'a> {
+    pub fn bookmarks(&self) -> Bookmarks {
         Bookmarks::new(self)
     }
 

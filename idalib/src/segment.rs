@@ -79,19 +79,23 @@ impl<'a> Segment<'a> {
     }
 
     pub fn start_address(&self) -> Address {
-        unsafe { (&*self.as_range_t()).start_ea.into() }
+        unsafe { (*self.as_range_t()).start_ea.into() }
     }
 
     pub fn end_address(&self) -> Address {
-        unsafe { (&*self.as_range_t()).end_ea.into() }
+        unsafe { (*self.as_range_t()).end_ea.into() }
     }
 
     pub fn len(&self) -> usize {
-        unsafe { (&*self.as_range_t()).size().0 as _ }
+        unsafe { (*self.as_range_t()).size().0 as _ }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 
     pub fn contains_address(&self, addr: Address) -> bool {
-        unsafe { (&*self.as_range_t()).contains(addr.into()) }
+        unsafe { (*self.as_range_t()).contains(addr.into()) }
     }
 
     pub fn name(&self) -> Option<String> {
@@ -137,46 +141,46 @@ impl<'a> Segment<'a> {
     }
 
     pub fn address_bits(&self) -> u32 {
-        unsafe { (&*self.ptr).abits().0 as _ }
+        unsafe { (*self.ptr).abits().0 as _ }
     }
 
     pub fn address_bytes(&self) -> usize {
-        unsafe { (&*self.ptr).abytes().0 as _ }
+        unsafe { (*self.ptr).abytes().0 as _ }
     }
 
     pub fn is_16bit(&self) -> bool {
-        unsafe { (&*self.ptr).is_16bit() }
+        unsafe { (*self.ptr).is_16bit() }
     }
 
     pub fn is_32bit(&self) -> bool {
-        unsafe { (&*self.ptr).is_32bit() }
+        unsafe { (*self.ptr).is_32bit() }
     }
 
     pub fn is_64bit(&self) -> bool {
-        unsafe { (&*self.ptr).is_64bit() }
+        unsafe { (*self.ptr).is_64bit() }
     }
 
     pub fn is_hidden(&self) -> bool {
-        unsafe { (&*self.ptr).is_hidden_segtype() }
+        unsafe { (*self.ptr).is_hidden_segtype() }
     }
 
     pub fn is_loader(&self) -> bool {
-        unsafe { (&*self.ptr).is_loader_segm() }
+        unsafe { (*self.ptr).is_loader_segm() }
     }
 
     pub fn is_header(&self) -> bool {
-        unsafe { (&*self.ptr).is_header_segm() }
+        unsafe { (*self.ptr).is_header_segm() }
     }
 
     pub fn is_ephemeral(&self) -> bool {
-        unsafe { (&*self.ptr).is_ephemeral_segm() }
+        unsafe { (*self.ptr).is_ephemeral_segm() }
     }
 
     pub fn is_debugger(&self) -> bool {
-        unsafe { (&*self.ptr).is_debugger_segm() }
+        unsafe { (*self.ptr).is_debugger_segm() }
     }
 
     pub fn is_visible(&self) -> bool {
-        unsafe { (&*self.ptr).is_visible_segm() }
+        unsafe { (*self.ptr).is_visible_segm() }
     }
 }
