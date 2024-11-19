@@ -103,9 +103,9 @@ impl<'a> XRef<'a> {
         let type_ = self.inner.type_ & (XREF_MASK as u8);
 
         if self.is_code() {
-            XRefType::Code(unsafe { mem::transmute(type_) })
+            XRefType::Code(unsafe { mem::transmute::<u8, CodeRef>(type_) })
         } else {
-            XRefType::Data(unsafe { mem::transmute(type_) })
+            XRefType::Data(unsafe { mem::transmute::<u8, DataRef>(type_) })
         }
     }
 

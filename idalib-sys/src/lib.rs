@@ -1,4 +1,7 @@
 #![doc(html_no_source)]
+#![allow(clippy::missing_safety_doc)]
+#![allow(clippy::identity_op)]
+#![allow(clippy::needless_lifetimes)]
 
 use autocxx::prelude::*;
 use thiserror::Error;
@@ -360,7 +363,7 @@ pub mod hexrays {
         type Kind = cxx::kind::Opaque;
     }
 
-    pub fn decompile_func(
+    pub unsafe fn decompile_func(
         f: *mut super::ffi::func_t,
         all_blocks: bool,
     ) -> Option<cxx::UniquePtr<cfuncptr_t>> {
@@ -370,8 +373,7 @@ pub mod hexrays {
             flags |= __impl::DECOMP_ALL_BLKS;
         }
 
-        let result =
-            unsafe { super::ffi::decompile_func(f, std::ptr::null_mut(), (flags as i32).into()) };
+        let result = super::ffi::decompile_func(f, std::ptr::null_mut(), (flags as i32).into());
 
         if result.is_null() {
             return None;

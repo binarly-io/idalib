@@ -1,3 +1,5 @@
+#![allow(clippy::needless_lifetimes)]
+
 use std::ffi::c_char;
 use std::sync::{Mutex, MutexGuard, OnceLock};
 

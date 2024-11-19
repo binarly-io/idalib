@@ -165,7 +165,7 @@ impl IDB {
             return None;
         }
 
-        decompile_func(f.as_ptr(), all_blocks).and_then(CFunction::new)
+        unsafe { decompile_func(f.as_ptr(), all_blocks).and_then(CFunction::new) }
     }
 
     pub fn function_by_id(&self, id: FunctionId) -> Option<Function> {

@@ -762,7 +762,7 @@ impl<'a> Metadata<'a> {
     }
 
     pub fn cc_cm(&self) -> u8 {
-        unsafe { mem::transmute(idalib_inf_get_cc_cm()) }
+        unsafe { idalib_inf_get_cc_cm() }
     }
 
     pub fn cc_size_i(&self) -> u8 {

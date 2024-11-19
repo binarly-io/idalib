@@ -1,5 +1,4 @@
 use std::marker::PhantomData;
-use std::mem;
 
 use bitflags::bitflags;
 
@@ -42,11 +41,11 @@ impl<'a> Plugin<'a> {
     }
 
     pub fn version(&self) -> u64 {
-        unsafe { mem::transmute(idalib_plugin_version(self.ptr)) }
+        unsafe { idalib_plugin_version(self.ptr) }
     }
 
     pub fn flags(&self) -> PluginFlags {
-        let bits = unsafe { mem::transmute(idalib_plugin_flags(self.ptr)) };
+        let bits = unsafe { idalib_plugin_flags(self.ptr) };
         PluginFlags::from_bits_retain(bits)
     }
 }
