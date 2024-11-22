@@ -118,4 +118,4 @@ accept PRs to support older beta releases.
 
 ## Contributors
 
-Please see [CONTRIBUTORS.md](CONTRIBUTORS.md) for a full list of acknowledgments.
+Please see [CONTRIBUTORS.md](https://github.com/binarly-io/idalib/blob/master/CONTRIBUTORS.md) for a full list of acknowledgments.
