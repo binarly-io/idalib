@@ -34,6 +34,7 @@ locate the SDK and IDA installation using the following environment variables:
 - [xorpse/idalib-mp](https://github.com/xorpse/idalib-mp): example project demonstrating idalib + multi-processing.
 - [xorpse/parascope](https://github.com/xorpse/parascope): mass-scan source/decompiled code using weggli rulesets.
 - [0xdea/rhabdomancer](https://github.com/0xdea/rhabdomancer): locate calls to insecure API functions in a binary file.
+- [0xdea/haruspex](https://github.com/0xdea/haruspex): extract pseudo-code from the IDA Hex-Rays decompiler.
 
 ### Examples
 
