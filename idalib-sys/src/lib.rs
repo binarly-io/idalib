@@ -12,6 +12,8 @@ mod platform;
 pub enum IDAError {
     #[error(transparent)]
     Ffi(anyhow::Error),
+    #[error(transparent)]
+    HexRays(#[from] hexrays::HexRaysError),
     #[error("could not initialise IDA: error code {:x}", _0.0)]
     Init(c_int),
     #[error("could not open IDA database: error code {:x}", _0.0)]
@@ -49,6 +51,7 @@ include_cpp! {
     #include "entry.hpp"
     #include "funcs.hpp"
     #include "gdl.hpp"
+    #include "hexrays.hpp"
     #include "ida.hpp"
     #include "idalib.hpp"
     #include "idp.hpp"
@@ -58,8 +61,6 @@ include_cpp! {
     #include "segment.hpp"
     #include "ua.hpp"
     #include "xref.hpp"
-    #include "hexrays.hpp"
-
 
     generate!("qstring")
 
@@ -147,9 +148,52 @@ include_cpp! {
     generate!("init_hexrays_plugin")
     generate!("term_hexrays_plugin")
 
-    generate!("decompile_func")
+    // generate!("decompile_func")
     generate!("cfuncptr_t")
     generate!("hexrays_failure_t")
+
+    generate_pod!("merror_t")
+
+    /*
+    generate!("MERR_OK")
+    generate!("MERR_BLOCK")
+    generate!("MERR_INTERR")
+    generate!("MERR_INSN")
+    generate!("MERR_MEM")
+    generate!("MERR_BADBLK")
+    generate!("MERR_BADSP")
+    generate!("MERR_PROLOG")
+    generate!("MERR_SWITCH")
+    generate!("MERR_EXCEPTION")
+    generate!("MERR_HUGESTACK")
+    generate!("MERR_LVARS")
+    generate!("MERR_BITNESS")
+    generate!("MERR_BADCALL")
+    generate!("MERR_BADFRAME")
+    generate!("MERR_UNKTYPE")
+    generate!("MERR_BADIDB")
+    generate!("MERR_SIZEOF")
+    generate!("MERR_REDO")
+    generate!("MERR_CANCELED")
+    generate!("MERR_RECDEPTH")
+    generate!("MERR_OVERLAP")
+    generate!("MERR_PARTINIT")
+    generate!("MERR_COMPLEX")
+    generate!("MERR_LICENSE")
+    generate!("MERR_ONLY")
+    generate!("MERR_ONLY")
+    generate!("MERR_BUSY")
+    generate!("MERR_FARPTR")
+    generate!("MERR_EXTERN")
+    generate!("MERR_FUNCSIZE")
+    generate!("MERR_BADRANGES")
+    generate!("MERR_BADARCH")
+    generate!("MERR_DSLOT")
+    generate!("MERR_STOP")
+    generate!("MERR_CLOUD")
+    generate!("MERR_MAX_ERR")
+    generate!("MERR_LOOP")
+    */
 
     generate!("carg_t")
     generate!("carglist_t")
@@ -304,6 +348,133 @@ include_cpp! {
 }
 
 pub mod hexrays {
+    use std::mem;
+
+    use thiserror::Error;
+
+    // NOTE: we don't export it; ideally this conversion should exist in idalib (not -sys), but it
+    // having the conversion here gives us a cleaner interface.
+    use super::ffi::merror_t;
+
+    #[derive(Debug, Error)]
+    #[error("{desc}")]
+    pub struct HexRaysError {
+        code: HexRaysErrorCode,
+        addr: u64,
+        desc: String,
+    }
+
+    impl HexRaysError {
+        pub fn code(&self) -> HexRaysErrorCode {
+            self.code
+        }
+
+        pub fn address(&self) -> u64 {
+            self.addr
+        }
+
+        pub fn reason(&self) -> &str {
+            &self.desc
+        }
+    }
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    pub enum HexRaysErrorCode {
+        Ok,
+        Block,
+        Internal,
+        Insn,
+        Mem,
+        BadBlock,
+        BadSp,
+        Prolog,
+        Switch,
+        Exception,
+        HugeStack,
+        LVars,
+        Bitness,
+        BadCall,
+        BadFrame,
+        UnknownType,
+        BadIDB,
+        SizeOf,
+        Redo,
+        Cancelled,
+        RecursionDepth,
+        Overlap,
+        PartInitVar,
+        Complex,
+        License,
+        Only32,
+        Only64,
+        Busy,
+        FarPtr,
+        Extern,
+        FuncSize,
+        BadRanges,
+        BadArch,
+        DelaySlot,
+        Stop,
+        Cloud,
+        Loop,
+        Unknown,
+    }
+
+    impl HexRaysErrorCode {
+        pub fn is_ok(&self) -> bool {
+            matches!(self, Self::Ok | Self::Block)
+        }
+
+        pub fn is_err(&self) -> bool {
+            !self.is_ok()
+        }
+    }
+
+    impl From<merror_t> for HexRaysErrorCode {
+        fn from(value: merror_t) -> Self {
+            match value {
+                merror_t::MERR_OK => Self::Ok,
+                merror_t::MERR_BLOCK => Self::Block,
+                merror_t::MERR_INTERR => Self::Internal,
+                merror_t::MERR_INSN => Self::Insn,
+                merror_t::MERR_MEM => Self::Mem,
+                merror_t::MERR_BADBLK => Self::BadBlock,
+                merror_t::MERR_BADSP => Self::BadSp,
+                merror_t::MERR_PROLOG => Self::Prolog,
+                merror_t::MERR_SWITCH => Self::Switch,
+                merror_t::MERR_EXCEPTION => Self::Exception,
+                merror_t::MERR_HUGESTACK => Self::HugeStack,
+                merror_t::MERR_LVARS => Self::LVars,
+                merror_t::MERR_BITNESS => Self::Bitness,
+                merror_t::MERR_BADCALL => Self::BadCall,
+                merror_t::MERR_BADFRAME => Self::BadFrame,
+                merror_t::MERR_UNKTYPE => Self::UnknownType,
+                merror_t::MERR_BADIDB => Self::BadIDB,
+                merror_t::MERR_SIZEOF => Self::SizeOf,
+                merror_t::MERR_REDO => Self::Redo,
+                merror_t::MERR_CANCELED => Self::Cancelled,
+                merror_t::MERR_RECDEPTH => Self::RecursionDepth,
+                merror_t::MERR_OVERLAP => Self::Overlap,
+                merror_t::MERR_PARTINIT => Self::PartInitVar,
+                merror_t::MERR_COMPLEX => Self::Complex,
+                merror_t::MERR_LICENSE => Self::License,
+                merror_t::MERR_ONLY32 => Self::Only32,
+                merror_t::MERR_ONLY64 => Self::Only64,
+                merror_t::MERR_BUSY => Self::Busy,
+                merror_t::MERR_FARPTR => Self::FarPtr,
+                merror_t::MERR_EXTERN => Self::Extern,
+                merror_t::MERR_FUNCSIZE => Self::FuncSize,
+                merror_t::MERR_BADRANGES => Self::BadRanges,
+                merror_t::MERR_BADARCH => Self::BadArch,
+                merror_t::MERR_DSLOT => Self::DelaySlot,
+                merror_t::MERR_STOP => Self::Stop,
+                merror_t::MERR_CLOUD => Self::Cloud,
+                merror_t::MERR_LOOP => Self::Loop,
+                _ => Self::Unknown,
+            }
+        }
+    }
+
     mod __impl {
         #![allow(non_camel_case_types)]
         #![allow(non_upper_case_globals)]
@@ -321,6 +492,7 @@ pub mod hexrays {
     pub use super::ffix::{
         cblock_iter, idalib_hexrays_cblock_iter, idalib_hexrays_cblock_iter_next,
         idalib_hexrays_cblock_len, idalib_hexrays_cfunc_pseudocode, idalib_hexrays_cfuncptr_inner,
+        idalib_hexrays_decompile_func,
     };
 
     unsafe impl cxx::ExternType for cfunc_t {
@@ -366,20 +538,31 @@ pub mod hexrays {
     pub unsafe fn decompile_func(
         f: *mut super::ffi::func_t,
         all_blocks: bool,
-    ) -> Option<cxx::UniquePtr<cfuncptr_t>> {
+    ) -> Result<cxx::UniquePtr<cfuncptr_t>, HexRaysError> {
         let mut flags = __impl::DECOMP_NO_WAIT | __impl::DECOMP_NO_CACHE;
 
         if all_blocks {
             flags |= __impl::DECOMP_ALL_BLKS;
         }
 
-        let result = super::ffi::decompile_func(f, std::ptr::null_mut(), (flags as i32).into());
+        let mut failure = super::ffix::hexrays_error_t::default();
+        let result = super::ffix::idalib_hexrays_decompile_func(
+            f,
+            &mut failure as *mut _,
+            (flags as i32).into(),
+        );
 
-        if result.is_null() {
-            return None;
+        let code = HexRaysErrorCode::from(mem::transmute::<i32, merror_t>(failure.code));
+
+        if result.is_null() || code.is_err() {
+            Err(HexRaysError {
+                addr: failure.addr,
+                code,
+                desc: failure.desc,
+            })
+        } else {
+            Ok(result)
         }
-
-        Some(result)
     }
 }
 
@@ -488,6 +671,13 @@ pub mod pod {
 
 #[cxx::bridge]
 mod ffix {
+    #[derive(Default)]
+    struct hexrays_error_t {
+        code: i32,
+        addr: u64,
+        desc: String,
+    }
+
     unsafe extern "C++" {
         include!("autocxxgen_ffi.h");
         include!("idalib.hpp");
@@ -557,6 +747,12 @@ mod ffix {
             f: *const qrefcnt_t_cfunc_t_AutocxxConcrete,
         ) -> *mut cfunc_t;
         unsafe fn idalib_hexrays_cfunc_pseudocode(f: *mut cfunc_t) -> String;
+
+        unsafe fn idalib_hexrays_decompile_func(
+            f: *mut func_t,
+            err: *mut hexrays_error_t,
+            flags: c_int,
+        ) -> UniquePtr<qrefcnt_t_cfunc_t_AutocxxConcrete>;
 
         unsafe fn idalib_hexrays_cblock_iter(b: *mut cblock_t) -> UniquePtr<cblock_iter>;
         unsafe fn idalib_hexrays_cblock_iter_next(slf: Pin<&mut cblock_iter>) -> *mut cinsn_t;
