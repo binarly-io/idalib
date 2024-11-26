@@ -288,6 +288,8 @@ include_cpp! {
     generate!("append_cmt")
 
     // strings
+    generate!("build_strlist")
+    generate!("clear_strlist")
     generate!("get_strlist_qty")
 
     // loader
@@ -946,7 +948,7 @@ pub mod search {
 }
 
 pub mod strings {
-    pub use super::ffi::get_strlist_qty;
+    pub use super::ffi::{build_strlist, clear_strlist, get_strlist_qty};
 }
 
 pub mod loader {

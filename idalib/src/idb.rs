@@ -16,7 +16,7 @@ use crate::ffi::loader::find_plugin;
 use crate::ffi::processor::get_ph;
 use crate::ffi::search::{idalib_find_defined, idalib_find_imm, idalib_find_text};
 use crate::ffi::segment::{get_segm_qty, getnseg, getseg};
-use crate::ffi::strings::get_strlist_qty;
+use crate::ffi::strings::{build_strlist, clear_strlist, get_strlist_qty};
 use crate::ffi::util::{is_align_insn, next_head, prev_head, str2reg};
 use crate::ffi::xref::{xrefblk_t, xrefblk_t_first_from, xrefblk_t_first_to};
 use crate::ffi::BADADDR;
@@ -378,6 +378,14 @@ impl IDB {
         } else {
             Some(addr.into())
         }
+    }
+
+    pub fn build_strlist() {
+        unsafe { build_strlist() }
+    }
+
+    pub fn clear_strlist() {
+        unsafe { clear_strlist() }
     }
 
     pub fn get_strlist_qty() -> usize {
