@@ -27,8 +27,12 @@ fn main() -> anyhow::Result<()> {
         let t = idb.get_strlist_item_type(i);
         println!("{a:#x} {l} {t}");
 
-        //let string = idb.ea2str(addr).unwrap();
-        //println!("{string}");
+        let bytes = idb.get_bytes(a, l as usize);
+        let string = String::from_utf8(bytes)?;
+        //let string = string.escape_default().to_string();
+
+        println!("{string:?}");
+        println!();
     }
 
     /*
