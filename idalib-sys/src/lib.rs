@@ -56,6 +56,7 @@ include_cpp! {
     #include "moves.hpp"
     #include "pro.h"
     #include "segment.hpp"
+    #include "strlist.hpp"
     #include "ua.hpp"
     #include "xref.hpp"
     #include "hexrays.hpp"
@@ -285,6 +286,9 @@ include_cpp! {
     // comments
     generate!("set_cmt")
     generate!("append_cmt")
+
+    // strings
+    generate!("get_strlist_qty")
 
     // loader
     generate!("plugin_t")
@@ -939,6 +943,10 @@ pub mod bookmarks {
 
 pub mod search {
     pub use super::ffix::{idalib_find_defined, idalib_find_imm, idalib_find_text};
+}
+
+pub mod strings {
+    pub use super::ffi::get_strlist_qty;
 }
 
 pub mod loader {
