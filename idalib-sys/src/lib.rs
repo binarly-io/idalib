@@ -511,6 +511,7 @@ mod ffix {
         include!("ph_extras.h");
         include!("segm_extras.h");
         include!("search_extras.h");
+        include!("strings_extras.h");
 
         type c_short = autocxx::c_short;
         type c_int = autocxx::c_int;
@@ -780,6 +781,8 @@ mod ffix {
         unsafe fn idalib_find_imm(ea: c_ulonglong, imm: c_uint) -> c_ulonglong;
         unsafe fn idalib_find_defined(ea: c_ulonglong) -> c_ulonglong;
 
+        unsafe fn idalib_get_strlist_item(index: usize) -> c_ulonglong;
+
         unsafe fn idalib_get_byte(ea: c_ulonglong) -> u8;
         unsafe fn idalib_get_word(ea: c_ulonglong) -> u16;
         unsafe fn idalib_get_dword(ea: c_ulonglong) -> u32;
@@ -949,6 +952,7 @@ pub mod search {
 
 pub mod strings {
     pub use super::ffi::{build_strlist, clear_strlist, get_strlist_qty};
+    pub use super::ffix::idalib_get_strlist_item;
 }
 
 pub mod loader {
