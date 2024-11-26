@@ -142,3 +142,13 @@ int idalib_open_database_quiet(const char *name, bool auto_analysis) {
 
   return result;
 }
+
+rust::String idalib_ea2str(ea_t ea) {
+  auto out = qstring();
+
+  if (ea2str(&out, ea)) {
+    return rust::String(out.c_str());
+  } else {
+    return rust::String();
+  }
+}
