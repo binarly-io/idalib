@@ -782,6 +782,7 @@ mod ffix {
         unsafe fn idalib_find_defined(ea: c_ulonglong) -> c_ulonglong;
 
         unsafe fn idalib_get_strlist_item(index: usize) -> c_ulonglong;
+        unsafe fn idalib_ea2str(ea: c_ulonglong) -> String;
 
         unsafe fn idalib_get_byte(ea: c_ulonglong) -> u8;
         unsafe fn idalib_get_word(ea: c_ulonglong) -> u16;
@@ -952,7 +953,7 @@ pub mod search {
 
 pub mod strings {
     pub use super::ffi::{build_strlist, clear_strlist, get_strlist_qty};
-    pub use super::ffix::idalib_get_strlist_item;
+    pub use super::ffix::{idalib_ea2str, idalib_get_strlist_item};
 }
 
 pub mod loader {

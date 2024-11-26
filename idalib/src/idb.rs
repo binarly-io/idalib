@@ -16,7 +16,9 @@ use crate::ffi::loader::find_plugin;
 use crate::ffi::processor::get_ph;
 use crate::ffi::search::{idalib_find_defined, idalib_find_imm, idalib_find_text};
 use crate::ffi::segment::{get_segm_qty, getnseg, getseg};
-use crate::ffi::strings::{build_strlist, clear_strlist, get_strlist_qty, idalib_get_strlist_item};
+use crate::ffi::strings::{
+    build_strlist, clear_strlist, get_strlist_qty, idalib_ea2str, idalib_get_strlist_item,
+};
 use crate::ffi::util::{is_align_insn, next_head, prev_head, str2reg};
 use crate::ffi::xref::{xrefblk_t, xrefblk_t_first_from, xrefblk_t_first_to};
 use crate::ffi::BADADDR;
@@ -398,6 +400,16 @@ impl IDB {
             None
         } else {
             Some(addr.into())
+        }
+    }
+
+    pub fn ea2str(&self, ea: Address) -> Option<String> {
+        let s = unsafe { idalib_ea2str(ea.into()) };
+
+        if s.is_empty() {
+            None
+        } else {
+            Some(s)
         }
     }
 
