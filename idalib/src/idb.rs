@@ -17,7 +17,8 @@ use crate::ffi::processor::get_ph;
 use crate::ffi::search::{idalib_find_defined, idalib_find_imm, idalib_find_text};
 use crate::ffi::segment::{get_segm_qty, getnseg, getseg};
 use crate::ffi::strings::{
-    build_strlist, clear_strlist, get_strlist_qty, idalib_ea2str, idalib_get_strlist_item,
+    build_strlist, clear_strlist, get_strlist_qty, idalib_ea2str, idalib_get_strlist_item_addr,
+    idalib_get_strlist_item_length, idalib_get_strlist_item_type,
 };
 use crate::ffi::util::{is_align_insn, next_head, prev_head, str2reg};
 use crate::ffi::xref::{xrefblk_t, xrefblk_t_first_from, xrefblk_t_first_to};
@@ -394,13 +395,21 @@ impl IDB {
         unsafe { get_strlist_qty() }
     }
 
-    pub fn get_strlist_item(&self, index: usize) -> Option<Address> {
-        let addr = unsafe { idalib_get_strlist_item(index) };
+    pub fn get_strlist_item_addr(&self, index: usize) -> Option<Address> {
+        let addr = unsafe { idalib_get_strlist_item_addr(index) };
         if addr == BADADDR {
             None
         } else {
             Some(addr.into())
         }
+    }
+
+    pub fn get_strlist_item_length(&self, index: usize) -> i32 {
+        unsafe { idalib_get_strlist_item_length(index).into() }
+    }
+
+    pub fn get_strlist_item_type(&self, index: usize) -> i32 {
+        unsafe { idalib_get_strlist_item_type(index).into() }
     }
 
     pub fn ea2str(&self, ea: Address) -> Option<String> {
