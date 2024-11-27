@@ -7,6 +7,8 @@ use crate::ffi::hexrays::{
 };
 use crate::idb::IDB;
 
+pub use crate::ffi::hexrays::{HexRaysError, HexRaysErrorCode};
+
 pub struct CFunction<'a> {
     ptr: *mut cfunc_t,
     _obj: cxx::UniquePtr<cfuncptr_t>,

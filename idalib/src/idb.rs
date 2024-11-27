@@ -152,7 +152,7 @@ impl IDB {
         Some(Insn::from_repr(insn))
     }
 
-    pub fn decompile<'a>(&'a self, f: &Function<'a>) -> Option<CFunction<'a>> {
+    pub fn decompile<'a>(&'a self, f: &Function<'a>) -> Result<CFunction<'a>, IDAError> {
         self.decompile_with(f, false)
     }
 
@@ -160,12 +160,15 @@ impl IDB {
         &'a self,
         f: &Function<'a>,
         all_blocks: bool,
-    ) -> Option<CFunction<'a>> {
+    ) -> Result<CFunction<'a>, IDAError> {
         if !self.decompiler {
-            return None;
+            return Err(IDAError::ffi_with("no decompiler available"));
         }
 
-        unsafe { decompile_func(f.as_ptr(), all_blocks).and_then(CFunction::new) }
+        Ok(unsafe {
+            decompile_func(f.as_ptr(), all_blocks)
+                .map(|f| CFunction::new(f).expect("null pointer checked"))?
+        })
     }
 
     pub fn function_by_id(&self, id: FunctionId) -> Option<Function> {

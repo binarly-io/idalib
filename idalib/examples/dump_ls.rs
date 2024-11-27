@@ -1,5 +1,6 @@
 use idalib::func::FunctionFlags;
 use idalib::idb::*;
+use idalib::IDAError;
 
 fn main() -> anyhow::Result<()> {
     let idb = IDB::open("./tests/ls")?;
@@ -53,16 +54,22 @@ fn main() -> anyhow::Result<()> {
             "function {fid} @ {addr:x}: {:?} (blocks: {}) (decompiled: {})",
             f.name(),
             fcfg.blocks_count(),
-            decompiled.is_some(),
+            decompiled.is_ok(),
         );
 
-        if let Some(df) = decompiled.as_ref() {
-            println!(
-                "statements: {} / {}",
-                df.body().len(),
-                df.body().iter().count()
-            );
-            println!("{}", df.pseudocode());
+        match decompiled.as_ref() {
+            Ok(df) => {
+                println!(
+                    "statements: {} / {}",
+                    df.body().len(),
+                    df.body().iter().count()
+                );
+                println!("{}", df.pseudocode());
+            }
+            Err(IDAError::HexRays(e)) => {
+                println!("decompilation failed: {:?} / {}", e.code(), e.reason());
+            }
+            _ => (),
         }
 
         for (id, blk) in fcfg.blocks().enumerate() {
