@@ -942,6 +942,10 @@ pub mod comments {
     pub use super::ffix::idalib_get_cmt;
 }
 
+pub mod conversions {
+    pub use super::ffix::idalib_ea2str;
+}
+
 pub mod bookmarks {
     pub use super::ffix::{
         idalib_bookmarks_t_erase, idalib_bookmarks_t_find_index, idalib_bookmarks_t_get,
@@ -956,8 +960,7 @@ pub mod search {
 pub mod strings {
     pub use super::ffi::{build_strlist, clear_strlist, get_strlist_qty};
     pub use super::ffix::{
-        idalib_ea2str, idalib_get_strlist_item_addr, idalib_get_strlist_item_length,
-        idalib_get_strlist_item_type,
+        idalib_get_strlist_item_addr, idalib_get_strlist_item_length, idalib_get_strlist_item_type,
     };
 }
 

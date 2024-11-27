@@ -5,6 +5,7 @@ use std::path::{Path, PathBuf};
 
 use crate::ffi::bytes::*;
 use crate::ffi::comments::{append_cmt, idalib_get_cmt, set_cmt};
+use crate::ffi::conversions::idalib_ea2str;
 use crate::ffi::entry::{get_entry, get_entry_ordinal, get_entry_qty};
 use crate::ffi::func::{get_func, get_func_qty, getn_func};
 use crate::ffi::hexrays::{decompile_func, init_hexrays_plugin, term_hexrays_plugin};
@@ -16,10 +17,6 @@ use crate::ffi::loader::find_plugin;
 use crate::ffi::processor::get_ph;
 use crate::ffi::search::{idalib_find_defined, idalib_find_imm, idalib_find_text};
 use crate::ffi::segment::{get_segm_qty, getnseg, getseg};
-use crate::ffi::strings::{
-    build_strlist, clear_strlist, get_strlist_qty, idalib_ea2str, idalib_get_strlist_item_addr,
-    idalib_get_strlist_item_length, idalib_get_strlist_item_type,
-};
 use crate::ffi::util::{is_align_insn, next_head, prev_head, str2reg};
 use crate::ffi::xref::{xrefblk_t, xrefblk_t_first_from, xrefblk_t_first_to};
 use crate::ffi::BADADDR;
@@ -32,6 +29,7 @@ use crate::meta::{Metadata, MetadataMut};
 use crate::plugin::Plugin;
 use crate::processor::Processor;
 use crate::segment::{Segment, SegmentId};
+use crate::strings::StringList;
 use crate::xref::{XRef, XRefQuery};
 use crate::{prepare_library, Address, IDAError, IDARuntimeHandle};
 
@@ -383,33 +381,8 @@ impl IDB {
         }
     }
 
-    pub fn build_strlist(&self) {
-        unsafe { build_strlist() }
-    }
-
-    pub fn clear_strlist(&self) {
-        unsafe { clear_strlist() }
-    }
-
-    pub fn get_strlist_qty(&self) -> usize {
-        unsafe { get_strlist_qty() }
-    }
-
-    pub fn get_strlist_item_addr(&self, index: usize) -> Option<Address> {
-        let addr = unsafe { idalib_get_strlist_item_addr(index) };
-        if addr == BADADDR {
-            None
-        } else {
-            Some(addr.into())
-        }
-    }
-
-    pub fn get_strlist_item_length(&self, index: usize) -> i32 {
-        unsafe { idalib_get_strlist_item_length(index).into() }
-    }
-
-    pub fn get_strlist_item_type(&self, index: usize) -> i32 {
-        unsafe { idalib_get_strlist_item_type(index).into() }
+    pub fn strings(&self) -> StringList {
+        StringList::new(self)
     }
 
     pub fn ea2str(&self, ea: Address) -> Option<String> {
