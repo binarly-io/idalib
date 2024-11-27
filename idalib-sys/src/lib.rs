@@ -783,6 +783,7 @@ mod ffix {
 
         unsafe fn idalib_get_strlist_item_addr(index: usize) -> c_ulonglong;
         unsafe fn idalib_get_strlist_item_length(index: usize) -> usize;
+
         unsafe fn idalib_ea2str(ea: c_ulonglong) -> String;
 
         unsafe fn idalib_get_byte(ea: c_ulonglong) -> u8;
