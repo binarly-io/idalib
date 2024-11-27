@@ -30,14 +30,6 @@ impl<'a> StringList<'a> {
         unsafe { clear_strlist() }
     }
 
-    pub fn len(&self) -> usize {
-        unsafe { get_strlist_qty() }
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.len() == 0
-    }
-
     pub fn get_item_addr(&self, index: usize) -> Option<Address> {
         let addr = unsafe { idalib_get_strlist_item_addr(index) };
         if addr == BADADDR {
@@ -47,7 +39,16 @@ impl<'a> StringList<'a> {
         }
     }
 
+    // Note: get_item_type() was not implemented
     pub fn get_item_length(&self, index: usize) -> usize {
         unsafe { idalib_get_strlist_item_length(index) }
+    }
+
+    pub fn len(&self) -> usize {
+        unsafe { get_strlist_qty() }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 }
