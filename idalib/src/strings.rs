@@ -2,7 +2,7 @@ use std::marker::PhantomData;
 
 use crate::ffi::strings::{
     build_strlist, clear_strlist, get_strlist_qty, idalib_get_strlist_item_addr,
-    idalib_get_strlist_item_length, idalib_get_strlist_item_type,
+    idalib_get_strlist_item_length,
 };
 use crate::ffi::BADADDR;
 
@@ -20,10 +20,12 @@ impl<'a> StringList<'a> {
         }
     }
 
+    // Note: Seems pretty much useless
     pub fn build(&self) {
         unsafe { build_strlist() }
     }
 
+    // Note: Seems pretty much useless
     pub fn clear(&self) {
         unsafe { clear_strlist() }
     }
@@ -45,11 +47,7 @@ impl<'a> StringList<'a> {
         }
     }
 
-    pub fn get_item_length(&self, index: usize) -> i32 {
-        unsafe { idalib_get_strlist_item_length(index).into() }
-    }
-
-    pub fn get_item_type(&self, index: usize) -> i32 {
-        unsafe { idalib_get_strlist_item_type(index).into() }
+    pub fn get_item_length(&self, index: usize) -> usize {
+        unsafe { idalib_get_strlist_item_length(index) }
     }
 }

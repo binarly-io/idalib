@@ -6,32 +6,36 @@ fn main() -> anyhow::Result<()> {
     // Open IDA database
     let idb = IDB::open("./tests/ls")?;
 
-    let strlist_qty = idb.get_strlist_qty();
-    println!("{strlist_qty}");
+    let len = idb.strings().len();
+    println!("{len}");
 
-    idb.clear_strlist();
-    let strlist_qty = idb.get_strlist_qty();
-    println!("{strlist_qty}");
+    idb.strings().clear();
+    let len = idb.strings().len();
+    println!("{len}");
 
-    idb.build_strlist();
-    let strlist_qty = idb.get_strlist_qty();
-    println!("{strlist_qty}");
+    idb.strings().build();
+    let len = idb.strings().len();
+    println!("{len}");
 
-    let addr = idb.get_strlist_item_addr(0).unwrap();
+    let addr = idb.strings().get_item_addr(0).unwrap();
     println!("{addr:#x}");
 
-    println!("Testing get_strlist_qty(), get_strlist_item(), and ea2str()");
-    for i in 0..idb.get_strlist_qty() {
-        let a = idb.get_strlist_item_addr(i).unwrap();
-        let l = idb.get_strlist_item_length(i);
-        let t = idb.get_strlist_item_type(i);
-        println!("{a:#x} {l} {t}");
+    let l = idb.strings().get_item_length(0);
+    println!("length: {l}");
 
-        let bytes = idb.get_bytes(a, l as usize);
-        let string = String::from_utf8(bytes)?;
-        //let string = string.escape_default().to_string();
+    let s = idb.get_string(0).unwrap();
+    println!("{s}");
+    println!();
 
-        println!("{string:?}");
+    // TODO
+    println!("Testing len(), get_item_addr(), get_item_length()...");
+    for i in 0..idb.strings().len() {
+        let a = idb.strings().get_item_addr(i).unwrap();
+        let l = idb.strings().get_item_length(i);
+        println!("{a:#x} {l}");
+
+        let s = idb.get_string(i).unwrap();
+        println!("{s}");
         println!();
     }
 

@@ -385,6 +385,15 @@ impl IDB {
         StringList::new(self)
     }
 
+    pub fn get_string(&self, index: usize) -> Option<String> {
+        let addr = self.strings().get_item_addr(index)?;
+        let len = self.strings().get_item_length(index);
+
+        let bytes = self.get_bytes(addr, len);
+
+        Some(String::from_utf8_lossy(&bytes).escape_debug().to_string())
+    }
+
     pub fn ea2str(&self, ea: Address) -> Option<String> {
         let s = unsafe { idalib_ea2str(ea.into()) };
 

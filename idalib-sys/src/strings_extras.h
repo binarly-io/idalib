@@ -10,14 +10,8 @@ ea_t idalib_get_strlist_item_addr(size_t n) {
   return si.ea;
 }
 
-int idalib_get_strlist_item_length(size_t n) {
+size_t idalib_get_strlist_item_length(size_t n) {
   string_info_t si;
   get_strlist_item(&si, n);
-  return si.length;
-}
-
-int idalib_get_strlist_item_type(size_t n) {
-  string_info_t si;
-  get_strlist_item(&si, n);
-  return si.type;
+  return (size_t)si.length;
 }
