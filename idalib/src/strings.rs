@@ -22,17 +22,21 @@ impl<'a> StringList<'a> {
         }
     }
 
-    // Note: Seems pretty much useless
+    // TODO: remove?
     pub fn build(&self) {
         unsafe { build_strlist() }
     }
 
-    // Note: Seems pretty much useless
+    // TODO: remove?
     pub fn clear(&self) {
         unsafe { clear_strlist() }
     }
 
-    pub fn get_item_addr(&self, index: StringIndex) -> Option<Address> {
+    pub fn get_by_index(&self, index: usize) -> Option<String> {
+        todo!()
+    }
+
+    pub fn get_address_by_index(&self, index: StringIndex) -> Option<Address> {
         let addr = unsafe { idalib_get_strlist_item_addr(index) };
         if addr == BADADDR {
             None
@@ -41,8 +45,8 @@ impl<'a> StringList<'a> {
         }
     }
 
-    // Note: get_item_type() was not implemented
-    pub fn get_item_length(&self, index: StringIndex) -> usize {
+    // TODO: remove the `pub` visibility marker and keep it internal
+    pub fn get_length_by_index(&self, index: StringIndex) -> usize {
         unsafe { idalib_get_strlist_item_length(index) }
     }
 
