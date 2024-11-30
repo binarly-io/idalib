@@ -9,6 +9,8 @@ use crate::ffi::BADADDR;
 use crate::idb::IDB;
 use crate::Address;
 
+pub type StringIndex = usize;
+
 pub struct StringList<'a> {
     _marker: PhantomData<&'a IDB>,
 }
@@ -30,7 +32,7 @@ impl<'a> StringList<'a> {
         unsafe { clear_strlist() }
     }
 
-    pub fn get_item_addr(&self, index: usize) -> Option<Address> {
+    pub fn get_item_addr(&self, index: StringIndex) -> Option<Address> {
         let addr = unsafe { idalib_get_strlist_item_addr(index) };
         if addr == BADADDR {
             None
@@ -40,11 +42,11 @@ impl<'a> StringList<'a> {
     }
 
     // Note: get_item_type() was not implemented
-    pub fn get_item_length(&self, index: usize) -> usize {
+    pub fn get_item_length(&self, index: StringIndex) -> usize {
         unsafe { idalib_get_strlist_item_length(index) }
     }
 
-    pub fn len(&self) -> usize {
+    pub fn len(&self) -> StringIndex {
         unsafe { get_strlist_qty() }
     }
 

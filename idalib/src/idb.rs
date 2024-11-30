@@ -385,6 +385,7 @@ impl IDB {
         StringList::new(self)
     }
 
+    // TODO: move to strings.rs and use `StringIndex` type instead of `usize`
     pub fn get_string(&self, index: usize) -> Option<String> {
         let addr = self.strings().get_item_addr(index)?;
         let len = self.strings().get_item_length(index);
