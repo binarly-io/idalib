@@ -385,18 +385,7 @@ impl IDB {
         StringList::new(self)
     }
 
-    // TODO: move to `StringList` as `get_by_index()` and use `StringIndex` type instead of `usize`
-    pub fn get_string(&self, index: usize) -> Option<String> {
-        let addr = self.strings().get_address_by_index(index)?;
-        let len = self.strings().get_length_by_index(index);
-
-        let bytes = self.get_bytes(addr, len);
-
-        // TODO: switch to `String::from_utf8_lossy_owned` once it's stable
-        Some(String::from_utf8_lossy(&bytes).into_owned())
-    }
-
-    pub fn convert_ea2str(&self, ea: Address) -> Option<String> {
+    pub fn address_to_string(&self, ea: Address) -> Option<String> {
         let s = unsafe { idalib_ea2str(ea.into()) };
 
         if s.is_empty() {

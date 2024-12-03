@@ -1,5 +1,6 @@
 use std::marker::PhantomData;
 
+use crate::ffi::bytes::idalib_get_bytes;
 use crate::ffi::strings::{
     build_strlist, clear_strlist, get_strlist_qty, idalib_get_strlist_item_addr,
     idalib_get_strlist_item_length,
@@ -22,18 +23,29 @@ impl<'a> StringList<'a> {
         }
     }
 
-    // TODO: remove?
-    pub fn build(&self) {
+    pub fn rebuild(&self) {
         unsafe { build_strlist() }
     }
 
-    // TODO: remove?
     pub fn clear(&self) {
         unsafe { clear_strlist() }
     }
 
-    pub fn get_by_index(&self, index: usize) -> Option<String> {
-        todo!()
+    pub fn get_by_index(&self, index: StringIndex) -> Option<String> {
+        let addr = self.get_address_by_index(index)?;
+        let size = self.get_length_by_index(index);
+
+        // See also `IDB::get_bytes`
+        let mut buf = Vec::with_capacity(size);
+        let Ok(new_len) = (unsafe { idalib_get_bytes(addr.into(), &mut buf) }) else {
+            return None;
+        };
+        unsafe {
+            buf.set_len(new_len);
+        }
+
+        // TODO: switch to `String::from_utf8_lossy_owned` once it's stable
+        Some(String::from_utf8_lossy(&buf).into_owned())
     }
 
     pub fn get_address_by_index(&self, index: StringIndex) -> Option<Address> {
@@ -45,8 +57,7 @@ impl<'a> StringList<'a> {
         }
     }
 
-    // TODO: remove the `pub` visibility marker and keep it internal
-    pub fn get_length_by_index(&self, index: StringIndex) -> usize {
+    fn get_length_by_index(&self, index: StringIndex) -> usize {
         unsafe { idalib_get_strlist_item_length(index) }
     }
 

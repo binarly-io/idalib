@@ -9,8 +9,15 @@ fn main() -> anyhow::Result<()> {
     println!("Testing len(), get_by_index(), and get_address_by_index() (valid indexes)");
     // len()
     for i in 0..idb.strings().len() {
+        /*
+        println!(
+            "\t{:#x}\t{:?}",
+            idb.strings().get_address_by_index(i).unwrap(),
+            idb.strings().get_by_index(i).unwrap()
+        );
+        */
         // get_by_index()
-        assert!(idb.get_string(i).is_some());
+        assert!(idb.strings().get_by_index(i).is_some());
         // get_address_by_index()
         assert!(idb.strings().get_address_by_index(i).is_some());
     }
@@ -19,7 +26,7 @@ fn main() -> anyhow::Result<()> {
     // len()
     let len = idb.strings().len();
     // get_by_index()
-    assert!(idb.get_string(len).is_none());
+    assert!(idb.strings().get_by_index(len).is_none());
     // get_address_by_index()
     assert!(idb.strings().get_address_by_index(len).is_none());
 
