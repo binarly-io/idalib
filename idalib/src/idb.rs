@@ -5,6 +5,7 @@ use std::path::{Path, PathBuf};
 
 use crate::ffi::bytes::*;
 use crate::ffi::comments::{append_cmt, idalib_get_cmt, set_cmt};
+use crate::ffi::conversions::idalib_ea2str;
 use crate::ffi::entry::{get_entry, get_entry_ordinal, get_entry_qty};
 use crate::ffi::func::{get_func, get_func_qty, getn_func};
 use crate::ffi::hexrays::{decompile_func, init_hexrays_plugin, term_hexrays_plugin};
@@ -28,6 +29,7 @@ use crate::meta::{Metadata, MetadataMut};
 use crate::plugin::Plugin;
 use crate::processor::Processor;
 use crate::segment::{Segment, SegmentId};
+use crate::strings::StringList;
 use crate::xref::{XRef, XRefQuery};
 use crate::{prepare_library, Address, IDAError, IDARuntimeHandle};
 
@@ -379,6 +381,20 @@ impl IDB {
             None
         } else {
             Some(addr.into())
+        }
+    }
+
+    pub fn strings(&self) -> StringList {
+        StringList::new(self)
+    }
+
+    pub fn address_to_string(&self, ea: Address) -> Option<String> {
+        let s = unsafe { idalib_ea2str(ea.into()) };
+
+        if s.is_empty() {
+            None
+        } else {
+            Some(s)
         }
     }
 

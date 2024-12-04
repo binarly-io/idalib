@@ -59,6 +59,7 @@ include_cpp! {
     #include "moves.hpp"
     #include "pro.h"
     #include "segment.hpp"
+    #include "strlist.hpp"
     #include "ua.hpp"
     #include "xref.hpp"
 
@@ -329,6 +330,11 @@ include_cpp! {
     // comments
     generate!("set_cmt")
     generate!("append_cmt")
+
+    // strings
+    generate!("build_strlist")
+    generate!("clear_strlist")
+    generate!("get_strlist_qty")
 
     // loader
     generate!("plugin_t")
@@ -695,6 +701,7 @@ mod ffix {
         include!("ph_extras.h");
         include!("segm_extras.h");
         include!("search_extras.h");
+        include!("strings_extras.h");
 
         type c_short = autocxx::c_short;
         type c_int = autocxx::c_int;
@@ -970,6 +977,11 @@ mod ffix {
         unsafe fn idalib_find_imm(ea: c_ulonglong, imm: c_uint) -> c_ulonglong;
         unsafe fn idalib_find_defined(ea: c_ulonglong) -> c_ulonglong;
 
+        unsafe fn idalib_get_strlist_item_addr(index: usize) -> c_ulonglong;
+        unsafe fn idalib_get_strlist_item_length(index: usize) -> usize;
+
+        unsafe fn idalib_ea2str(ea: c_ulonglong) -> String;
+
         unsafe fn idalib_get_byte(ea: c_ulonglong) -> u8;
         unsafe fn idalib_get_word(ea: c_ulonglong) -> u16;
         unsafe fn idalib_get_dword(ea: c_ulonglong) -> u32;
@@ -1126,6 +1138,10 @@ pub mod comments {
     pub use super::ffix::idalib_get_cmt;
 }
 
+pub mod conversions {
+    pub use super::ffix::idalib_ea2str;
+}
+
 pub mod bookmarks {
     pub use super::ffix::{
         idalib_bookmarks_t_erase, idalib_bookmarks_t_find_index, idalib_bookmarks_t_get,
@@ -1135,6 +1151,11 @@ pub mod bookmarks {
 
 pub mod search {
     pub use super::ffix::{idalib_find_defined, idalib_find_imm, idalib_find_text};
+}
+
+pub mod strings {
+    pub use super::ffi::{build_strlist, clear_strlist, get_strlist_qty};
+    pub use super::ffix::{idalib_get_strlist_item_addr, idalib_get_strlist_item_length};
 }
 
 pub mod loader {
