@@ -250,9 +250,9 @@
         <span class="kw">let </span>type_ = <span class="self">self</span>.inner.type_ &amp; (XREF_MASK <span class="kw">as </span>u8);
 
         <span class="kw">if </span><span class="self">self</span>.is_code() {
-            XRefType::Code(<span class="kw">unsafe </span>{ mem::transmute(type_) })
+            XRefType::Code(<span class="kw">unsafe </span>{ mem::transmute::&lt;u8, CodeRef&gt;(type_) })
         } <span class="kw">else </span>{
-            XRefType::Data(<span class="kw">unsafe </span>{ mem::transmute(type_) })
+            XRefType::Data(<span class="kw">unsafe </span>{ mem::transmute::&lt;u8, DataRef&gt;(type_) })
         }
     }
 
@@ -268,7 +268,7 @@
         <span class="self">self</span>.inner.user == <span class="number">1
     </span>}
 
-    <span class="kw">pub fn </span>next_to(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;XRef&lt;<span class="lifetime">'a</span>&gt;&gt; {
+    <span class="kw">pub fn </span>next_to(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>curr = <span class="self">self</span>.clone();
 
         <span class="kw">let </span>found = <span class="kw">unsafe </span>{ xrefblk_t_next_to(<span class="kw-2">&amp;mut </span>curr.inner <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) };
@@ -280,7 +280,7 @@
         </span>}
     }
 
-    <span class="kw">pub fn </span>next_from(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;XRef&lt;<span class="lifetime">'a</span>&gt;&gt; {
+    <span class="kw">pub fn </span>next_from(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>curr = <span class="self">self</span>.clone();
 
         <span class="kw">let </span>found = <span class="kw">unsafe </span>{ xrefblk_t_next_from(<span class="kw-2">&amp;mut </span>curr.inner <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) };

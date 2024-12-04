@@ -1337,7 +1337,7 @@
     }
 
     <span class="kw">pub fn </span>nametype(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i8 {
-        <span class="kw">unsafe </span>{ idalib_inf_get_nametype().into() }
+        <span class="kw">unsafe </span>{ idalib_inf_get_nametype() }
     }
 
     <span class="kw">pub fn </span>short_demnames(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
@@ -1521,7 +1521,7 @@
     }
 
     <span class="kw">pub fn </span>strlit_zeroes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i8 {
-        <span class="kw">unsafe </span>{ idalib_inf_get_strlit_zeroes().into() }
+        <span class="kw">unsafe </span>{ idalib_inf_get_strlit_zeroes() }
     }
 
     <span class="kw">pub fn </span>strtype(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
@@ -1597,7 +1597,7 @@
     }
 
     <span class="kw">pub fn </span>cc_cm(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
-        <span class="kw">unsafe </span>{ mem::transmute(idalib_inf_get_cc_cm()) }
+        <span class="kw">unsafe </span>{ idalib_inf_get_cc_cm() }
     }
 
     <span class="kw">pub fn </span>cc_size_i(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {

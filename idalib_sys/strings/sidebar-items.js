@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["build_strlist","clear_strlist","get_strlist_qty","idalib_get_strlist_item_addr","idalib_get_strlist_item_length"]};

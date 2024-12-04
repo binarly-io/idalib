@@ -92,6 +92,12 @@
 <a href="#92" id="92">92</a>
 <a href="#93" id="93">93</a>
 <a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::marker::PhantomData;
 
 <span class="kw">use </span><span class="kw">crate</span>::ffi::hexrays::{
@@ -100,6 +106,8 @@
     idalib_hexrays_cfuncptr_inner,
 };
 <span class="kw">use </span><span class="kw">crate</span>::idb::IDB;
+
+<span class="kw">pub use </span><span class="kw">crate</span>::ffi::hexrays::{HexRaysError, HexRaysErrorCode};
 
 <span class="kw">pub struct </span>CFunction&lt;<span class="lifetime">'a</span>&gt; {
     ptr: <span class="kw-2">*mut </span>cfunc_t,
@@ -185,5 +193,9 @@
     <span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="kw">unsafe </span>{ idalib_hexrays_cblock_len(<span class="self">self</span>.ptr) }
     }
+
+    <span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.len() == <span class="number">0
+    </span>}
 }
 </code></pre></div></section></main></body></html>

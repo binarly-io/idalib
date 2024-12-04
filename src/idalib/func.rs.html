@@ -309,6 +309,14 @@
 <a href="#309" id="309">309</a>
 <a href="#310" id="310">310</a>
 <a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::marker::PhantomData;
 <span class="kw">use </span>std::mem;
 <span class="kw">use </span>std::pin::Pin;
@@ -355,20 +363,24 @@
     }
 
     <span class="kw">pub fn </span>start_address(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Address {
-        <span class="kw">unsafe </span>{ (<span class="kw-2">&amp;*</span><span class="self">self</span>.as_range_t()).start_ea.into() }
+        <span class="kw">unsafe </span>{ (<span class="kw-2">*</span><span class="self">self</span>.as_range_t()).start_ea.into() }
     }
 
     <span class="kw">pub fn </span>end_address(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Address {
-        <span class="kw">unsafe </span>{ (<span class="kw-2">&amp;*</span><span class="self">self</span>.as_range_t()).end_ea.into() }
+        <span class="kw">unsafe </span>{ (<span class="kw-2">*</span><span class="self">self</span>.as_range_t()).end_ea.into() }
     }
 
     <span class="kw">pub fn </span>contains_address(<span class="kw-2">&amp;</span><span class="self">self</span>, addr: Address) -&gt; bool {
-        <span class="kw">unsafe </span>{ (<span class="kw-2">&amp;*</span><span class="self">self</span>.as_range_t()).contains(addr.into()) }
+        <span class="kw">unsafe </span>{ (<span class="kw-2">*</span><span class="self">self</span>.as_range_t()).contains(addr.into()) }
     }
 
     <span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
-        <span class="kw">unsafe </span>{ (<span class="kw-2">&amp;*</span><span class="self">self</span>.as_range_t()).size().<span class="number">0 </span><span class="kw">as _ </span>}
+        <span class="kw">unsafe </span>{ (<span class="kw-2">*</span><span class="self">self</span>.as_range_t()).size().<span class="number">0 </span><span class="kw">as _ </span>}
     }
+
+    <span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.len() == <span class="number">0
+    </span>}
 
     <span class="kw">pub fn </span>is_normal(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(<span class="self">self</span>.kind, fc_block_type_t::fcb_normal)
@@ -404,7 +416,7 @@
 
     <span class="kw">pub fn </span>succs&lt;<span class="lifetime">'b</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'b </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = BasicBlockId&gt; + <span class="lifetime">'b </span>{
         <span class="kw">unsafe </span>{ idalib_qbasic_block_succs(<span class="self">self</span>.block) }
-            .into_iter()
+            .iter()
             .map(|v| v.<span class="number">0 </span><span class="kw">as _</span>)
     }
 
@@ -418,7 +430,7 @@
 
     <span class="kw">pub fn </span>preds&lt;<span class="lifetime">'b</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'b </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = BasicBlockId&gt; + <span class="lifetime">'b </span>{
         <span class="kw">unsafe </span>{ idalib_qbasic_block_preds(<span class="self">self</span>.block) }
-            .into_iter()
+            .iter()
             .map(|v| v.<span class="number">0 </span><span class="kw">as _</span>)
     }
 
@@ -492,20 +504,24 @@
     }
 
     <span class="kw">pub fn </span>start_address(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Address {
-        <span class="kw">unsafe </span>{ (<span class="kw-2">&amp;*</span><span class="self">self</span>.as_range_t()).start_ea.into() }
+        <span class="kw">unsafe </span>{ (<span class="kw-2">*</span><span class="self">self</span>.as_range_t()).start_ea.into() }
     }
 
     <span class="kw">pub fn </span>end_address(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Address {
-        <span class="kw">unsafe </span>{ (<span class="kw-2">&amp;*</span><span class="self">self</span>.as_range_t()).end_ea.into() }
+        <span class="kw">unsafe </span>{ (<span class="kw-2">*</span><span class="self">self</span>.as_range_t()).end_ea.into() }
     }
 
     <span class="kw">pub fn </span>contains_address(<span class="kw-2">&amp;</span><span class="self">self</span>, addr: Address) -&gt; bool {
-        <span class="kw">unsafe </span>{ (<span class="kw-2">&amp;*</span><span class="self">self</span>.as_range_t()).contains(addr.into()) }
+        <span class="kw">unsafe </span>{ (<span class="kw-2">*</span><span class="self">self</span>.as_range_t()).contains(addr.into()) }
     }
 
     <span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
-        <span class="kw">unsafe </span>{ (<span class="kw-2">&amp;*</span><span class="self">self</span>.as_range_t()).size().<span class="number">0 </span><span class="kw">as _ </span>}
+        <span class="kw">unsafe </span>{ (<span class="kw-2">*</span><span class="self">self</span>.as_range_t()).size().<span class="number">0 </span><span class="kw">as _ </span>}
     }
+
+    <span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.len() == <span class="number">0
+    </span>}
 
     <span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
         <span class="kw">let </span>name = <span class="kw">unsafe </span>{ idalib_func_name(<span class="self">self</span>.ptr) }.ok()<span class="question-mark">?</span>;
@@ -523,19 +539,19 @@
     }
 
     <span class="kw">pub fn </span>is_far(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="kw">unsafe </span>{ (<span class="kw-2">&amp;*</span><span class="self">self</span>.ptr).is_far() }
+        <span class="kw">unsafe </span>{ (<span class="kw-2">*</span><span class="self">self</span>.ptr).is_far() }
     }
 
     <span class="kw">pub fn </span>does_return(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="kw">unsafe </span>{ (<span class="kw-2">&amp;*</span><span class="self">self</span>.ptr).does_return() }
+        <span class="kw">unsafe </span>{ (<span class="kw-2">*</span><span class="self">self</span>.ptr).does_return() }
     }
 
     <span class="kw">pub fn </span>analyzed_sp(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="kw">unsafe </span>{ (<span class="kw-2">&amp;*</span><span class="self">self</span>.ptr).analyzed_sp() }
+        <span class="kw">unsafe </span>{ (<span class="kw-2">*</span><span class="self">self</span>.ptr).analyzed_sp() }
     }
 
     <span class="kw">pub fn </span>need_prolog_analysis(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="kw">unsafe </span>{ (<span class="kw-2">&amp;*</span><span class="self">self</span>.ptr).need_prolog_analysis() }
+        <span class="kw">unsafe </span>{ (<span class="kw-2">*</span><span class="self">self</span>.ptr).need_prolog_analysis() }
     }
 
     <span class="kw">pub fn </span>has_external_refs(<span class="kw-2">&amp;</span><span class="self">self</span>, ea: Address) -&gt; bool {
@@ -552,11 +568,11 @@
         }
     }
 
-    <span class="kw">pub fn </span>cfg&lt;<span class="lifetime">'b</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'b </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;FunctionCFG&lt;<span class="lifetime">'b</span>&gt;, IDAError&gt; {
+    <span class="kw">pub fn </span>cfg(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;FunctionCFG, IDAError&gt; {
         <span class="self">self</span>.cfg_with(FunctionCFGFlags::empty())
     }
 
-    <span class="kw">pub fn </span>cfg_with&lt;<span class="lifetime">'b</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'b </span><span class="self">self</span>, flags: FunctionCFGFlags) -&gt; <span class="prelude-ty">Result</span>&lt;FunctionCFG&lt;<span class="lifetime">'b</span>&gt;, IDAError&gt; {
+    <span class="kw">pub fn </span>cfg_with(<span class="kw-2">&amp;</span><span class="self">self</span>, flags: FunctionCFGFlags) -&gt; <span class="prelude-ty">Result</span>&lt;FunctionCFG, IDAError&gt; {
         <span class="kw">let </span>ptr = <span class="kw">unsafe </span>{ idalib_func_flow_chart(<span class="self">self</span>.ptr, flags.bits().into()) };
 
         <span class="prelude-val">Ok</span>(FunctionCFG {
@@ -573,7 +589,7 @@
             .map(|r| mem::transmute::&lt;<span class="kw-2">&amp;</span>qflow_chart_t, <span class="kw-2">&amp;</span>gdl_graph_t&gt;(r))
     }
 
-    <span class="kw">pub fn </span>block_by_id&lt;<span class="lifetime">'b</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'b </span><span class="self">self</span>, id: BasicBlockId) -&gt; <span class="prelude-ty">Option</span>&lt;BasicBlock&lt;<span class="lifetime">'b</span>&gt;&gt; {
+    <span class="kw">pub fn </span>block_by_id(<span class="kw-2">&amp;</span><span class="self">self</span>, id: BasicBlockId) -&gt; <span class="prelude-ty">Option</span>&lt;BasicBlock&gt; {
         <span class="kw">let </span>blk = <span class="kw">unsafe </span>{
             idalib_qflow_graph_getn_block(<span class="self">self</span>.flow_chart.as_ref().expect(<span class="string">"valid pointer"</span>), id)
         };
@@ -592,7 +608,7 @@
         <span class="prelude-val">Some</span>(BasicBlock::from_parts(blk, kind))
     }
 
-    <span class="kw">pub fn </span>entry&lt;<span class="lifetime">'b</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'b </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;BasicBlock&lt;<span class="lifetime">'b</span>&gt;&gt; {
+    <span class="kw">pub fn </span>entry(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;BasicBlock&gt; {
         <span class="kw">let </span>id = <span class="kw">unsafe </span>{ <span class="self">self</span>.as_gdl_graph().expect(<span class="string">"valid pointer"</span>).entry() };
 
         <span class="kw">if </span>id.<span class="number">0 </span>&lt; <span class="number">0 </span>{
@@ -602,7 +618,7 @@
         <span class="self">self</span>.block_by_id(id.<span class="number">0 </span><span class="kw">as _</span>)
     }
 
-    <span class="kw">pub fn </span>exit&lt;<span class="lifetime">'b</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'b </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;BasicBlock&lt;<span class="lifetime">'b</span>&gt;&gt; {
+    <span class="kw">pub fn </span>exit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;BasicBlock&gt; {
         <span class="kw">let </span>id = <span class="kw">unsafe </span>{ <span class="self">self</span>.as_gdl_graph().expect(<span class="string">"valid pointer"</span>).exit() };
 
         <span class="kw">if </span>id.<span class="number">0 </span>&lt; <span class="number">0 </span>{

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["IDAError"],"fn":["enable_console_messages","force_batch_mode","init_library"],"mod":["bookmarks","decompiler","func","idb","insn","license","meta","plugin","processor","segment","xref"],"type":["Address"]};
+window.SIDEBAR_ITEMS = {"enum":["IDAError"],"fn":["enable_console_messages","force_batch_mode","init_library"],"mod":["bookmarks","decompiler","func","idb","insn","license","meta","plugin","processor","segment","strings","xref"],"type":["Address"]};

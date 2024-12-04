@@ -49,9 +49,7 @@
 <a href="#49" id="49">49</a>
 <a href="#50" id="50">50</a>
 <a href="#51" id="51">51</a>
-<a href="#52" id="52">52</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::marker::PhantomData;
-<span class="kw">use </span>std::mem;
 
 <span class="kw">use </span>bitflags::bitflags;
 
@@ -94,11 +92,11 @@
     }
 
     <span class="kw">pub fn </span>version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
-        <span class="kw">unsafe </span>{ mem::transmute(idalib_plugin_version(<span class="self">self</span>.ptr)) }
+        <span class="kw">unsafe </span>{ idalib_plugin_version(<span class="self">self</span>.ptr) }
     }
 
     <span class="kw">pub fn </span>flags(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; PluginFlags {
-        <span class="kw">let </span>bits = <span class="kw">unsafe </span>{ mem::transmute(idalib_plugin_flags(<span class="self">self</span>.ptr)) };
+        <span class="kw">let </span>bits = <span class="kw">unsafe </span>{ idalib_plugin_flags(<span class="self">self</span>.ptr) };
         PluginFlags::from_bits_retain(bits)
     }
 }

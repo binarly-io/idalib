@@ -474,6 +474,25 @@
 <a href="#474" id="474">474</a>
 <a href="#475" id="475">475</a>
 <a href="#476" id="476">476</a>
+<a href="#477" id="477">477</a>
+<a href="#478" id="478">478</a>
+<a href="#479" id="479">479</a>
+<a href="#480" id="480">480</a>
+<a href="#481" id="481">481</a>
+<a href="#482" id="482">482</a>
+<a href="#483" id="483">483</a>
+<a href="#484" id="484">484</a>
+<a href="#485" id="485">485</a>
+<a href="#486" id="486">486</a>
+<a href="#487" id="487">487</a>
+<a href="#488" id="488">488</a>
+<a href="#489" id="489">489</a>
+<a href="#490" id="490">490</a>
+<a href="#491" id="491">491</a>
+<a href="#492" id="492">492</a>
+<a href="#493" id="493">493</a>
+<a href="#494" id="494">494</a>
+<a href="#495" id="495">495</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::ffi::CString;
 <span class="kw">use </span>std::marker::PhantomData;
 <span class="kw">use </span>std::mem::MaybeUninit;
@@ -481,6 +500,7 @@
 
 <span class="kw">use </span><span class="kw">crate</span>::ffi::bytes::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::ffi::comments::{append_cmt, idalib_get_cmt, set_cmt};
+<span class="kw">use </span><span class="kw">crate</span>::ffi::conversions::idalib_ea2str;
 <span class="kw">use </span><span class="kw">crate</span>::ffi::entry::{get_entry, get_entry_ordinal, get_entry_qty};
 <span class="kw">use </span><span class="kw">crate</span>::ffi::func::{get_func, get_func_qty, getn_func};
 <span class="kw">use </span><span class="kw">crate</span>::ffi::hexrays::{decompile_func, init_hexrays_plugin, term_hexrays_plugin};
@@ -504,6 +524,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::plugin::Plugin;
 <span class="kw">use </span><span class="kw">crate</span>::processor::Processor;
 <span class="kw">use </span><span class="kw">crate</span>::segment::{Segment, SegmentId};
+<span class="kw">use </span><span class="kw">crate</span>::strings::StringList;
 <span class="kw">use </span><span class="kw">crate</span>::xref::{XRef, XRefQuery};
 <span class="kw">use crate</span>::{prepare_library, Address, IDAError, IDARuntimeHandle};
 
@@ -554,7 +575,7 @@
     }
 
     <span class="kw">pub fn </span>set_screen_address(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ea: Address) {
-        set_screen_ea(ea.into())
+        set_screen_ea(ea.into());
     }
 
     <span class="kw">pub fn </span>make_signatures(<span class="kw-2">&amp;mut </span><span class="self">self</span>, only_pat: bool) -&gt; <span class="prelude-ty">Result</span>&lt;(), IDAError&gt; {
@@ -565,20 +586,20 @@
         <span class="self">self</span>.decompiler
     }
 
-    <span class="kw">pub fn </span>meta&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>) -&gt; Metadata&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">pub fn </span>meta(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Metadata {
         Metadata::new()
     }
 
-    <span class="kw">pub fn </span>meta_mut&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; MetadataMut&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">pub fn </span>meta_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; MetadataMut {
         MetadataMut::new()
     }
 
-    <span class="kw">pub fn </span>processor&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>) -&gt; Processor&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">pub fn </span>processor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Processor {
         <span class="kw">let </span>ptr = <span class="kw">unsafe </span>{ get_ph() };
         Processor::from_ptr(ptr)
     }
 
-    <span class="kw">pub fn </span>entries&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>) -&gt; EntryPointIter&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">pub fn </span>entries(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; EntryPointIter {
         <span class="kw">let </span>limit = <span class="kw">unsafe </span>{ get_entry_qty() };
         EntryPointIter {
             index: <span class="number">0</span>,
@@ -587,7 +608,7 @@
         }
     }
 
-    <span class="kw">pub fn </span>function_at&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>, ea: Address) -&gt; <span class="prelude-ty">Option</span>&lt;Function&lt;<span class="lifetime">'a</span>&gt;&gt; {
+    <span class="kw">pub fn </span>function_at(<span class="kw-2">&amp;</span><span class="self">self</span>, ea: Address) -&gt; <span class="prelude-ty">Option</span>&lt;Function&gt; {
         <span class="kw">let </span>ptr = <span class="kw">unsafe </span>{ get_func(ea.into()) };
 
         <span class="kw">if </span>ptr.is_null() {
@@ -628,7 +649,7 @@
         <span class="prelude-val">Some</span>(Insn::from_repr(insn))
     }
 
-    <span class="kw">pub fn </span>decompile&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>, f: <span class="kw-2">&amp;</span>Function&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;CFunction&lt;<span class="lifetime">'a</span>&gt;&gt; {
+    <span class="kw">pub fn </span>decompile&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>, f: <span class="kw-2">&amp;</span>Function&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;CFunction&lt;<span class="lifetime">'a</span>&gt;, IDAError&gt; {
         <span class="self">self</span>.decompile_with(f, <span class="bool-val">false</span>)
     }
 
@@ -636,15 +657,18 @@
         <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>,
         f: <span class="kw-2">&amp;</span>Function&lt;<span class="lifetime">'a</span>&gt;,
         all_blocks: bool,
-    ) -&gt; <span class="prelude-ty">Option</span>&lt;CFunction&lt;<span class="lifetime">'a</span>&gt;&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;CFunction&lt;<span class="lifetime">'a</span>&gt;, IDAError&gt; {
         <span class="kw">if </span>!<span class="self">self</span>.decompiler {
-            <span class="kw">return </span><span class="prelude-val">None</span>;
+            <span class="kw">return </span><span class="prelude-val">Err</span>(IDAError::ffi_with(<span class="string">"no decompiler available"</span>));
         }
 
-        decompile_func(f.as_ptr(), all_blocks).and_then(CFunction::new)
+        <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{
+            decompile_func(f.as_ptr(), all_blocks)
+                .map(|f| CFunction::new(f).expect(<span class="string">"null pointer checked"</span>))<span class="question-mark">?
+        </span>})
     }
 
-    <span class="kw">pub fn </span>function_by_id&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>, id: FunctionId) -&gt; <span class="prelude-ty">Option</span>&lt;Function&lt;<span class="lifetime">'a</span>&gt;&gt; {
+    <span class="kw">pub fn </span>function_by_id(<span class="kw-2">&amp;</span><span class="self">self</span>, id: FunctionId) -&gt; <span class="prelude-ty">Option</span>&lt;Function&gt; {
         <span class="kw">let </span>ptr = <span class="kw">unsafe </span>{ getn_func(id) };
 
         <span class="kw">if </span>ptr.is_null() {
@@ -662,7 +686,7 @@
         <span class="kw">unsafe </span>{ get_func_qty() }
     }
 
-    <span class="kw">pub fn </span>segment_at&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>, ea: Address) -&gt; <span class="prelude-ty">Option</span>&lt;Segment&lt;<span class="lifetime">'a</span>&gt;&gt; {
+    <span class="kw">pub fn </span>segment_at(<span class="kw-2">&amp;</span><span class="self">self</span>, ea: Address) -&gt; <span class="prelude-ty">Option</span>&lt;Segment&gt; {
         <span class="kw">let </span>ptr = <span class="kw">unsafe </span>{ getseg(ea.into()) };
 
         <span class="kw">if </span>ptr.is_null() {
@@ -672,7 +696,7 @@
         <span class="prelude-val">Some</span>(Segment::from_ptr(ptr))
     }
 
-    <span class="kw">pub fn </span>segment_by_id&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>, id: SegmentId) -&gt; <span class="prelude-ty">Option</span>&lt;Segment&lt;<span class="lifetime">'a</span>&gt;&gt; {
+    <span class="kw">pub fn </span>segment_by_id(<span class="kw-2">&amp;</span><span class="self">self</span>, id: SegmentId) -&gt; <span class="prelude-ty">Option</span>&lt;Segment&gt; {
         <span class="kw">let </span>ptr = <span class="kw">unsafe </span>{ getnseg((id <span class="kw">as </span>i32).into()) };
 
         <span class="kw">if </span>ptr.is_null() {
@@ -803,7 +827,7 @@
         }
     }
 
-    <span class="kw">pub fn </span>bookmarks&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>) -&gt; Bookmarks&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">pub fn </span>bookmarks(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Bookmarks {
         Bookmarks::new(<span class="self">self</span>)
     }
 
@@ -852,6 +876,20 @@
             <span class="prelude-val">None
         </span>} <span class="kw">else </span>{
             <span class="prelude-val">Some</span>(addr.into())
+        }
+    }
+
+    <span class="kw">pub fn </span>strings(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; StringList {
+        StringList::new(<span class="self">self</span>)
+    }
+
+    <span class="kw">pub fn </span>address_to_string(<span class="kw-2">&amp;</span><span class="self">self</span>, ea: Address) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+        <span class="kw">let </span>s = <span class="kw">unsafe </span>{ idalib_ea2str(ea.into()) };
+
+        <span class="kw">if </span>s.is_empty() {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="prelude-val">Some</span>(s)
         }
     }
 
