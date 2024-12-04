@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.3.0 (2024-12-04)
+
+Features:
+- Improved error reporting for decompiler.
+- Add string list API (contributor: [@0xdea](https://github.com/0xdea)).
+
+## 0.2.2 (2024-11-16)
+
+Fix:
+- Documentation generation and workflow.
+
+## 0.2.1 (2024-11-16)
+
+Features:
+- Add `Bookmarks::get_address` (contributor: [@0xdea](https://github.com/0xdea)).
+- Add search API (contributor: [@0xdea](https://github.com/0xdea)).
+- Add "set show" family of functions.
+
 ## 0.2.0 (2024-11-13)
 
 Features:
