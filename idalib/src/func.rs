@@ -24,6 +24,19 @@ pub struct FunctionCFG<'a> {
     _marker: PhantomData<&'a Function<'a>>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct FunctionFrame {
+    arguments: Vec<FunctionVar>,
+    locals: Vec<FunctionVar>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct FunctionVar {
+    name: Option<String>,
+    fp_offset: i64,
+    size: usize,
+}
+
 pub struct BasicBlock<'a> {
     block: *const qbasic_block_t,
     kind: fc_block_type_t,
@@ -239,6 +252,52 @@ impl<'a> Function<'a> {
         unsafe { has_external_refs(self.ptr, ea.into()) }
     }
 
+    pub fn sp_delta_at(&self, ea: Address) -> i64 {
+        unsafe { idalib_func_spd(self.ptr, ea.into()) }
+    }
+
+    pub fn effective_sp_delta_at(&self, ea: Address) -> i64 {
+        unsafe { idalib_func_effective_spd(self.ptr, ea.into()) }
+    }
+
+    pub fn sp_delta_of(&self, ea: Address) -> i64 {
+        unsafe { idalib_func_sp_delta(self.ptr, ea.into()) }
+    }
+
+    pub fn frame(&self) -> Option<FunctionFrame> {
+        let mut frame = func_frame_t::default();
+        unsafe { idalib_func_frame(self.ptr, &mut frame).ok()? }
+
+        Some(FunctionFrame {
+            arguments: frame
+                .arguments
+                .into_iter()
+                .map(|v| FunctionVar {
+                    name: if v.name.is_empty() {
+                        None
+                    } else {
+                        Some(v.name)
+                    },
+                    fp_offset: v.fp_offset,
+                    size: v.size,
+                })
+                .collect(),
+            locals: frame
+                .locals
+                .into_iter()
+                .map(|v| FunctionVar {
+                    name: if v.name.is_empty() {
+                        None
+                    } else {
+                        Some(v.name)
+                    },
+                    fp_offset: v.fp_offset,
+                    size: v.size,
+                })
+                .collect(),
+        })
+    }
+
     pub fn calc_thunk_target(&self) -> Option<Address> {
         let addr = unsafe { calc_thunk_func_target(self.ptr, ptr::null_mut()) };
 
@@ -260,6 +319,30 @@ impl<'a> Function<'a> {
             flow_chart: ptr.map_err(IDAError::ffi)?,
             _marker: PhantomData,
         })
+    }
+}
+
+impl FunctionFrame {
+    pub fn arguments(&self) -> &[FunctionVar] {
+        &self.arguments
+    }
+
+    pub fn locals(&self) -> &[FunctionVar] {
+        &self.locals
+    }
+}
+
+impl FunctionVar {
+    pub fn name(&self) -> Option<&str> {
+        self.name.as_deref()
+    }
+
+    pub fn fp_offset(&self) -> i64 {
+        self.fp_offset
+    }
+
+    pub fn size(&self) -> usize {
+        self.size
     }
 }
 

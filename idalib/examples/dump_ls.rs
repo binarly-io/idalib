@@ -57,6 +57,10 @@ fn main() -> anyhow::Result<()> {
             decompiled.is_ok(),
         );
 
+        if let Some(frame) = f.frame() {
+            println!("function {fid} frame: {frame:#?}");
+        }
+
         match decompiled.as_ref() {
             Ok(df) => {
                 println!(

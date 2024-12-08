@@ -684,6 +684,19 @@ mod ffix {
         desc: String,
     }
 
+    #[derive(Default)]
+    struct func_var_t {
+        name: String,
+        fp_offset: i64,
+        size: usize,
+    }
+
+    #[derive(Default)]
+    struct func_frame_t {
+        arguments: Vec<func_var_t>,
+        locals: Vec<func_var_t>,
+    }
+
     unsafe extern "C++" {
         include!("autocxxgen_ffi.h");
         include!("idalib.hpp");
@@ -744,6 +757,10 @@ mod ffix {
 
         unsafe fn idalib_func_flags(f: *const func_t) -> u64;
         unsafe fn idalib_func_name(f: *const func_t) -> Result<String>;
+        unsafe fn idalib_func_frame(f: *const func_t, frame: &mut func_frame_t) -> Result<()>;
+        unsafe fn idalib_func_spd(f: *const func_t, ea: c_ulonglong) -> i64;
+        unsafe fn idalib_func_effective_spd(f: *const func_t, ea: c_ulonglong) -> i64;
+        unsafe fn idalib_func_sp_delta(f: *const func_t, ea: c_ulonglong) -> i64;
 
         unsafe fn idalib_func_flow_chart(
             f: *mut func_t,
@@ -1067,9 +1084,12 @@ pub mod func {
         calc_thunk_func_target, fc_block_type_t, func_t, gdl_graph_t, get_func, get_func_num,
         get_func_qty, getn_func, lock_func, qbasic_block_t, qflow_chart_t,
     };
+
     pub use super::ffix::{
-        idalib_func_flags, idalib_func_flow_chart, idalib_func_name, idalib_qbasic_block_preds,
-        idalib_qbasic_block_succs, idalib_qflow_graph_getn_block,
+        func_frame_t, func_var_t, idalib_func_effective_spd, idalib_func_flags,
+        idalib_func_flow_chart, idalib_func_frame, idalib_func_name, idalib_func_sp_delta,
+        idalib_func_spd, idalib_qbasic_block_preds, idalib_qbasic_block_succs,
+        idalib_qflow_graph_getn_block,
     };
 
     pub mod flags {
