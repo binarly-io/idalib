@@ -60,6 +60,7 @@ include_cpp! {
     #include "pro.h"
     #include "segment.hpp"
     #include "strlist.hpp"
+    #include "typeinf.hpp"
     #include "ua.hpp"
     #include "xref.hpp"
 
@@ -259,6 +260,18 @@ include_cpp! {
     generate!("SEGPERM_WRITE")
     generate!("SEGPERM_READ")
     generate!("SEGPERM_MAXVAL")
+
+    // typeinf
+    generate!("TAFLD_BASECLASS")
+    generate!("TAFLD_UNALIGNED")
+    generate!("TAFLD_VIRTBASE")
+    generate!("TAFLD_VFTABLE")
+    generate!("TAFLD_METHOD")
+    generate!("TAFLD_GAP")
+    generate!("TAFLD_REGCMT")
+    generate!("TAFLD_FRAME_R")
+    generate!("TAFLD_FRAME_S")
+    generate!("TAFLD_BYTIL")
 
     // ua (we use insn_t, op_t, etc. from pod)
     generate!("decode_insn")
@@ -675,6 +688,23 @@ pub mod pod {
     }
 }
 
+// NOTE: outside of the module due to:
+//
+// parsed correctly: InvalidCxx(Syn(Error("expected an empty impl block")))
+//
+impl Default for ffix::func_var_t {
+    fn default() -> Self {
+        Self {
+            name: Default::default(),
+            fp_offset: Default::default(),
+            attributes: Default::default(),
+            effective_alignment: c_int(0),
+            alignment: Default::default(),
+            size: Default::default(),
+        }
+    }
+}
+
 #[cxx::bridge]
 mod ffix {
     #[derive(Default)]
@@ -684,17 +714,21 @@ mod ffix {
         desc: String,
     }
 
-    #[derive(Default)]
     struct func_var_t {
         name: String,
         fp_offset: i64,
         size: usize,
+        attributes: u32,
+        alignment: u8,
+        effective_alignment: c_int,
     }
 
     #[derive(Default)]
     struct func_frame_t {
         arguments: Vec<func_var_t>,
         locals: Vec<func_var_t>,
+        saved_registers: func_var_t,
+        return_address: func_var_t,
     }
 
     unsafe extern "C++" {
@@ -1171,6 +1205,13 @@ pub mod bookmarks {
 
 pub mod search {
     pub use super::ffix::{idalib_find_defined, idalib_find_imm, idalib_find_text};
+}
+
+pub mod typeinf {
+    pub use super::ffi::{
+        TAFLD_BASECLASS, TAFLD_BYTIL, TAFLD_FRAME_R, TAFLD_FRAME_S, TAFLD_GAP, TAFLD_METHOD,
+        TAFLD_REGCMT, TAFLD_UNALIGNED, TAFLD_VFTABLE, TAFLD_VIRTBASE,
+    };
 }
 
 pub mod strings {

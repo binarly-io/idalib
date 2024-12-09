@@ -91,6 +91,10 @@ fn main() -> anyhow::Result<()> {
                     insn.len(),
                     insn.operand_count()
                 );
+
+                println!("- stack delta (insn): {}", f.sp_delta_of(insn.address()));
+                println!("- stack delta (start): {}", f.sp_delta_at(blk.start_address()));
+                println!("- stack delta (end): {}", f.sp_delta_at(blk.end_address() - 1));
             }
 
             println!("- ret: {}", blk.is_ret());

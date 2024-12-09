@@ -11,6 +11,7 @@ use crate::ffi::func::*;
 use crate::ffi::xref::has_external_refs;
 use crate::ffi::{range_t, IDAError, BADADDR};
 use crate::idb::IDB;
+use crate::types::FieldAttributes;
 use crate::Address;
 
 pub struct Function<'a> {
@@ -28,13 +29,35 @@ pub struct FunctionCFG<'a> {
 pub struct FunctionFrame {
     arguments: Vec<FunctionVar>,
     locals: Vec<FunctionVar>,
+    saved_registers: Option<FunctionVar>,
+    return_address: Option<FunctionVar>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct FunctionVar {
     name: Option<String>,
+    alignment: u8,
+    effective_alignment: i32,
+    attributes: FieldAttributes,
     fp_offset: i64,
     size: usize,
+}
+
+impl From<func_var_t> for FunctionVar {
+    fn from(v: func_var_t) -> Self {
+        FunctionVar {
+            name: if v.name.is_empty() {
+                None
+            } else {
+                Some(v.name)
+            },
+            attributes: FieldAttributes::from_bits_truncate(v.attributes),
+            alignment: v.alignment,
+            effective_alignment: v.effective_alignment.0,
+            fp_offset: v.fp_offset,
+            size: v.size,
+        }
+    }
 }
 
 pub struct BasicBlock<'a> {
@@ -266,35 +289,15 @@ impl<'a> Function<'a> {
 
     pub fn frame(&self) -> Option<FunctionFrame> {
         let mut frame = func_frame_t::default();
-        unsafe { idalib_func_frame(self.ptr, &mut frame).ok()? }
+        unsafe { idalib_func_frame(self.ptr, &mut frame).ok()? };
 
         Some(FunctionFrame {
-            arguments: frame
-                .arguments
-                .into_iter()
-                .map(|v| FunctionVar {
-                    name: if v.name.is_empty() {
-                        None
-                    } else {
-                        Some(v.name)
-                    },
-                    fp_offset: v.fp_offset,
-                    size: v.size,
-                })
-                .collect(),
-            locals: frame
-                .locals
-                .into_iter()
-                .map(|v| FunctionVar {
-                    name: if v.name.is_empty() {
-                        None
-                    } else {
-                        Some(v.name)
-                    },
-                    fp_offset: v.fp_offset,
-                    size: v.size,
-                })
-                .collect(),
+            arguments: frame.arguments.into_iter().map(FunctionVar::from).collect(),
+            locals: frame.locals.into_iter().map(FunctionVar::from).collect(),
+            saved_registers: (frame.saved_registers.size != 0)
+                .then(|| FunctionVar::from(frame.saved_registers)),
+            return_address: (frame.return_address.size != 0)
+                .then(|| FunctionVar::from(frame.return_address)),
         })
     }
 
@@ -330,11 +333,31 @@ impl FunctionFrame {
     pub fn locals(&self) -> &[FunctionVar] {
         &self.locals
     }
+
+    pub fn saved_registers(&self) -> Option<&FunctionVar> {
+        self.saved_registers.as_ref()
+    }
+
+    pub fn return_address(&self) -> Option<&FunctionVar> {
+        self.return_address.as_ref()
+    }
 }
 
 impl FunctionVar {
     pub fn name(&self) -> Option<&str> {
         self.name.as_deref()
+    }
+
+    pub fn attributes(&self) -> FieldAttributes {
+        self.attributes
+    }
+
+    pub fn alignment(&self) -> usize {
+        self.alignment as _
+    }
+
+    pub fn effective_alignment(&self) -> usize {
+        self.effective_alignment as _
     }
 
     pub fn fp_offset(&self) -> i64 {

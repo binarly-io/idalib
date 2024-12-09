@@ -19,9 +19,15 @@ struct func_var_t final {
   ::std::int64_t fp_offset;
   ::std::size_t size;
 
+  ::std::uint32_t attributes;
+  ::std::uint8_t alignment;
+  int effective_alignment;
+
   // TODO: type...
 
   using IsRelocatable = ::std::true_type;
+
+  func_var_t(const udm_t& m, const func_t *f);
 };
 #endif // CXXBRIDGE1_STRUCT_func_var_t
 
@@ -31,9 +37,28 @@ struct func_frame_t final {
   ::rust::Vec<func_var_t> arguments;
   ::rust::Vec<func_var_t> locals;
 
+  func_var_t saved_registers;
+  func_var_t return_address;
+
   using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_func_frame_t
+
+
+func_var_t::func_var_t(const udm_t& m, const func_t *f) {
+    auto offset = m.offset / 8;
+
+    if (!m.name.empty()) {
+      this->name = rust::String(m.name.c_str());
+    }
+
+    this->attributes = m.tafld_bits;
+    this->alignment = m.fda;
+    this->effective_alignment = m.effalign;
+
+    this->fp_offset = soff_to_fpoff(const_cast<func_t *>(f), offset);
+    this->size = m.size / 8;
+}
 
 void idalib_func_frame(const func_t *f, func_frame_t &fframe) {
   auto udt = udt_type_data_t();
@@ -51,20 +76,17 @@ void idalib_func_frame(const func_t *f, func_frame_t &fframe) {
 
   for (const auto &m : udt) {
     if (m.is_special_member()) {
+      if (m.is_retaddr()) {
+        fframe.return_address = func_var_t(m, f);
+      } else if (m.is_savregs()) {
+        fframe.saved_registers = func_var_t(m, f);
+      }
       continue;
     }
 
-    auto fvar = func_var_t();
-    auto offset = m.offset / 8;
+    auto fvar = func_var_t(m, f);
 
-    if (!m.name.empty()) {
-      fvar.name = rust::String(m.name.c_str());
-    }
-
-    fvar.fp_offset = soff_to_fpoff(const_cast<func_t *>(f), offset);
-    fvar.size = m.size / 8;
-
-    if (offset < arguments_offset) {
+    if ((m.offset / 8) < arguments_offset) {
       fframe.locals.push_back(std::move(fvar));
     } else {
       fframe.arguments.push_back(std::move(fvar));
