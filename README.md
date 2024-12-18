@@ -109,6 +109,41 @@ linking:
   `(lib)idalib` stub libraries and for Linux/macOS sets the RPATH to refer to
   the detected (or specified via `IDADIR`) installation directory.
 
+⚠️ Warning: If you copy the `build.rs` from `idalib/examples`, you may encounter
+unexpected behaviour when IDA is installed in a non-default location and
+`IDADIR` is not set, for example:
+
+```sh
+error while loading shared libraries: [libida.so]
+```
+
+This issue can be worked around by ensuring `IDADIR` is correctly set at build
+time, or by ensuring the `(lib)ida` and `(lib)idalib` shared libraries are
+available to the dynamic linker at runtime, e.g., via `LD_LIBRARY_PATH` or
+`/etc/ld.so.conf{,.d}`. Note that using the stub libraries provided by the SDK,
+e.g., those located at `$IDASDK/lib/...` as opposed to the
+libraries in the IDA installation directory will result in
+[crashes](https://github.com/binarly-io/idalib/issues/24).
+
+For users wanting to use the `build.rs` from `idalib/examples`, e.g., so builds
+succeed via [GitHub
+Actions](https://github.com/binarly-io/idalib/blob/master/GITHUB-ACTIONS.md)
+without an IDA installation, we recommend using the following `build.rs` which
+will help debug issues related to linking:
+
+```rust
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let (_, ida_path, idalib_path) = idalib_build::idalib_install_paths_with(false);
+    if !ida_path.exists() || !idalib_path.exists() {
+        println!("cargo::warning=IDA installation not found.");
+        idalib_build::configure_idasdk_linkage();
+    } else {
+        idalib_build::configure_linkage()?;
+    }
+    Ok(())
+}
+```
+
 ## Extending idalib
 
 To expose unimplemented IDA SDK functionality, modify the `idasdk-sys` crate,
