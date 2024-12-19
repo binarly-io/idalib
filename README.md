@@ -144,6 +144,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
+Note that for `idalib`-based tools being installed via
+[crates.io](https://crates.io), e.g.,
+[rhabdomancer](https://github.com/0xdea/rhabdomancer), the warning will only be
+visible when installing with `cargo -vv`, as explained in [the cargo documentation](https://doc.rust-lang.org/cargo/reference/build-scripts.html#cargo-warning):
+
+> The warning instruction tells Cargo to display a warning after the build
+> script has finished running. Warnings are only shown for path dependencies
+> (that is, those you’re working on locally), so for example warnings printed
+> out in crates.io crates are not emitted by default. The -vv “very verbose”
+> flag may be used to have Cargo display warnings for all crates.
+
 ## Extending idalib
 
 To expose unimplemented IDA SDK functionality, modify the `idasdk-sys` crate,
