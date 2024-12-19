@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0 (2024-12-19)
+
+Compatibility release for IDA 9.0sp1.
+
 ## 0.3.0 (2024-12-04)
 
 Features:

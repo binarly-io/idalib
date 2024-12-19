@@ -1,7 +1,7 @@
 # idalib
 
 [![crates.io](https://img.shields.io/crates/v/idalib)](https://crates.io/crates/idalib)
-[![documentation](https://img.shields.io/badge/documentation-0.3.0%2B9.0.240925-blue?link=https%3A%2F%2Fbinarly-io.github.io%2Fidalib%2Fidalib)](https://binarly-io.github.io/idalib/idalib/)
+[![documentation](https://img.shields.io/badge/documentation-0.4.0%2B9.0.241217-blue?link=https%3A%2F%2Fbinarly-io.github.io%2Fidalib%2Fidalib)](https://binarly-io.github.io/idalib/idalib/)
 [![license](https://img.shields.io/crates/l/idalib)](https://github.com/binarly-io/idalib)
 [![crates.io downloads](https://img.shields.io/crates/d/idalib)](https://crates.io/crates/idalib)
 
@@ -48,10 +48,10 @@ name = "example-analyser"
 # ...
 
 [dependencies]
-idalib = "0.3"
+idalib = "0.4"
 
 [build-dependencies]
-idalib-build = "0.3"
+idalib-build = "0.4"
 ```
 
 `build.rs`:
