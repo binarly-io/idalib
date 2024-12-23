@@ -157,6 +157,16 @@ visible when installing with `cargo -vv`, as explained in [the cargo documentati
 > out in crates.io crates are not emitted by default. The -vv “very verbose”
 > flag may be used to have Cargo display warnings for all crates.
 
+### Testing and documentation generation via GitHub Actions
+
+Since redistribution of the IDA SDK alongside `idalib` isn't possible,
+configuring GitHub Actions or similar technologies to perform build testing
+and/or documentation generation/deployment can be tricky; we therefore include
+a [guide](https://github.com/binarly-io/idalib/blob/master/GITHUB-ACTIONS.md)
+explaining how we test `idalib`'s build compatibility across all supported
+operating systems and environments, and how we perform documentation generation
+and deployment via GitHub Pages.
+
 ## Extending idalib
 
 To expose unimplemented IDA SDK functionality, modify the `idasdk-sys` crate,
