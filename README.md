@@ -16,6 +16,8 @@ The bindings and examples have been tested against IDA Pro v9.0 on Windows
 In addition to the latest v9.0 IDA SDK and IDA itself, a recent version of
 LLVM/Clang is required (this is to help generate bindings from the SDK), it can
 be obtained from, e.g., [here](https://github.com/llvm/llvm-project/releases).
+See the [bindgen documentation](https://rust-lang.github.io/rust-bindgen/requirements.html)
+for extended instructions for each supported operating system/environment.
 
 ## Developing with idalib
 
