@@ -3,6 +3,8 @@
 #![allow(clippy::identity_op)]
 #![allow(clippy::needless_lifetimes)]
 
+use std::path::PathBuf;
+
 use autocxx::prelude::*;
 use thiserror::Error;
 
@@ -16,6 +18,8 @@ pub enum IDAError {
     HexRays(#[from] hexrays::HexRaysError),
     #[error("could not initialise IDA: error code {:x}", _0.0)]
     Init(c_int),
+    #[error("could not create/open IDA database: input file `{0}` not found")]
+    FileNotFound(PathBuf),
     #[error("could not open IDA database: error code {:x}", _0.0)]
     OpenDb(c_int),
     #[error("could not close IDA database: error code {:x}", _0.0)]
@@ -39,6 +43,10 @@ impl IDAError {
         M: std::fmt::Debug + std::fmt::Display + Send + Sync + 'static,
     {
         Self::Ffi(anyhow::Error::msg(m))
+    }
+
+    pub fn not_found(path: impl Into<PathBuf>) -> Self {
+        Self::FileNotFound(path.into())
     }
 }
 
