@@ -27,6 +27,7 @@ struct license_location_t {
   uint32_t _skip_c;
   uint64_t remote;
   qstring license_path;
+  qstring license_path_pattern;
 };
 
 struct license_info_t {
