@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.1 (2025-02-24)
+
+Features:
+- Add additional sanity checks when creating/opening an IDB to prevent IDA
+  causing the consumer to exit.
+- Bump autocxx dependency.
+
 ## 0.4.0 (2024-12-19)
 
 Compatibility release for IDA 9.0sp1.
@@ -26,12 +33,14 @@ Features:
 
 Features:
 - Bookmarks API (contributor: [@0xdea](https://github.com/0xdea)).
-- Build system improvements to avoid idalib-sys rebuilds (contributor: [@Bobo1239](https://github.com/Bobo1239)).
+- Build system improvements to avoid idalib-sys rebuilds (contributor:
+  [@Bobo1239](https://github.com/Bobo1239)).
 - Documentation generation and build testing workflows.
 - Initial Hex-rays support (basic decompiler support).
 - License manager API.
 - Plugin API.
-- Reimplementation of `init_database` to workaround IDA not respecting `enable_console_messages(false)`.
+- Reimplementation of `init_database` to workaround IDA not respecting
+  `enable_console_messages(false)`.
 
 ## 0.1.1 (2024-10-27)
 
