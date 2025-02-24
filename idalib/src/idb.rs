@@ -54,6 +54,10 @@ impl IDB {
         let _guard = prepare_library();
         let path = path.as_ref();
 
+        if !path.exists() || !path.is_file() {
+            return Err(IDAError::not_found(path));
+        }
+
         open_database_quiet(path, auto_analyse)?;
 
         let decompiler = unsafe { init_hexrays_plugin(0.into()) };
