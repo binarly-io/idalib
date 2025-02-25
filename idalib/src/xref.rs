@@ -24,6 +24,7 @@ impl<'a> Clone for XRef<'a> {
                 iscode: self.inner.iscode,
                 type_: self.inner.type_,
                 user: self.inner.user,
+                _flags: self.inner._flags,
             },
             _marker: PhantomData,
         }
@@ -110,7 +111,7 @@ impl<'a> XRef<'a> {
     }
 
     pub fn is_code(&self) -> bool {
-        self.inner.iscode == 1
+        self.inner.iscode
     }
 
     pub fn is_data(&self) -> bool {
@@ -118,7 +119,7 @@ impl<'a> XRef<'a> {
     }
 
     pub fn is_user_defined(&self) -> bool {
-        self.inner.user == 1
+        self.inner.user
     }
 
     pub fn next_to(&self) -> Option<Self> {
