@@ -1,7 +1,7 @@
 # idalib
 
 [![crates.io](https://img.shields.io/crates/v/idalib)](https://crates.io/crates/idalib)
-[![documentation](https://img.shields.io/badge/documentation-0.4.0%2B9.0.241217-blue?link=https%3A%2F%2Fbinarly-io.github.io%2Fidalib%2Fidalib)](https://binarly-io.github.io/idalib/idalib/)
+[![documentation](https://img.shields.io/badge/documentation-0.4.1%2B9.0.241217-blue?link=https%3A%2F%2Fbinarly-io.github.io%2Fidalib%2Fidalib)](https://binarly-io.github.io/idalib/idalib/)
 [![license](https://img.shields.io/crates/l/idalib)](https://github.com/binarly-io/idalib)
 [![crates.io downloads](https://img.shields.io/crates/d/idalib)](https://crates.io/crates/idalib)
 
@@ -37,6 +37,7 @@ locate the SDK and IDA installation using the following environment variables:
 - [xorpse/parascope](https://github.com/xorpse/parascope): mass-scan source/decompiled code using weggli rulesets.
 - [0xdea/rhabdomancer](https://github.com/0xdea/rhabdomancer): locate calls to insecure API functions in a binary file.
 - [0xdea/haruspex](https://github.com/0xdea/haruspex): extract pseudo-code from the IDA Hex-Rays decompiler.
+- [0xdea/augur](https://github.com/0xdea/augur): extract strings and related pseudo-code from a binary file.
 
 ### Examples
 
@@ -149,7 +150,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 Note that for `idalib`-based tools being installed via
 [crates.io](https://crates.io), e.g.,
 [rhabdomancer](https://github.com/0xdea/rhabdomancer), the warning will only be
-visible when installing with `cargo -vv`, as explained in [the cargo documentation](https://doc.rust-lang.org/cargo/reference/build-scripts.html#cargo-warning):
+visible when installing with `cargo -vv`, as explained
+in [the cargo documentation](https://doc.rust-lang.org/cargo/reference/build-scripts.html#cargo-warning):
 
 > The warning instruction tells Cargo to display a warning after the build
 > script has finished running. Warnings are only shown for path dependencies
@@ -176,4 +178,5 @@ accept PRs to support older beta releases.
 
 ## Contributors
 
-Please see [CONTRIBUTORS.md](https://github.com/binarly-io/idalib/blob/master/CONTRIBUTORS.md) for a full list of acknowledgments.
+Please see [CONTRIBUTORS.md](https://github.com/binarly-io/idalib/blob/master/CONTRIBUTORS.md) for a full list of
+acknowledgments.
