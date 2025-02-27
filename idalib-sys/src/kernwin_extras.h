@@ -80,7 +80,14 @@ struct license_manager_t {
   qstring machine_id;
 };
 
+struct config_t {
+  char _skip_a[0x530];
+  license_location_t license_location;
+  license_info_t license_info;
+};
+
 extern "C" license_manager_t *get_license_manager();
+extern "C" config_t *get_current_config();
 
 bool idalib_check_license() {
   auto manager = get_license_manager();
@@ -93,8 +100,7 @@ bool idalib_check_license() {
     return true;
   }
 
-  auto license_location = manager->_vtbl->get_license_location(manager);
-  license_info_t license_config = {{0}, 0, 1, 1};
+  config_t *config = get_current_config();
   uint64_t flags = 16;
 
   // NOTE: this will contain a description of any error; we should likely
@@ -102,7 +108,7 @@ bool idalib_check_license() {
   qstring estr;
 
   auto nres = manager->_vtbl->get_or_borrow_license(
-      manager, license_location, &license_config, flags, &estr);
+      manager, &config->license_location, &config->license_info, flags, &estr);
 
   return !nres;
 }
