@@ -52,7 +52,11 @@ struct license_addon_info_t {
 };
 
 struct license_manager_t_vtbl {
+#if defined(__NT__)
+  void *_skip_a[3];
+#else
   void *_skip_a[4];
+#endif
   int (*get_or_borrow_license)(license_manager_t *, void *, license_info_t *,
                                uint64_t, qstring *);
   void *(*get_license_location)(license_manager_t *);
