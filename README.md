@@ -18,7 +18,7 @@ release. See the table below for compatibility:
 | IDA Pro version | Latest compatible idalib |
 | --------------- | ------------------------ |
 | v9.1            | 0.5.0                    |
-| v9.0sp1         | 0.4.0                    |
+| v9.0sp1         | 0.4.1                    |
 | v9.0            | 0.3.0                    |
 
 In addition to the latest IDA SDK and IDA itself, a recent version of
