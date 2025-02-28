@@ -1,23 +1,32 @@
 # idalib
 
 [![crates.io](https://img.shields.io/crates/v/idalib)](https://crates.io/crates/idalib)
-[![documentation](https://img.shields.io/badge/documentation-0.4.1%2B9.0.241217-blue?link=https%3A%2F%2Fbinarly-io.github.io%2Fidalib%2Fidalib)](https://binarly-io.github.io/idalib/idalib/)
+[![documentation](https://img.shields.io/badge/documentation-0.5.0%2B9.1.250226-blue?link=https%3A%2F%2Fbinarly-io.github.io%2Fidalib%2Fidalib)](https://binarly-io.github.io/idalib/idalib/)
 [![license](https://img.shields.io/crates/l/idalib)](https://github.com/binarly-io/idalib)
 [![crates.io downloads](https://img.shields.io/crates/d/idalib)](https://crates.io/crates/idalib)
 
 Idiomatic Rust bindings for the IDA SDK, enabling the development of standalone
-analysis tools using IDA v9.0’s idalib.
+analysis tools using IDA v9.x’s idalib.
 
 ## IDA support and dependencies
 
-The bindings and examples have been tested against IDA Pro v9.0 on Windows
-(11), Linux (Ubuntu 24.04 LTS), and macOS Sequoia (Apple Silicon).
+The bindings and examples have been tested against IDA Pro v9.1 on Windows
+(11), Linux (Ubuntu 24.04 LTS), and macOS Sequoia (Apple Silicon). The latest
+bindings are only guaranteed compatible with the latest official IDA Pro/SDK
+release. See the table below for compatibility:
 
-In addition to the latest v9.0 IDA SDK and IDA itself, a recent version of
+| IDA Pro version | Latest compatible idalib |
+| --------------- | ------------------------ |
+| v9.1            | 0.5.0                    |
+| v9.0sp1         | 0.4.0                    |
+| v9.0            | 0.3.0                    |
+
+In addition to the latest IDA SDK and IDA itself, a recent version of
 LLVM/Clang is required (this is to help generate bindings from the SDK), it can
 be obtained from, e.g., [here](https://github.com/llvm/llvm-project/releases).
-See the [bindgen documentation](https://rust-lang.github.io/rust-bindgen/requirements.html)
-for extended instructions for each supported operating system/environment.
+See the [bindgen
+documentation](https://rust-lang.github.io/rust-bindgen/requirements.html) for
+extended instructions for each supported operating system/environment.
 
 ## Developing with idalib
 
@@ -25,10 +34,10 @@ For development, only the IDA SDK is required, whereas to run tests, an IDA
 installation (with a valid license) is required. During build, the crates
 locate the SDK and IDA installation using the following environment variables:
 
-- `IDASDKDIR` set to the IDA Pro v9.0 SDK
+- `IDASDKDIR` set to the IDA Pro v9.x SDK
 - `IDADIR` (optional) set to the directory containing the `ida` executable
-  (e.g., `/Applications/IDA Professional v9.0/Contents/macOS` for macOS, or
-  `$HOME/ida-pro-9.0` for Linux). If not set, the build script will check
+  (e.g., `/Applications/IDA Professional v9.x/Contents/macOS` for macOS, or
+  `$HOME/ida-pro-9.x` for Linux). If not set, the build script will check
   common locations.
 
 ### Projects using idalib
@@ -51,10 +60,10 @@ name = "example-analyser"
 # ...
 
 [dependencies]
-idalib = "0.4"
+idalib = "0.5"
 
 [build-dependencies]
-idalib-build = "0.4"
+idalib-build = "0.5"
 ```
 
 `build.rs`:
@@ -92,8 +101,8 @@ cargo run --example=dump_ls
 Windows:
 
 ```powershell
-$env:PATH="C:\Program Files\IDA Professional 9.0;$env:PATH"
-$env:IDADIR="C:\Program Files\IDA Professional 9.0"
+$env:PATH="C:\Program Files\IDA Professional 9.1;$env:PATH"
+$env:IDADIR="C:\Program Files\IDA Professional 9.1"
 $env:IDASDKDIR=...
 
 cargo run --example=dump_ls

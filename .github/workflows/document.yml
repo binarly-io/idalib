@@ -21,14 +21,14 @@ jobs:
           submodules: true
       - name: prepare IDA SDK
         env:
-          IDASDK90_URL: ${{ secrets.IDASDK90_URL }}
-          IDASDK90_PASSWORD: ${{ secrets.IDASDK90_PASSWORD }}
+          IDASDK91_URL: ${{ secrets.IDASDK91_URL }}
+          IDASDK91_PASSWORD: ${{ secrets.IDASDK91_PASSWORD }}
         run: |
-          curl -o "${{ runner.temp }}/idasdk90.zip" -L "$IDASDK90_URL"
-          unzip -d "${{ runner.temp }}" -P "$IDASDK90_PASSWORD" "${{ runner.temp }}/idasdk90.zip"
+          curl -o "${{ runner.temp }}/idasdk91.zip" -L "$IDASDK91_URL"
+          unzip -d "${{ runner.temp }}" -P "$IDASDK91_PASSWORD" "${{ runner.temp }}/idasdk91.zip"
       - name: generate documentation
         env:
-          IDASDKDIR: "${{ runner.temp }}/idasdk90"
+          IDASDKDIR: "${{ runner.temp }}/idasdk91"
         run: cargo doc --no-deps
       - name: git configuration
         run: |
