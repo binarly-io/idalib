@@ -101,6 +101,7 @@ pub type Address = u64;
 
 static INIT: OnceLock<Mutex<()>> = OnceLock::new();
 
+#[cfg(not(target_os = "windows"))]
 extern "C" {
     static mut batch: c_char;
 }
@@ -108,6 +109,7 @@ extern "C" {
 pub(crate) type IDARuntimeHandle = MutexGuard<'static, ()>;
 
 pub fn force_batch_mode() {
+    #[cfg(not(target_os = "windows"))]
     unsafe {
         batch = 1;
     }
