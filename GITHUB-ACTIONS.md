@@ -13,13 +13,13 @@ To adapt the workflows in this document in your own project, you need to
 configure two repository secrets via Settings -> Secrets and variables ->
 Actions:
 
-- `IDASDK90_URL`: a publicly accessible encrypted/password-protected archive
+- `IDASDK91_URL`: a publicly accessible encrypted/password-protected archive
   containing he latest IDA SDK. We are using a zip in our workflow below, but
   it should be straightforward to use an approach like
   [binexport](https://github.com/google/binexport/blob/23619ba62d88b3b93615d28fe3033489d12b38ac/.github/workflows/cmake.yml#L25),
   where the SDK is [stored encrypted alongside the source
   code](https://github.com/google/binexport/tree/main/ida/idasdk).
-- `IDASDK90_PASSWORD`: the password/encryption key for the SDK archive.
+- `IDASDK91_PASSWORD`: the password/encryption key for the SDK archive.
 
 You will also need to make sure your `build.rs` gracefully falls back to link
 against the IDA SDK stub libraries if an IDA installation cannot be located,
@@ -64,14 +64,14 @@ jobs:
           submodules: true
       - name: prepare IDA SDK
         env:
-          IDASDK90_URL: ${{ secrets.IDASDK90_URL }}
-          IDASDK90_PASSWORD: ${{ secrets.IDASDK90_PASSWORD }}
+          IDASDK91_URL: ${{ secrets.IDASDK91_URL }}
+          IDASDK91_PASSWORD: ${{ secrets.IDASDK91_PASSWORD }}
         run: |
-          curl -o "${{ runner.temp }}/idasdk90.zip" -L "$IDASDK90_URL"
-          unzip -d "${{ runner.temp }}" -P "$IDASDK90_PASSWORD" "${{ runner.temp }}/idasdk90.zip"
+          curl -o "${{ runner.temp }}/idasdk91.zip" -L "$IDASDK91_URL"
+          unzip -d "${{ runner.temp }}" -P "$IDASDK91_PASSWORD" "${{ runner.temp }}/idasdk91.zip"
       - name: build
         env:
-          IDASDKDIR: "${{ runner.temp }}/idasdk90"
+          IDASDKDIR: "${{ runner.temp }}/idasdk91"
         run: cargo build
 
   build-macos:
@@ -83,14 +83,14 @@ jobs:
           submodules: true
       - name: prepare IDA SDK
         env:
-          IDASDK90_URL: ${{ secrets.IDASDK90_URL }}
-          IDASDK90_PASSWORD: ${{ secrets.IDASDK90_PASSWORD }}
+          IDASDK91_URL: ${{ secrets.IDASDK91_URL }}
+          IDASDK91_PASSWORD: ${{ secrets.IDASDK91_PASSWORD }}
         run: |
-          curl -o "${{ runner.temp }}/idasdk90.zip" -L "$IDASDK90_URL"
-          unzip -d "${{ runner.temp }}" -P "$IDASDK90_PASSWORD" "${{ runner.temp }}/idasdk90.zip"
+          curl -o "${{ runner.temp }}/idasdk91.zip" -L "$IDASDK91_URL"
+          unzip -d "${{ runner.temp }}" -P "$IDASDK91_PASSWORD" "${{ runner.temp }}/idasdk91.zip"
       - name: build
         env:
-          IDASDKDIR: "${{ runner.temp }}/idasdk90"
+          IDASDKDIR: "${{ runner.temp }}/idasdk91"
         run: cargo build
 
   build-windows:
@@ -109,14 +109,14 @@ jobs:
           submodules: true
       - name: prepare IDA SDK
         env:
-          IDASDK90_URL: ${{ secrets.IDASDK90_URL }}
-          IDASDK90_PASSWORD: ${{ secrets.IDASDK90_PASSWORD }}
+          IDASDK91_URL: ${{ secrets.IDASDK91_URL }}
+          IDASDK91_PASSWORD: ${{ secrets.IDASDK91_PASSWORD }}
         run: |
-          curl -o "${{ runner.temp }}/idasdk90.zip" -L $env:IDASDK90_URL
-          unzip -d "${{ runner.temp }}" -P $env:IDASDK90_PASSWORD "${{ runner.temp }}/idasdk90.zip"
+          curl -o "${{ runner.temp }}/idasdk91.zip" -L $env:IDASDK91_URL
+          unzip -d "${{ runner.temp }}" -P $env:IDASDK91_PASSWORD "${{ runner.temp }}/idasdk91.zip"
       - name: build
         env:
-          IDASDKDIR: "${{ runner.temp }}/idasdk90"
+          IDASDKDIR: "${{ runner.temp }}/idasdk91"
         run: cargo build
 
 ```
@@ -154,14 +154,14 @@ jobs:
           submodules: true
       - name: prepare IDA SDK
         env:
-          IDASDK90_URL: ${{ secrets.IDASDK90_URL }}
-          IDASDK90_PASSWORD: ${{ secrets.IDASDK90_PASSWORD }}
+          IDASDK91_URL: ${{ secrets.IDASDK91_URL }}
+          IDASDK91_PASSWORD: ${{ secrets.IDASDK91_PASSWORD }}
         run: |
-          curl -o "${{ runner.temp }}/idasdk90.zip" -L "$IDASDK90_URL"
-          unzip -d "${{ runner.temp }}" -P "$IDASDK90_PASSWORD" "${{ runner.temp }}/idasdk90.zip"
+          curl -o "${{ runner.temp }}/idasdk91.zip" -L "$IDASDK91_URL"
+          unzip -d "${{ runner.temp }}" -P "$IDASDK91_PASSWORD" "${{ runner.temp }}/idasdk91.zip"
       - name: generate documentation
         env:
-          IDASDKDIR: "${{ runner.temp }}/idasdk90"
+          IDASDKDIR: "${{ runner.temp }}/idasdk91"
         run: cargo doc --no-deps
       - name: git configuration
         run: |

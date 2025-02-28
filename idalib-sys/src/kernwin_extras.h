@@ -26,7 +26,11 @@ struct license_location_t {
   uint8_t _skip_b;
   uint32_t _skip_c;
   uint64_t remote;
+#if defined(__NT__)
+  uint64_t _skip_d;
+#endif
   qstring license_path;
+  qstring license_path_pattern;
 };
 
 struct license_info_t {
@@ -48,7 +52,11 @@ struct license_addon_info_t {
 };
 
 struct license_manager_t_vtbl {
+#if defined(__NT__)
+  void *_skip_a[3];
+#else
   void *_skip_a[4];
+#endif
   int (*get_or_borrow_license)(license_manager_t *, void *, license_info_t *,
                                uint64_t, qstring *);
   void *(*get_license_location)(license_manager_t *);
@@ -79,7 +87,20 @@ struct license_manager_t {
   qstring machine_id;
 };
 
+struct config_t {
+#if defined(__MACOS__)
+  char _skip_a[0x530];
+#elif defined(__LINUX__)
+  char _skip_a[0x578];
+#elif defined(__NT__)
+  char _skip_a[0x528];
+#endif
+  license_location_t license_location;
+  license_info_t license_info;
+};
+
 extern "C" license_manager_t *get_license_manager();
+extern "C" config_t *get_current_config();
 
 bool idalib_check_license() {
   auto manager = get_license_manager();
@@ -92,8 +113,7 @@ bool idalib_check_license() {
     return true;
   }
 
-  auto license_location = manager->_vtbl->get_license_location(manager);
-  license_info_t license_config = {{0}, 0, 1, 1};
+  config_t *config = get_current_config();
   uint64_t flags = 16;
 
   // NOTE: this will contain a description of any error; we should likely
@@ -101,7 +121,7 @@ bool idalib_check_license() {
   qstring estr;
 
   auto nres = manager->_vtbl->get_or_borrow_license(
-      manager, license_location, &license_config, flags, &estr);
+      manager, &config->license_location, &config->license_info, flags, &estr);
 
   return !nres;
 }

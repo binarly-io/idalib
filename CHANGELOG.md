@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.0 (2025-02-28)
+
+Compatibility release for IDA 9.1.
+
 ## 0.4.1 (2025-02-24)
 
 Features:
