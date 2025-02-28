@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.1 (2025-02-28)
+
+Bugfix:
+- Make `idalib::force_batch_mode` a no-op on Windows.
+
 ## 0.5.0 (2025-02-28)
 
 Compatibility release for IDA 9.1.
