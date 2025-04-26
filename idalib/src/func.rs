@@ -267,7 +267,7 @@ impl<'a> FunctionCFG<'a> {
     unsafe fn as_gdl_graph(&self) -> Option<&gdl_graph_t> {
         self.flow_chart
             .as_ref()
-            .map(|r| mem::transmute::<&qflow_chart_t, &gdl_graph_t>(r))
+            .map(|r| unsafe { mem::transmute::<&qflow_chart_t, &gdl_graph_t>(r) })
     }
 
     pub fn block_by_id(&self, id: BasicBlockId) -> Option<BasicBlock> {

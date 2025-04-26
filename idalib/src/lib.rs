@@ -10,10 +10,10 @@
 //!
 //! ```toml
 //! [dependencies]
-//! idalib = "0.4"
+//! idalib = "0.5"
 //!
 //! [build-dependencies]
-//! idalib-build = "0.4"
+//! idalib-build = "0.5"
 //! ```
 //!
 //! Here is a basic example of a `build.rs` file:
@@ -102,7 +102,7 @@ pub type Address = u64;
 static INIT: OnceLock<Mutex<()>> = OnceLock::new();
 
 #[cfg(not(target_os = "windows"))]
-extern "C" {
+unsafe extern "C" {
     static mut batch: c_char;
 }
 

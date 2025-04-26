@@ -1,13 +1,13 @@
 [package]
 name = "idalib-build"
 authors = ["Sam L. Thomas <sam@binarly.io>", "Yegor Vasilenko <yegor@binarly.io>"]
-version = "0.5.1+9.1.250226"
+version = "0.5.2+9.1.250226"
 description = "Idiomatic bindings to IDA SDK"
 repository = "https://github.com/binarly-io/idalib"
-documentation = "https://binarly-io.github.io/idalib/idalib_build"
+documentation = "https://idalib.rs/idalib_build"
 license = "MIT OR Apache-2.0"
 readme = "../README.md"
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 anyhow = "1"

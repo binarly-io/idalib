@@ -2,6 +2,7 @@
 #![allow(clippy::missing_safety_doc)]
 #![allow(clippy::identity_op)]
 #![allow(clippy::needless_lifetimes)]
+#![allow(unsafe_op_in_unsafe_fn)]
 
 use std::path::PathBuf;
 
@@ -952,6 +953,7 @@ mod ffix {
         unsafe fn idalib_ph_id(ph: *const processor_t) -> i32;
         unsafe fn idalib_ph_short_name(ph: *const processor_t) -> String;
         unsafe fn idalib_ph_long_name(ph: *const processor_t) -> String;
+        unsafe fn idalib_is_thumb_at(ph: *const processor_t, ea: c_ulonglong) -> bool;
 
         unsafe fn idalib_qflow_graph_getn_block(
             f: *const qflow_chart_t,
@@ -1034,14 +1036,14 @@ pub mod insn {
 
     pub mod op {
         pub use super::super::ffi::{
-            dt_bitfild, dt_byte, dt_byte16, dt_byte32, dt_byte64, dt_code, dt_double, dt_dword,
-            dt_float, dt_fword, dt_half, dt_ldbl, dt_packreal, dt_qword, dt_string, dt_tbyte,
-            dt_unicode, dt_void, dt_word, o_displ, o_far, o_idpspec0, o_idpspec1, o_idpspec2,
-            o_idpspec3, o_idpspec4, o_idpspec5, o_imm, o_mem, o_near, o_phrase, o_reg, o_void,
-            IRI_EXTENDED, IRI_RET_LITERALLY, IRI_SKIP_RETTARGET, IRI_STRICT,
+            IRI_EXTENDED, IRI_RET_LITERALLY, IRI_SKIP_RETTARGET, IRI_STRICT, dt_bitfild, dt_byte,
+            dt_byte16, dt_byte32, dt_byte64, dt_code, dt_double, dt_dword, dt_float, dt_fword,
+            dt_half, dt_ldbl, dt_packreal, dt_qword, dt_string, dt_tbyte, dt_unicode, dt_void,
+            dt_word, o_displ, o_far, o_idpspec0, o_idpspec1, o_idpspec2, o_idpspec3, o_idpspec4,
+            o_idpspec5, o_imm, o_mem, o_near, o_phrase, o_reg, o_void,
         };
         pub use super::super::pod::{
-            op_dtype_t, op_t, optype_t, OF_NO_BASE_DISP, OF_NUMBER, OF_OUTER_DISP, OF_SHOW,
+            OF_NO_BASE_DISP, OF_NUMBER, OF_OUTER_DISP, OF_SHOW, op_dtype_t, op_t, optype_t,
         };
     }
 
@@ -1099,19 +1101,21 @@ pub mod func {
 
 pub mod processor {
     pub use super::ffi::{get_ph, processor_t};
-    pub use super::ffix::{idalib_ph_id, idalib_ph_long_name, idalib_ph_short_name};
+    pub use super::ffix::{
+        idalib_is_thumb_at, idalib_ph_id, idalib_ph_long_name, idalib_ph_short_name,
+    };
 
     pub use super::idp as ids;
 }
 
 pub mod segment {
     pub use super::ffi::{
-        get_segm_by_name, get_segm_qty, getnseg, getseg, lock_segment, saAbs, saGroup,
-        saRel1024Bytes, saRel128Bytes, saRel2048Bytes, saRel32Bytes, saRel4K, saRel512Bytes,
-        saRel64Bytes, saRelByte, saRelDble, saRelPage, saRelPara, saRelQword, saRelWord,
-        saRel_MAX_ALIGN_CODE, segment_t, SEGPERM_EXEC, SEGPERM_MAXVAL, SEGPERM_READ, SEGPERM_WRITE,
         SEG_ABSSYM, SEG_BSS, SEG_CODE, SEG_COMM, SEG_DATA, SEG_GRP, SEG_IMEM, SEG_IMP,
-        SEG_MAX_SEGTYPE_CODE, SEG_NORM, SEG_NULL, SEG_UNDF, SEG_XTRN,
+        SEG_MAX_SEGTYPE_CODE, SEG_NORM, SEG_NULL, SEG_UNDF, SEG_XTRN, SEGPERM_EXEC, SEGPERM_MAXVAL,
+        SEGPERM_READ, SEGPERM_WRITE, get_segm_by_name, get_segm_qty, getnseg, getseg, lock_segment,
+        saAbs, saGroup, saRel_MAX_ALIGN_CODE, saRel4K, saRel32Bytes, saRel64Bytes, saRel128Bytes,
+        saRel512Bytes, saRel1024Bytes, saRel2048Bytes, saRelByte, saRelDble, saRelPage, saRelPara,
+        saRelQword, saRelWord, segment_t,
     };
 
     pub use super::ffix::{
@@ -1135,9 +1139,9 @@ pub mod util {
 
 pub mod xref {
     pub use super::ffi::{
+        XREF_ALL, XREF_BASE, XREF_DATA, XREF_FAR, XREF_MASK, XREF_PASTEND, XREF_TAIL, XREF_USER,
         cref_t, dref_t, has_external_refs, xrefblk_t, xrefblk_t_first_from, xrefblk_t_first_to,
-        xrefblk_t_next_from, xrefblk_t_next_to, XREF_ALL, XREF_BASE, XREF_DATA, XREF_FAR,
-        XREF_MASK, XREF_PASTEND, XREF_TAIL, XREF_USER,
+        xrefblk_t_next_from, xrefblk_t_next_to,
     };
 }
 
@@ -1187,7 +1191,7 @@ pub mod ida {
     use autocxx::prelude::*;
 
     use super::platform::is_main_thread;
-    use super::{ea_t, ffi, ffix, IDAError};
+    use super::{IDAError, ea_t, ffi, ffix};
 
     pub use ffi::auto_wait;
 
@@ -1221,7 +1225,7 @@ pub mod ida {
             "IDA cannot function correctly when not running on the main thread"
         );
 
-        env::set_var("TVHEADLESS", "1");
+        unsafe { env::set_var("TVHEADLESS", "1") };
 
         let res = unsafe { ffix::init_library(c_int(0), ptr::null_mut()) };
 

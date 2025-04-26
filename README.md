@@ -1,7 +1,7 @@
 # idalib
 
 [![crates.io](https://img.shields.io/crates/v/idalib)](https://crates.io/crates/idalib)
-[![documentation](https://img.shields.io/badge/documentation-0.5.1%2B9.1.250226-blue?link=https%3A%2F%2Fbinarly-io.github.io%2Fidalib%2Fidalib)](https://binarly-io.github.io/idalib/idalib/)
+[![documentation](https://img.shields.io/badge/documentation-0.5.2%2B9.1.250226-blue?link=https%3A%2F%2Fidalib.rs%2Fidalib)](https://idalib.rs/idalib/)
 [![license](https://img.shields.io/crates/l/idalib)](https://github.com/binarly-io/idalib)
 [![crates.io downloads](https://img.shields.io/crates/d/idalib)](https://crates.io/crates/idalib)
 
@@ -17,7 +17,7 @@ release. See the table below for compatibility:
 
 | IDA Pro version | Latest compatible idalib |
 | --------------- | ------------------------ |
-| v9.1            | 0.5.1                    |
+| v9.1            | 0.5.2                    |
 | v9.0sp1         | 0.4.1                    |
 | v9.0            | 0.3.0                    |
 
