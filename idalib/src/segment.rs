@@ -64,6 +64,76 @@ pub enum SegmentType {
     IMEM = SEG_IMEM as _,
 }
 
+impl SegmentType {
+    pub fn is_normal(&self) -> bool {
+        matches!(self, Self::NORM)
+    }
+
+    pub fn is_norm(&self) -> bool {
+        self.is_normal()
+    }
+
+    pub fn is_extern(&self) -> bool {
+        matches!(self, Self::XTRN)
+    }
+
+    pub fn is_xtrn(&self) -> bool {
+        self.is_extern()
+    }
+
+    pub fn is_code(&self) -> bool {
+        matches!(self, Self::CODE)
+    }
+
+    pub fn is_data(&self) -> bool {
+        matches!(self, Self::DATA)
+    }
+
+    pub fn is_import(&self) -> bool {
+        matches!(self, Self::IMP)
+    }
+
+    pub fn is_imp(&self) -> bool {
+        self.is_import()
+    }
+
+    pub fn is_group(&self) -> bool {
+        matches!(self, Self::GRP)
+    }
+
+    pub fn is_grp(&self) -> bool {
+        self.is_group()
+    }
+
+    pub fn is_bss(&self) -> bool {
+        matches!(self, Self::BSS)
+    }
+
+    pub fn is_null(&self) -> bool {
+        matches!(self, Self::NULL)
+    }
+
+    pub fn is_absym(&self) -> bool {
+        matches!(self, Self::ABSSYM)
+    }
+
+    pub fn is_comm(&self) -> bool {
+        matches!(self, Self::COMM)
+    }
+
+    pub fn is_imem(&self) -> bool {
+        matches!(self, Self::IMEM)
+    }
+
+    pub fn is_undefined(&self) -> bool {
+        matches!(self, Self::UNDF)
+    }
+
+    pub fn is_undf(&self) -> bool {
+        self.is_undefined()
+    }
+}
+
 impl<'a> Segment<'a> {
     pub(crate) fn from_ptr(ptr: *mut segment_t) -> Self {
         let lock = unsafe { Box::emplace(lock_segment::new(ptr)) };

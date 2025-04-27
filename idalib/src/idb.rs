@@ -3,6 +3,7 @@ use std::marker::PhantomData;
 use std::mem::MaybeUninit;
 use std::path::{Path, PathBuf};
 
+use crate::ffi::BADADDR;
 use crate::ffi::bytes::*;
 use crate::ffi::comments::{append_cmt, idalib_get_cmt, set_cmt};
 use crate::ffi::conversions::idalib_ea2str;
@@ -16,10 +17,9 @@ use crate::ffi::insn::decode;
 use crate::ffi::loader::find_plugin;
 use crate::ffi::processor::get_ph;
 use crate::ffi::search::{idalib_find_defined, idalib_find_imm, idalib_find_text};
-use crate::ffi::segment::{get_segm_qty, getnseg, getseg};
+use crate::ffi::segment::{get_segm_by_name, get_segm_qty, getnseg, getseg};
 use crate::ffi::util::{is_align_insn, next_head, prev_head, str2reg};
 use crate::ffi::xref::{xrefblk_t, xrefblk_t_first_from, xrefblk_t_first_to};
-use crate::ffi::BADADDR;
 
 use crate::bookmarks::Bookmarks;
 use crate::decompiler::CFunction;
@@ -31,7 +31,7 @@ use crate::processor::Processor;
 use crate::segment::{Segment, SegmentId};
 use crate::strings::StringList;
 use crate::xref::{XRef, XRefQuery};
-use crate::{prepare_library, Address, IDAError, IDARuntimeHandle};
+use crate::{Address, IDAError, IDARuntimeHandle, prepare_library};
 
 pub struct IDB {
     path: PathBuf,
@@ -215,6 +215,17 @@ impl IDB {
         Some(Segment::from_ptr(ptr))
     }
 
+    pub fn segment_by_name(&self, name: impl AsRef<str>) -> Option<Segment> {
+        let s = CString::new(name.as_ref()).ok()?;
+        let ptr = unsafe { get_segm_by_name(s.as_ptr()) };
+
+        if ptr.is_null() {
+            return None;
+        }
+
+        Some(Segment::from_ptr(ptr))
+    }
+
     pub fn segments<'a>(&'a self) -> impl Iterator<Item = (SegmentId, Segment<'a>)> + 'a {
         (0..self.segment_count()).filter_map(|id| self.segment_by_id(id).map(|s| (id, s)))
     }
@@ -227,20 +238,12 @@ impl IDB {
         let s = CString::new(name.as_ref()).ok()?;
         let id = unsafe { str2reg(s.as_ptr()).0 };
 
-        if id == -1 {
-            None
-        } else {
-            Some(id as _)
-        }
+        if id == -1 { None } else { Some(id as _) }
     }
 
     pub fn insn_alignment_at(&self, ea: Address) -> Option<usize> {
         let align = unsafe { is_align_insn(ea.into()).0 };
-        if align == 0 {
-            None
-        } else {
-            Some(align as _)
-        }
+        if align == 0 { None } else { Some(align as _) }
     }
 
     pub fn first_xref_from(&self, ea: Address, flags: XRefQuery) -> Option<XRef> {
@@ -274,11 +277,7 @@ impl IDB {
     pub fn get_cmt_with(&self, ea: Address, rptble: bool) -> Option<String> {
         let s = unsafe { idalib_get_cmt(ea.into(), rptble) };
 
-        if s.is_empty() {
-            None
-        } else {
-            Some(s)
-        }
+        if s.is_empty() { None } else { Some(s) }
     }
 
     pub fn set_cmt(&self, ea: Address, comm: impl AsRef<str>) -> Result<(), IDAError> {
@@ -395,11 +394,7 @@ impl IDB {
     pub fn address_to_string(&self, ea: Address) -> Option<String> {
         let s = unsafe { idalib_ea2str(ea.into()) };
 
-        if s.is_empty() {
-            None
-        } else {
-            Some(s)
-        }
+        if s.is_empty() { None } else { Some(s) }
     }
 
     pub fn get_byte(&self, ea: Address) -> u8 {
