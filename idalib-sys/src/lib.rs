@@ -743,7 +743,11 @@ mod ffix {
 
         unsafe fn init_library(argc: c_int, argv: *mut *mut c_char) -> c_int;
 
-        unsafe fn idalib_open_database_quiet(name: *const c_char, auto_analysis: bool) -> c_int;
+        unsafe fn idalib_open_database_quiet(
+            argc: c_int,
+            argv: *const *const c_char,
+            auto_analysis: bool,
+        ) -> c_int;
         unsafe fn idalib_check_license() -> bool;
         unsafe fn idalib_get_license_id(id: &mut [u8; 6]) -> bool;
 
@@ -1184,7 +1188,7 @@ pub mod loader {
 
 pub mod ida {
     use std::env;
-    use std::ffi::CString;
+    use std::ffi::{CStr, CString};
     use std::path::Path;
     use std::ptr;
 
@@ -1296,6 +1300,7 @@ pub mod ida {
     pub fn open_database_quiet(
         path: impl AsRef<Path>,
         auto_analysis: bool,
+        args: &[impl AsRef<str>],
     ) -> Result<(), IDAError> {
         assert!(
             is_main_thread(),
@@ -1306,9 +1311,24 @@ pub mod ida {
             return Err(IDAError::InvalidLicense);
         }
 
-        let path = CString::new(path.as_ref().to_string_lossy().as_ref()).map_err(IDAError::ffi)?;
+        let mut args = args
+            .iter()
+            .map(|s| CString::new(s.as_ref()).map_err(IDAError::ffi))
+            .collect::<Result<Vec<_>, _>>()?;
 
-        let res = unsafe { ffix::idalib_open_database_quiet(path.as_ptr(), auto_analysis) };
+        let path = CString::new(path.as_ref().to_string_lossy().as_ref()).map_err(IDAError::ffi)?;
+        args.push(path);
+
+        let idalib0 = CStr::from_bytes_with_nul(b"idalib\0").map_err(IDAError::ffi)?;
+
+        let argv = std::iter::once(idalib0.as_ptr())
+            .chain(args.iter().map(|s| s.as_ptr()))
+            .collect::<Vec<_>>();
+        let argc = argv.len();
+
+        let res = unsafe {
+            ffix::idalib_open_database_quiet(c_int(argc as _), argv.as_ptr(), auto_analysis)
+        };
 
         if res != c_int(0) {
             Err(IDAError::OpenDb(res))

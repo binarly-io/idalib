@@ -41,6 +41,73 @@ pub struct IDB {
     _marker: PhantomData<*const ()>,
 }
 
+#[derive(Debug, Clone)]
+pub struct IDBOpenOptions {
+    idb: Option<PathBuf>,
+    ftype: Option<String>,
+    save: bool,
+    auto_analyse: bool,
+}
+
+impl Default for IDBOpenOptions {
+    fn default() -> Self {
+        Self {
+            idb: None,
+            ftype: None,
+            save: false,
+            auto_analyse: true,
+        }
+    }
+}
+
+impl IDBOpenOptions {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn idb(&mut self, path: impl AsRef<Path>) -> &mut Self {
+        self.idb = Some(path.as_ref().to_owned());
+        self
+    }
+
+    pub fn save(&mut self, save: bool) -> &mut Self {
+        self.save = save;
+        self
+    }
+
+    // NOTE: as of IDA 9.1, the file type switch does not work as documented;
+    // we get the following log output:
+    //
+    // ```
+    // Unknown switch '-T' -> OK
+    // ```
+    //
+    // pub fn file_type(&mut self, ftype: impl AsRef<str>) -> &mut Self {
+    //   self.ftype = Some(ftype.as_ref().to_owned());
+    //   self
+    // }
+
+    pub fn auto_analyse(&mut self, auto_analyse: bool) -> &mut Self {
+        self.auto_analyse = auto_analyse;
+        self
+    }
+
+    pub fn open(&self, path: impl AsRef<Path>) -> Result<IDB, IDAError> {
+        let mut args = Vec::new();
+
+        if let Some(ftype) = self.ftype.as_ref() {
+            args.push(format!("-T{}", ftype));
+        }
+
+        if let Some(idb_path) = self.idb.as_ref() {
+            args.push("-c".to_owned());
+            args.push(format!("-o{}", idb_path.display()));
+        }
+
+        IDB::open_full_with(path, self.auto_analyse, self.save, &args)
+    }
+}
+
 impl IDB {
     pub fn open(path: impl AsRef<Path>) -> Result<Self, IDAError> {
         Self::open_with(path, true, false)
@@ -51,6 +118,15 @@ impl IDB {
         auto_analyse: bool,
         save: bool,
     ) -> Result<Self, IDAError> {
+        Self::open_full_with(path, auto_analyse, save, &[] as &[&str])
+    }
+
+    fn open_full_with(
+        path: impl AsRef<Path>,
+        auto_analyse: bool,
+        save: bool,
+        args: &[impl AsRef<str>],
+    ) -> Result<Self, IDAError> {
         let _guard = prepare_library();
         let path = path.as_ref();
 
@@ -58,7 +134,7 @@ impl IDB {
             return Err(IDAError::not_found(path));
         }
 
-        open_database_quiet(path, auto_analyse)?;
+        open_database_quiet(path, auto_analyse, args)?;
 
         let decompiler = unsafe { init_hexrays_plugin(0.into()) };
 

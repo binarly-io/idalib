@@ -145,10 +145,10 @@ bool idalib_get_license_id(std::array<uint8_t, 6> &id) {
   return false;
 }
 
-int idalib_open_database_quiet(const char *name, bool auto_analysis) {
+int idalib_open_database_quiet(int argc, const char *const *argv,
+                               bool auto_analysis) {
   auto new_file = 0;
-  const char *argv[] = {"idalib", name};
-  auto result = init_database(2, argv, &new_file);
+  auto result = init_database(argc, argv, &new_file);
 
   if (result != 0) {
     return result;
