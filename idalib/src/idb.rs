@@ -44,7 +44,7 @@ pub struct IDB {
 #[derive(Debug, Clone)]
 pub struct IDBOpenOptions {
     idb: Option<PathBuf>,
-    ftype: Option<String>,
+    // ftype: Option<String>,
     save: bool,
     auto_analyse: bool,
 }
@@ -53,7 +53,7 @@ impl Default for IDBOpenOptions {
     fn default() -> Self {
         Self {
             idb: None,
-            ftype: None,
+            // ftype: None,
             save: false,
             auto_analyse: true,
         }
@@ -95,9 +95,11 @@ impl IDBOpenOptions {
     pub fn open(&self, path: impl AsRef<Path>) -> Result<IDB, IDAError> {
         let mut args = Vec::new();
 
-        if let Some(ftype) = self.ftype.as_ref() {
-            args.push(format!("-T{}", ftype));
-        }
+        // NOTE: for now, we will disable this functionality (see comment on file_type above).
+        //
+        // if let Some(ftype) = self.ftype.as_ref() {
+        //    args.push(format!("-T{}", ftype));
+        // }
 
         if let Some(idb_path) = self.idb.as_ref() {
             args.push("-c".to_owned());
