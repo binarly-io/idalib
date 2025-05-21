@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["EntryPointIter","IDB"]};
+window.SIDEBAR_ITEMS = {"struct":["EntryPointIter","IDB","IDBOpenOptions"]};

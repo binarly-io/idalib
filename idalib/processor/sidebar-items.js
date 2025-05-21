@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["id"],"struct":["Processor"],"type":["ProcessorId"]};
+window.SIDEBAR_ITEMS = {"mod":["id"],"struct":["Processor","ProcessorFamily"],"type":["ProcessorId"]};
