@@ -1,13 +1,16 @@
 [package]
 name = "idalib"
-authors = ["Sam L. Thomas <sam@binarly.io>", "Yegor Vasilenko <yegor@binarly.io>"]
-version = "0.5.1+9.1.250226"
+authors = ["Sam L. Thomas <sam@binarly.io>", "Yegor Vasilenko <yegor@binarly.io>", "Marco Ivaldi <raptor@0xdeadbeef.info>"]
+version = "0.6.0+9.1.250226"
 description = "Idiomatic bindings to IDA SDK"
 repository = "https://github.com/binarly-io/idalib"
-documentation = "https://binarly-io.github.io/idalib/idalib"
+documentation = "https://idalib.rs/idalib"
+homepage = "https://idalib.rs"
+keywords = ["reverse-engineering", "ida", "ida-pro", "idalib"]
+categories = ["security"]
 license = "MIT OR Apache-2.0"
 readme = "../README.md"
-edition = "2021"
+edition = "2024"
 build = "build.rs"
 
 [dependencies]
@@ -15,8 +18,8 @@ anyhow = "1"
 autocxx = "0.28"
 bitflags = "2"
 cxx = "1"
-idalib-sys = { version = "0.5", path = "../idalib-sys" }
+idalib-sys = { version = "0.6", path = "../idalib-sys" }
 thiserror = "1"
 
 [build-dependencies]
-idalib-build = { version = "0.5", path = "../idalib-build" }
+idalib-build = { version = "0.6", path = "../idalib-build" }

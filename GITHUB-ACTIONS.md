@@ -46,6 +46,9 @@ The workflow below will perform a basic build test for all supported OSes:
 ```yml
 name: build
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ master ]

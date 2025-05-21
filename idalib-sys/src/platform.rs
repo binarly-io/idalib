@@ -28,7 +28,7 @@ fn main_thread_id() -> u32 {
     // main entrypoint.
     //
     // See: https://doc.rust-lang.org/stable/reference/abi.html#the-link_section-attribute
-    #[link_section = ".CRT$XCU"]
+    #[unsafe(link_section = ".CRT$XCU")]
     static INIT_MAIN_THREAD_ID: unsafe fn() = {
         unsafe fn initer() {
             unsafe { MAIN_THREAD_ID = GetCurrentThreadId() };

@@ -13,7 +13,7 @@
 rust::String idalib_segm_name(const segment_t *s) {
   auto name = qstring();
 
-  if (get_visible_segm_name(&name, s) > 0) {
+  if (get_segm_name(&name, s) > 0) {
     return rust::String(name.c_str());
   } else {
     return rust::String();

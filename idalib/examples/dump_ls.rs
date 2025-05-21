@@ -1,9 +1,12 @@
+use idalib::IDAError;
 use idalib::func::FunctionFlags;
 use idalib::idb::*;
-use idalib::IDAError;
 
 fn main() -> anyhow::Result<()> {
-    let idb = IDB::open("./tests/ls")?;
+    let idb = IDBOpenOptions::new()
+        .idb("/tmp/out.idb")
+        .save(true)
+        .open("./tests/ls")?;
 
     println!("decompiler available: {}", idb.decompiler_available());
 

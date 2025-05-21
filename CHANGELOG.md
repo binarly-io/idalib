@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.6.0 (2025-05-21)
+
+Features:
+- Add `IDBOpenOptions` to supply additional "command line" arguments during
+  database open, e.g., to set database location.
+- Add `IDB::segment_by_name`.
+- Improvements to APIs returning addresses where `BADADDR` is now checked and
+  mapped to None.
+- Add `ProcessorFamily` and `is_thumb_at` to `Processor`.
+- Add additional convenience methods on `SegmentAlignment`,
+  `SegmentPermissions`, and `SegmentType`.
+
+Miscellaneous:
+- Support for Rust 2024 edition.
+- Switch to https://idalib.rs/ domain for documentation.
+
 ## 0.5.1 (2025-02-28)
 
 Bugfix:
