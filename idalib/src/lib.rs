@@ -1,7 +1,7 @@
 //! # idalib
 //!
 //! idalib is a Rust library providing idiomatic bindings for the IDA SDK, enabling the development
-//! of standalone analysis tools using IDA v9.0’s idalib.
+//! of standalone analysis tools using IDA v9.x’s idalib.
 //!
 //! ## Usage
 //!
@@ -10,10 +10,10 @@
 //!
 //! ```toml
 //! [dependencies]
-//! idalib = "0.5"
+//! idalib = "0.6"
 //!
 //! [build-dependencies]
-//! idalib-build = "0.5"
+//! idalib-build = "0.6"
 //! ```
 //!
 //! Here is a basic example of a `build.rs` file:
