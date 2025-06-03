@@ -165,6 +165,14 @@ fn main() {
 
     configure_and_generate(hexrays, &ida, "hexrays.rs");
 
+    let plugin = autocxx_bindgen::builder()
+        .header(ida.join("pro.h").to_str().expect("path is valid string"))
+        .header(ida.join("loader.hpp").to_str().expect("path is valid string"))
+        .allowlist_item("plugmod_t")
+        .allowlist_item("plugin_t");
+
+    configure_and_generate(plugin, &ida, "plugin.rs");
+
     println!(
         "cargo::rerun-if-changed={}",
         ffi_path.join("lib.rs").display()

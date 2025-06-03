@@ -346,7 +346,7 @@ include_cpp! {
     generate!("get_strlist_qty")
 
     // loader
-    generate!("plugin_t")
+    extern_cpp_type!("plugin_t", crate::plugin::plugin_t)
     generate!("find_plugin")
     generate!("run_plugin")
 
@@ -666,6 +666,34 @@ pub mod inf {
     };
 }
 
+pub mod plugin {
+    #![allow(non_camel_case_types)]
+    #![allow(non_upper_case_globals)]
+    #![allow(unused)]
+
+    pub use super::ffi::{find_plugin, run_plugin};
+    pub use super::ffix::{idalib_plugin_flags, idalib_plugin_version};
+
+    include!(concat!(env!("OUT_DIR"), "/plugin.rs"));
+
+    unsafe impl cxx::ExternType for plugin_t {
+        type Id = cxx::type_id!("plugin_t");
+        type Kind = cxx::kind::Trivial;
+    }
+
+    unsafe impl cxx::ExternType for plugmod_t {
+        type Id = cxx::type_id!("plugmod_t");
+        type Kind = cxx::kind::Opaque;
+    }
+
+    pub mod flags {
+        pub use crate::ffi::{
+            PLUGIN_DBG, PLUGIN_DRAW, PLUGIN_FIX, PLUGIN_HIDE, PLUGIN_MOD, PLUGIN_MULTI,
+            PLUGIN_PROC, PLUGIN_SCRIPTED, PLUGIN_SEG, PLUGIN_UNL,
+        };
+    }
+}
+
 pub mod pod {
     #![allow(non_camel_case_types)]
     #![allow(non_upper_case_globals)]
@@ -739,7 +767,7 @@ mod ffix {
 
         type cblock_iter;
 
-        type plugin_t = super::ffi::plugin_t;
+        type plugin_t = super::plugin::plugin_t;
 
         unsafe fn init_library(argc: c_int, argv: *mut *mut c_char) -> c_int;
 
@@ -1172,18 +1200,6 @@ pub mod search {
 pub mod strings {
     pub use super::ffi::{build_strlist, clear_strlist, get_strlist_qty};
     pub use super::ffix::{idalib_get_strlist_item_addr, idalib_get_strlist_item_length};
-}
-
-pub mod loader {
-    pub use super::ffi::{find_plugin, plugin_t, run_plugin};
-    pub use super::ffix::{idalib_plugin_flags, idalib_plugin_version};
-
-    pub mod flags {
-        pub use super::super::ffi::{
-            PLUGIN_DBG, PLUGIN_DRAW, PLUGIN_FIX, PLUGIN_HIDE, PLUGIN_MOD, PLUGIN_MULTI,
-            PLUGIN_PROC, PLUGIN_SCRIPTED, PLUGIN_SEG, PLUGIN_UNL,
-        };
-    }
 }
 
 pub mod ida {

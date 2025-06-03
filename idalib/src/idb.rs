@@ -14,7 +14,7 @@ use crate::ffi::ida::{
     auto_wait, close_database_with, make_signatures, open_database_quiet, set_screen_ea,
 };
 use crate::ffi::insn::decode;
-use crate::ffi::loader::find_plugin;
+use crate::ffi::plugin::find_plugin;
 use crate::ffi::processor::get_ph;
 use crate::ffi::search::{idalib_find_defined, idalib_find_imm, idalib_find_text};
 use crate::ffi::segment::{get_segm_by_name, get_segm_qty, getnseg, getseg};
@@ -519,7 +519,7 @@ impl IDB {
                 name.as_ref()
             )))
         } else {
-            Ok(Plugin::from_ptr(ptr))
+            Ok(Plugin::from_ptr(ptr as *const _))
         }
     }
 
