@@ -1,0 +1,12 @@
+{
+  "IDAMetadataDescriptorVersion": 1,
+  "plugin": {
+    "name": "idalib",
+    "entryPoint": "idalib",
+    "categories": ["api-scripting-and-automation", "integration-with-third-parties-interoperability"],
+    "logoPath": "resources/logo.png",
+    "idaVersions": ">=9.0",
+    "description" : "Idiomatic Rust bindings to IDA SDK",
+    "version": "0.6.0"
+  }
+}
