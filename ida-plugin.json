@@ -1,7 +1,7 @@
 {
   "IDAMetadataDescriptorVersion": 1,
   "plugin": {
-    "name": "idalib",
+    "name": "idalib Rust bindings",
     "entryPoint": "idalib",
     "categories": ["api-scripting-and-automation", "integration-with-third-parties-interoperability"],
     "logoPath": "resources/logo.png",
