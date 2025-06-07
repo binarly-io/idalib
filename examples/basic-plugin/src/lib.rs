@@ -1,5 +1,5 @@
-use idalib::ffi::plugin::{plugin_t, plugmod_t};
 use idalib::ffi::ida::msg;
+use idalib::ffi::plugin::{plugin_t, plugmod_t};
 
 #[unsafe(no_mangle)]
 pub static mut PLUGIN: plugin_t = plugin_t {
@@ -23,5 +23,4 @@ extern "C" fn run(_args: usize) -> bool {
     true
 }
 
-extern "C" fn term() {
-}
+extern "C" fn term() {}

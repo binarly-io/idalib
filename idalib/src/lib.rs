@@ -95,7 +95,7 @@ pub mod xref;
 pub use idalib_sys as ffi;
 
 pub use ffi::IDAError;
-pub use license::{is_valid_license, license_id, LicenseId};
+pub use license::{LicenseId, is_valid_license, license_id};
 
 pub type Address = u64;
 
