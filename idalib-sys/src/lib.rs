@@ -1024,6 +1024,8 @@ mod ffix {
 
         unsafe fn idalib_ea2str(ea: c_ulonglong) -> String;
 
+        unsafe fn idalib_msg(msg: *const c_char);
+
         unsafe fn idalib_get_byte(ea: c_ulonglong) -> u8;
         unsafe fn idalib_get_word(ea: c_ulonglong) -> u16;
         unsafe fn idalib_get_dword(ea: c_ulonglong) -> u32;
@@ -1214,6 +1216,13 @@ pub mod ida {
     use super::{IDAError, ea_t, ffi, ffix};
 
     pub use ffi::auto_wait;
+    pub use ffix::idalib_msg;
+
+    pub unsafe fn msg(msg: impl AsRef<str>) -> Result<(), IDAError> {
+        let msg = CString::new(msg.as_ref()).map_err(IDAError::ffi)?;
+        unsafe { ffix::idalib_msg(msg.as_ptr()) };
+        Ok(())
+    }
 
     pub fn is_license_valid() -> bool {
         assert!(
