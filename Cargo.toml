@@ -3,5 +3,11 @@ members = [
   "idalib",
   "idalib-build",
   "idalib-sys",
+  "examples/*",
+]
+default-members = [
+  "idalib",
+  "idalib-build",
+  "idalib-sys",
 ]
 resolver = "2"
