@@ -100,7 +100,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: install clang/llvm
-        uses: KyleMayes/install-llvm-action@v2
+        uses: KyleMayes/install-llvm-action@a7a1a882e2d06ebe05d5bb97c3e1f8c984ae96fc
         with:
           version: "20"
           directory: "${{ runner.temp }}/llvm-20"
