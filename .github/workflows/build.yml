@@ -54,10 +54,10 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: install clang/llvm
-        uses: KyleMayes/install-llvm-action@e0a8dc9cb8a22e8a7696e8a91a4e9581bec13181
+        uses: KyleMayes/install-llvm-action@a7a1a882e2d06ebe05d5bb97c3e1f8c984ae96fc
         with:
-          version: "18.1.8"
-          directory: "${{ runner.temp }}/llvm-18"
+          version: "20"
+          directory: "${{ runner.temp }}/llvm-20"
       - name: configure clang/llvm environment
         run: echo "LIBCLANG_PATH=$((gcm clang).source -replace "clang.exe")" >> $env:GITHUB_ENV
       - name: checkout
