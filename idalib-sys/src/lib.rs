@@ -66,6 +66,7 @@ include_cpp! {
     #include "idp.hpp"
     #include "loader.hpp"
     #include "moves.hpp"
+    #include "nalt.hpp"
     #include "pro.h"
     #include "segment.hpp"
     #include "strlist.hpp"
@@ -360,6 +361,12 @@ include_cpp! {
     generate!("PLUGIN_FIX")
     generate!("PLUGIN_MULTI")
     generate!("PLUGIN_SCRIPTED")
+
+    // nalt
+    generate!("get_input_file_path")
+    generate!("retrieve_input_file_md5")
+    generate!("retrieve_input_file_sha256")
+    generate!("retrieve_input_file_size")
 }
 
 pub mod hexrays {
@@ -1184,6 +1191,13 @@ pub mod loader {
             PLUGIN_PROC, PLUGIN_SCRIPTED, PLUGIN_SEG, PLUGIN_UNL,
         };
     }
+}
+
+pub mod nalt {
+    pub use super::ffi::{
+        get_input_file_path, retrieve_input_file_md5, retrieve_input_file_sha256,
+        retrieve_input_file_size,
+    };
 }
 
 pub mod ida {
