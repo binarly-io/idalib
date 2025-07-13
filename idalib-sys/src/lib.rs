@@ -363,7 +363,6 @@ include_cpp! {
     generate!("PLUGIN_SCRIPTED")
 
     // nalt
-    generate!("get_input_file_path")
     generate!("retrieve_input_file_md5")
     generate!("retrieve_input_file_sha256")
     generate!("retrieve_input_file_size")
@@ -714,6 +713,7 @@ mod ffix {
         include!("inf_extras.h");
         include!("kernwin_extras.h");
         include!("loader_extras.h");
+        include!("nalt_extras.h");
         include!("ph_extras.h");
         include!("segm_extras.h");
         include!("search_extras.h");
@@ -1009,6 +1009,8 @@ mod ffix {
         unsafe fn idalib_get_qword(ea: c_ulonglong) -> u64;
         unsafe fn idalib_get_bytes(ea: c_ulonglong, buf: &mut Vec<u8>) -> Result<usize>;
 
+        unsafe fn idalib_get_input_file_path() -> String;
+
         unsafe fn idalib_plugin_version(p: *const plugin_t) -> u64;
         unsafe fn idalib_plugin_flags(p: *const plugin_t) -> u64;
     }
@@ -1195,9 +1197,9 @@ pub mod loader {
 
 pub mod nalt {
     pub use super::ffi::{
-        get_input_file_path, retrieve_input_file_md5, retrieve_input_file_sha256,
-        retrieve_input_file_size,
+        retrieve_input_file_md5, retrieve_input_file_sha256, retrieve_input_file_size,
     };
+    pub use super::ffix::idalib_get_input_file_path;
 }
 
 pub mod ida {

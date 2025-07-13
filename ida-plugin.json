@@ -7,6 +7,6 @@
     "logoPath": "resources/logo.png",
     "idaVersions": ">=9.0",
     "description" : "Idiomatic Rust bindings to IDA SDK",
-    "version": "0.6.0"
+    "version": "0.6.1"
   }
 }
