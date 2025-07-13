@@ -86,6 +86,7 @@ pub mod idb;
 pub mod insn;
 pub mod license;
 pub mod meta;
+pub mod name;
 pub mod plugin;
 pub mod processor;
 pub mod segment;

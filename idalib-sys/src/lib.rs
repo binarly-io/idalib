@@ -67,6 +67,7 @@ include_cpp! {
     #include "loader.hpp"
     #include "moves.hpp"
     #include "nalt.hpp"
+    #include "name.hpp"
     #include "pro.h"
     #include "segment.hpp"
     #include "strlist.hpp"
@@ -366,6 +367,15 @@ include_cpp! {
     generate!("retrieve_input_file_md5")
     generate!("retrieve_input_file_sha256")
     generate!("retrieve_input_file_size")
+
+    // name(s)
+    generate!("get_nlist_idx")
+    generate!("get_nlist_size")
+    generate!("get_nlist_ea")
+    generate!("get_nlist_name")
+    generate!("is_in_nlist")
+    generate!("is_public_name")
+    generate!("is_weak_name")
 }
 
 pub mod hexrays {
@@ -1200,6 +1210,13 @@ pub mod nalt {
         retrieve_input_file_md5, retrieve_input_file_sha256, retrieve_input_file_size,
     };
     pub use super::ffix::idalib_get_input_file_path;
+}
+
+pub mod name {
+    pub use super::ffi::{
+        get_nlist_ea, get_nlist_idx, get_nlist_name, get_nlist_size, is_in_nlist, is_public_name,
+        is_weak_name,
+    };
 }
 
 pub mod ida {

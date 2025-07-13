@@ -7,6 +7,8 @@ Features:
   [@williballenthin](https://github.com/williballenthin)]).
 - Add `input_file_path`, `input_file_size`, `input_file_sha256`,
   `input_file_md5` to `Metadata`.
+- Add `NameList`, `NameListIterator`, and `Name` to access/iterate over names
+  in the database.
 
 Miscellaneous:
 - Update GitHub workflows to fix Windows build issues. (contributor:

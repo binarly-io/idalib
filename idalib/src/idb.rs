@@ -26,6 +26,7 @@ use crate::decompiler::CFunction;
 use crate::func::{Function, FunctionId};
 use crate::insn::{Insn, Register};
 use crate::meta::{Metadata, MetadataMut};
+use crate::name::NameList;
 use crate::plugin::Plugin;
 use crate::processor::Processor;
 use crate::segment::{Segment, SegmentId};
@@ -467,6 +468,10 @@ impl IDB {
 
     pub fn strings(&self) -> StringList {
         StringList::new(self)
+    }
+
+    pub fn names(&self) -> crate::name::NameList {
+        NameList::new(self)
     }
 
     pub fn address_to_string(&self, ea: Address) -> Option<String> {
