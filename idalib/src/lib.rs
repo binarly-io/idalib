@@ -96,9 +96,30 @@ pub mod xref;
 pub use idalib_sys as ffi;
 
 pub use ffi::IDAError;
-pub use license::{is_valid_license, license_id, LicenseId};
+pub use license::{LicenseId, is_valid_license, license_id};
 
 pub type Address = u64;
+
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct IDAVersion {
+    major: i32,
+    minor: i32,
+    build: i32,
+}
+
+impl IDAVersion {
+    pub fn major(&self) -> i32 {
+        self.major
+    }
+
+    pub fn minor(&self) -> i32 {
+        self.minor
+    }
+
+    pub fn build(&self) -> i32 {
+        self.build
+    }
+}
 
 static INIT: OnceLock<Mutex<()>> = OnceLock::new();
 
@@ -132,4 +153,12 @@ pub(crate) fn prepare_library() -> IDARuntimeHandle {
 pub fn enable_console_messages(enabled: bool) {
     init_library();
     ffi::ida::enable_console_messages(enabled);
+}
+
+pub fn version() -> Result<IDAVersion, IDAError> {
+    ffi::ida::library_version().map(|(major, minor, build)| IDAVersion {
+        major,
+        minor,
+        build,
+    })
 }

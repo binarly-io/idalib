@@ -9,6 +9,7 @@ Features:
   `input_file_md5` to `Metadata`.
 - Add `NameList`, `NameListIterator`, and `Name` to access/iterate over names
   in the database.
+- Add `idalib::version` to get the IDA version information.
 
 Miscellaneous:
 - Update GitHub workflows to fix Windows build issues. (contributor:

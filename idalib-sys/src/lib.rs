@@ -29,6 +29,8 @@ pub enum IDAError {
     InvalidLicense,
     #[error("could not generate pattern or signature files")]
     MakeSigs,
+    #[error("could not get library version")]
+    GetVersion,
 }
 
 impl IDAError {
@@ -720,6 +722,7 @@ mod ffix {
         include!("entry_extras.h");
         include!("func_extras.h");
         include!("hexrays_extras.h");
+        include!("idalib_extras.h");
         include!("inf_extras.h");
         include!("kernwin_extras.h");
         include!("loader_extras.h");
@@ -1023,6 +1026,12 @@ mod ffix {
 
         unsafe fn idalib_plugin_version(p: *const plugin_t) -> u64;
         unsafe fn idalib_plugin_flags(p: *const plugin_t) -> u64;
+
+        unsafe fn idalib_get_library_version(
+            major: *mut c_int,
+            minor: *mut c_int,
+            build: *mut c_int,
+        ) -> bool;
     }
 }
 
@@ -1381,5 +1390,22 @@ pub mod ida {
         );
 
         unsafe { ffi::close_database(save) }
+    }
+
+    pub fn library_version() -> Result<(i32, i32, i32), IDAError> {
+        assert!(
+            is_main_thread(),
+            "IDA cannot function correctly when not running on the main thread"
+        );
+
+        let mut major = c_int(0);
+        let mut minor = c_int(0);
+        let mut build = c_int(0);
+
+        if unsafe { ffix::idalib_get_library_version(&mut major, &mut minor, &mut build) } {
+            Ok((major.0 as _, minor.0 as _, build.0 as _))
+        } else {
+            Err(IDAError::GetVersion)
+        }
     }
 }
