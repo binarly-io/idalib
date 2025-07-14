@@ -77,6 +77,7 @@
 #![allow(clippy::needless_lifetimes)]
 
 use std::ffi::c_char;
+use std::marker::PhantomData;
 use std::sync::{Mutex, MutexGuard, OnceLock};
 
 pub mod bookmarks;
@@ -96,9 +97,31 @@ pub mod xref;
 pub use idalib_sys as ffi;
 
 pub use ffi::IDAError;
+pub use idb::{IDB, IDBOpenOptions};
 pub use license::{LicenseId, is_valid_license, license_id};
 
 pub type Address = u64;
+pub struct AddressFlags<'a> {
+    flags: ffi::bytes::flags64_t,
+    _marker: PhantomData<&'a IDB>,
+}
+
+impl<'a> AddressFlags<'a> {
+    pub(crate) fn new(flags: ffi::bytes::flags64_t) -> Self {
+        Self {
+            flags,
+            _marker: PhantomData,
+        }
+    }
+
+    pub fn is_code(&self) -> bool {
+        unsafe { ffi::bytes::is_code(self.flags) }
+    }
+
+    pub fn is_data(&self) -> bool {
+        unsafe { ffi::bytes::is_data(self.flags) }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct IDAVersion {

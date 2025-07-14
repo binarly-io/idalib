@@ -89,6 +89,12 @@ include_cpp! {
     // auto
     generate!("auto_wait")
 
+    // bytes
+    generate_pod!("flags64_t")
+    generate!("is_data")
+    generate!("is_code")
+    generate!("get_flags")
+
     // entry
     generate!("get_entry")
     generate!("get_entry_ordinal")
@@ -1157,6 +1163,7 @@ pub mod segment {
 }
 
 pub mod bytes {
+    pub use super::ffi::{flags64_t, get_flags, is_code, is_data};
     pub use super::ffix::{
         idalib_get_byte, idalib_get_bytes, idalib_get_dword, idalib_get_qword, idalib_get_word,
     };

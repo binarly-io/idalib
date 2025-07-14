@@ -12,6 +12,7 @@ typedef long long sval_t;
 typedef unsigned long long uval_t;
 #endif
 
+typedef uint64_t flags64_t;
 typedef unsigned char optype_t;
 
 typedef void c_void;

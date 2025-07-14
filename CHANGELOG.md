@@ -9,6 +9,8 @@ Features:
   `input_file_md5` to `Metadata`.
 - Add `NameList`, `NameListIterator`, and `Name` to access/iterate over names
   in the database.
+- Add `AddressFlags` and basic APIs to check if an address corresponds to code
+  or data.
 - Add `idalib::version` to get the IDA version information.
 
 Miscellaneous:

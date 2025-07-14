@@ -32,7 +32,7 @@ use crate::processor::Processor;
 use crate::segment::{Segment, SegmentId};
 use crate::strings::StringList;
 use crate::xref::{XRef, XRefQuery};
-use crate::{Address, IDAError, IDARuntimeHandle, prepare_library};
+use crate::{Address, AddressFlags, IDAError, IDARuntimeHandle, prepare_library};
 
 pub struct IDB {
     path: PathBuf,
@@ -478,6 +478,10 @@ impl IDB {
         let s = unsafe { idalib_ea2str(ea.into()) };
 
         if s.is_empty() { None } else { Some(s) }
+    }
+
+    pub fn flags(&self, ea: Address) -> AddressFlags {
+        AddressFlags::new(unsafe { get_flags(ea.into()) })
     }
 
     pub fn get_byte(&self, ea: Address) -> u8 {
