@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.6.1 (2025-07-13)
+## 0.6.1 (2025-07-15)
 
 Features:
 - Add string list iterator (contributor:
