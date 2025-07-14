@@ -480,7 +480,7 @@ impl IDB {
         if s.is_empty() { None } else { Some(s) }
     }
 
-    pub fn flags(&self, ea: Address) -> AddressFlags {
+    pub fn flags_at(&self, ea: Address) -> AddressFlags {
         AddressFlags::new(unsafe { get_flags(ea.into()) })
     }
 

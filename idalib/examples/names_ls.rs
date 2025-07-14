@@ -32,7 +32,7 @@ fn main() -> anyhow::Result<()> {
 
     println!("\nTesting iterator:");
     for name in idb.names().iter() {
-        let flags = idb.flags(name.address());
+        let flags = idb.flags_at(name.address());
         println!(
             "\t{:#x}\t{:?}\tcode: {}\tdata: {}",
             name.address(),
