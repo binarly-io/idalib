@@ -7,7 +7,7 @@
 
 rust::String idalib_get_input_file_path() {
   char path[QMAXPATH] = {0};
-  auto size = get_input_file_path(path, QMAXPATH);
+  auto size = get_input_file_path(path, sizeof(path));
 
   if (size > 0) {
     return rust::String(path, size);
