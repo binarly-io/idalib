@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["StringList"],"type":["StringIndex"]};
+window.SIDEBAR_ITEMS = {"struct":["StringList","StringListIter"],"type":["StringIndex"]};

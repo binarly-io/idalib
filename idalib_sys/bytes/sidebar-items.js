@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["idalib_get_byte","idalib_get_bytes","idalib_get_dword","idalib_get_qword","idalib_get_word"]};
+window.SIDEBAR_ITEMS = {"fn":["get_flags","idalib_get_byte","idalib_get_bytes","idalib_get_dword","idalib_get_qword","idalib_get_word","is_code","is_data"],"type":["flags64_t"]};

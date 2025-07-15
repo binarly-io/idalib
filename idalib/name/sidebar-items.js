@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["Name","NameList","NameListIter","NameProperties"],"type":["NameIndex"]};
