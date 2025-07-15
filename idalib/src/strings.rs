@@ -61,11 +61,44 @@ impl<'a> StringList<'a> {
         unsafe { idalib_get_strlist_item_length(index) }
     }
 
-    pub fn len(&self) -> StringIndex {
+    pub fn len(&self) -> usize {
         unsafe { get_strlist_qty() }
     }
 
     pub fn is_empty(&self) -> bool {
         self.len() == 0
+    }
+
+    pub fn iter(&self) -> StringListIter<'_, 'a> {
+        StringListIter {
+            string_list: self,
+            current_index: 0,
+        }
+    }
+}
+
+pub struct StringListIter<'s, 'a> {
+    string_list: &'s StringList<'a>,
+    current_index: StringIndex,
+}
+
+impl<'s, 'a> Iterator for StringListIter<'s, 'a> {
+    type Item = (Address, String);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        while self.current_index < self.string_list.len() {
+            let addr = self.string_list.get_address_by_index(self.current_index);
+            let string = self.string_list.get_by_index(self.current_index);
+
+            self.current_index += 1;
+
+            if let (Some(addr), Some(string)) = (addr, string) {
+                return Some((addr, string));
+            };
+            // skip invalid strings, such as:
+            // - the index became invalid, such as if a string was undefined
+            // - the string failed to decode (today: not UTF-8)
+        }
+        None
     }
 }

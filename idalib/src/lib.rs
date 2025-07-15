@@ -77,6 +77,7 @@
 #![allow(clippy::needless_lifetimes)]
 
 use std::ffi::c_char;
+use std::marker::PhantomData;
 use std::sync::{Mutex, MutexGuard, OnceLock};
 
 pub mod bookmarks;
@@ -86,6 +87,7 @@ pub mod idb;
 pub mod insn;
 pub mod license;
 pub mod meta;
+pub mod name;
 pub mod plugin;
 pub mod processor;
 pub mod segment;
@@ -95,9 +97,52 @@ pub mod xref;
 pub use idalib_sys as ffi;
 
 pub use ffi::IDAError;
-pub use license::{is_valid_license, license_id, LicenseId};
+pub use idb::{IDB, IDBOpenOptions};
+pub use license::{LicenseId, is_valid_license, license_id};
 
 pub type Address = u64;
+pub struct AddressFlags<'a> {
+    flags: ffi::bytes::flags64_t,
+    _marker: PhantomData<&'a IDB>,
+}
+
+impl<'a> AddressFlags<'a> {
+    pub(crate) fn new(flags: ffi::bytes::flags64_t) -> Self {
+        Self {
+            flags,
+            _marker: PhantomData,
+        }
+    }
+
+    pub fn is_code(&self) -> bool {
+        unsafe { ffi::bytes::is_code(self.flags) }
+    }
+
+    pub fn is_data(&self) -> bool {
+        unsafe { ffi::bytes::is_data(self.flags) }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct IDAVersion {
+    major: i32,
+    minor: i32,
+    build: i32,
+}
+
+impl IDAVersion {
+    pub fn major(&self) -> i32 {
+        self.major
+    }
+
+    pub fn minor(&self) -> i32 {
+        self.minor
+    }
+
+    pub fn build(&self) -> i32 {
+        self.build
+    }
+}
 
 static INIT: OnceLock<Mutex<()>> = OnceLock::new();
 
@@ -131,4 +176,12 @@ pub(crate) fn prepare_library() -> IDARuntimeHandle {
 pub fn enable_console_messages(enabled: bool) {
     init_library();
     ffi::ida::enable_console_messages(enabled);
+}
+
+pub fn version() -> Result<IDAVersion, IDAError> {
+    ffi::ida::library_version().map(|(major, minor, build)| IDAVersion {
+        major,
+        minor,
+        build,
+    })
 }

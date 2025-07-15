@@ -30,5 +30,16 @@ fn main() -> anyhow::Result<()> {
     // get_address_by_index()
     assert!(idb.strings().get_address_by_index(len).is_none());
 
+    println!("\nTesting iterator:");
+    for (_address, _content) in idb.strings().iter() {
+        /*
+        println!(
+            "\t{:#x}\t{:?}",
+            _address,
+            _content
+        );
+        */
+    }
+
     Ok(())
 }

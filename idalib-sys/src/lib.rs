@@ -29,6 +29,8 @@ pub enum IDAError {
     InvalidLicense,
     #[error("could not generate pattern or signature files")]
     MakeSigs,
+    #[error("could not get library version")]
+    GetVersion,
 }
 
 impl IDAError {
@@ -66,6 +68,8 @@ include_cpp! {
     #include "idp.hpp"
     #include "loader.hpp"
     #include "moves.hpp"
+    #include "nalt.hpp"
+    #include "name.hpp"
     #include "pro.h"
     #include "segment.hpp"
     #include "strlist.hpp"
@@ -84,6 +88,12 @@ include_cpp! {
 
     // auto
     generate!("auto_wait")
+
+    // bytes
+    generate_pod!("flags64_t")
+    generate!("is_data")
+    generate!("is_code")
+    generate!("get_flags")
 
     // entry
     generate!("get_entry")
@@ -360,6 +370,20 @@ include_cpp! {
     generate!("PLUGIN_FIX")
     generate!("PLUGIN_MULTI")
     generate!("PLUGIN_SCRIPTED")
+
+    // nalt
+    generate!("retrieve_input_file_md5")
+    generate!("retrieve_input_file_sha256")
+    generate!("retrieve_input_file_size")
+
+    // name(s)
+    generate!("get_nlist_idx")
+    generate!("get_nlist_size")
+    generate!("get_nlist_ea")
+    generate!("get_nlist_name")
+    generate!("is_in_nlist")
+    generate!("is_public_name")
+    generate!("is_weak_name")
 }
 
 pub mod hexrays {
@@ -704,9 +728,11 @@ mod ffix {
         include!("entry_extras.h");
         include!("func_extras.h");
         include!("hexrays_extras.h");
+        include!("idalib_extras.h");
         include!("inf_extras.h");
         include!("kernwin_extras.h");
         include!("loader_extras.h");
+        include!("nalt_extras.h");
         include!("ph_extras.h");
         include!("segm_extras.h");
         include!("search_extras.h");
@@ -1002,8 +1028,16 @@ mod ffix {
         unsafe fn idalib_get_qword(ea: c_ulonglong) -> u64;
         unsafe fn idalib_get_bytes(ea: c_ulonglong, buf: &mut Vec<u8>) -> Result<usize>;
 
+        unsafe fn idalib_get_input_file_path() -> String;
+
         unsafe fn idalib_plugin_version(p: *const plugin_t) -> u64;
         unsafe fn idalib_plugin_flags(p: *const plugin_t) -> u64;
+
+        unsafe fn idalib_get_library_version(
+            major: *mut c_int,
+            minor: *mut c_int,
+            build: *mut c_int,
+        ) -> bool;
     }
 }
 
@@ -1129,6 +1163,7 @@ pub mod segment {
 }
 
 pub mod bytes {
+    pub use super::ffi::{flags64_t, get_flags, is_code, is_data};
     pub use super::ffix::{
         idalib_get_byte, idalib_get_bytes, idalib_get_dword, idalib_get_qword, idalib_get_word,
     };
@@ -1184,6 +1219,20 @@ pub mod loader {
             PLUGIN_PROC, PLUGIN_SCRIPTED, PLUGIN_SEG, PLUGIN_UNL,
         };
     }
+}
+
+pub mod nalt {
+    pub use super::ffi::{
+        retrieve_input_file_md5, retrieve_input_file_sha256, retrieve_input_file_size,
+    };
+    pub use super::ffix::idalib_get_input_file_path;
+}
+
+pub mod name {
+    pub use super::ffi::{
+        get_nlist_ea, get_nlist_idx, get_nlist_name, get_nlist_size, is_in_nlist, is_public_name,
+        is_weak_name,
+    };
 }
 
 pub mod ida {
@@ -1348,5 +1397,22 @@ pub mod ida {
         );
 
         unsafe { ffi::close_database(save) }
+    }
+
+    pub fn library_version() -> Result<(i32, i32, i32), IDAError> {
+        assert!(
+            is_main_thread(),
+            "IDA cannot function correctly when not running on the main thread"
+        );
+
+        let mut major = c_int(0);
+        let mut minor = c_int(0);
+        let mut build = c_int(0);
+
+        if unsafe { ffix::idalib_get_library_version(&mut major, &mut minor, &mut build) } {
+            Ok((major.0 as _, minor.0 as _, build.0 as _))
+        } else {
+            Err(IDAError::GetVersion)
+        }
     }
 }

@@ -26,12 +26,13 @@ use crate::decompiler::CFunction;
 use crate::func::{Function, FunctionId};
 use crate::insn::{Insn, Register};
 use crate::meta::{Metadata, MetadataMut};
+use crate::name::NameList;
 use crate::plugin::Plugin;
 use crate::processor::Processor;
 use crate::segment::{Segment, SegmentId};
 use crate::strings::StringList;
 use crate::xref::{XRef, XRefQuery};
-use crate::{Address, IDAError, IDARuntimeHandle, prepare_library};
+use crate::{Address, AddressFlags, IDAError, IDARuntimeHandle, prepare_library};
 
 pub struct IDB {
     path: PathBuf,
@@ -469,10 +470,18 @@ impl IDB {
         StringList::new(self)
     }
 
+    pub fn names(&self) -> crate::name::NameList {
+        NameList::new(self)
+    }
+
     pub fn address_to_string(&self, ea: Address) -> Option<String> {
         let s = unsafe { idalib_ea2str(ea.into()) };
 
         if s.is_empty() { None } else { Some(s) }
+    }
+
+    pub fn flags_at(&self, ea: Address) -> AddressFlags {
+        AddressFlags::new(unsafe { get_flags(ea.into()) })
     }
 
     pub fn get_byte(&self, ea: Address) -> u8 {

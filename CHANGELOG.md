@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.6.1 (2025-07-15)
+
+Features:
+- Add string list iterator (contributor:
+  [@williballenthin](https://github.com/williballenthin)]).
+- Add `input_file_path`, `input_file_size`, `input_file_sha256`,
+  `input_file_md5` to `Metadata`.
+- Add `NameList`, `NameListIterator`, and `Name` to access/iterate over names
+  in the database.
+- Add `AddressFlags` and basic APIs to check if an address corresponds to code
+  or data.
+- Add `idalib::version` to get the IDA version information.
+
+Miscellaneous:
+- Update GitHub workflows to fix Windows build issues. (contributor:
+  [@0xdea](https://github.com/0xdea)).
+
 ## 0.6.0 (2025-05-21)
 
 Features:
