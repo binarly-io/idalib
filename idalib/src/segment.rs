@@ -263,6 +263,10 @@ impl<'a> Segment<'a> {
         SegmentPermissions::from_bits_retain(bits)
     }
 
+    pub fn set_permissions(&mut self, permissions: SegmentPermissions) {
+        unsafe { idalib_segm_set_perm(self.ptr, permissions.bits()) };
+    }
+
     pub fn bitness(&self) -> usize {
         (unsafe { idalib_segm_bitness(self.ptr) }) as usize
     }

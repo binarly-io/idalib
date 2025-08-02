@@ -3,6 +3,7 @@
 #include "pro.h"
 #include "funcs.hpp"
 #include "gdl.hpp"
+#include "name.hpp"
 
 #include <cstdint>
 #include <exception>
@@ -41,4 +42,21 @@ rust::Slice<const int> idalib_qbasic_block_succs(qbasic_block_t const *blk) {
 
 rust::Slice<const int> idalib_qbasic_block_preds(qbasic_block_t const *blk) {
   return rust::Slice(std::begin(blk->pred), std::size(blk->pred));
+}
+
+bool idalib_func_set_name(const func_t *f, const char *name, int flags) {
+  if (f == nullptr || name == nullptr) {
+    return false;
+  }
+  return set_name(f->start_ea, name, flags);
+}
+
+void idalib_func_set_noret(func_t *f, bool noret) {
+  if (f != nullptr) {
+    if (noret) {
+      f->flags |= FUNC_NORET;
+    } else {
+      f->flags &= ~FUNC_NORET;
+    }
+  }
 }
