@@ -3,27 +3,34 @@ use std::marker::PhantomData;
 use std::mem::MaybeUninit;
 use std::path::{Path, PathBuf};
 
+use autocxx::c_int;
+
 use crate::ffi::BADADDR;
 use crate::ffi::bytes::*;
 use crate::ffi::comments::{append_cmt, idalib_get_cmt, set_cmt};
 use crate::ffi::conversions::idalib_ea2str;
 use crate::ffi::entry::{get_entry, get_entry_ordinal, get_entry_qty};
-use crate::ffi::func::{get_func, get_func_qty, getn_func};
+use crate::ffi::func::{get_func, get_fchunk, get_func_qty, getn_func};
 use crate::ffi::hexrays::{decompile_func, init_hexrays_plugin, term_hexrays_plugin};
 use crate::ffi::ida::{
     auto_wait, close_database_with, make_signatures, open_database_quiet, set_screen_ea,
 };
 use crate::ffi::insn::decode;
 use crate::ffi::loader::find_plugin;
+use crate::ffi::name::idalib_set_name;
 use crate::ffi::processor::get_ph;
 use crate::ffi::search::{idalib_find_defined, idalib_find_imm, idalib_find_text};
 use crate::ffi::segment::{get_segm_by_name, get_segm_qty, getnseg, getseg};
+use crate::ffi::types::{
+    idalib_parse_header_file,
+    idalib_get_type_ordinal_at_address,
+};
 use crate::ffi::util::{is_align_insn, next_head, prev_head, str2reg};
 use crate::ffi::xref::{xrefblk_t, xrefblk_t_first_from, xrefblk_t_first_to};
 
 use crate::bookmarks::Bookmarks;
 use crate::decompiler::CFunction;
-use crate::func::{Function, FunctionId};
+use crate::func::{Function, FunctionId, NameFlags};
 use crate::insn::{Insn, Register};
 use crate::meta::{Metadata, MetadataMut};
 use crate::name::NameList;
@@ -31,6 +38,7 @@ use crate::plugin::Plugin;
 use crate::processor::Processor;
 use crate::segment::{Segment, SegmentId};
 use crate::strings::StringList;
+use crate::types::{Type, TypeList};
 use crate::xref::{XRef, XRefQuery};
 use crate::{Address, AddressFlags, IDAError, IDARuntimeHandle, prepare_library};
 
@@ -198,6 +206,16 @@ impl IDB {
 
     pub fn function_at(&self, ea: Address) -> Option<Function> {
         let ptr = unsafe { get_func(ea.into()) };
+
+        if ptr.is_null() {
+            return None;
+        }
+
+        Some(Function::from_ptr(ptr))
+    }
+
+    pub fn function_containing_address(&self, ea: Address) -> Option<Function> {
+        let ptr = unsafe { get_fchunk(ea.into()) };
 
         if ptr.is_null() {
             return None;
@@ -414,6 +432,50 @@ impl IDB {
         }
     }
 
+    pub fn set_name(&mut self, ea: Address, name: impl AsRef<str>) -> Result<(), IDAError> {
+        let c_name = CString::new(name.as_ref()).map_err(IDAError::ffi)?;
+        let success = unsafe { idalib_set_name(ea.into(), c_name.as_ptr(), c_int(0)) };
+        if success {
+            Ok(())
+        } else {
+            Err(IDAError::ffi_with(format!(
+                "failed to set name '{}' at address {ea:#x}",
+                name.as_ref()
+            )))
+        }
+    }
+
+    pub fn set_name_with_flags(&mut self, ea: Address, name: impl AsRef<str>, flags: NameFlags) -> Result<(), IDAError> {
+        let c_name = CString::new(name.as_ref()).map_err(IDAError::ffi)?;
+        let success = unsafe { idalib_set_name(ea.into(), c_name.as_ptr(), c_int(flags.bits())) };
+        if success {
+            Ok(())
+        } else {
+            Err(IDAError::ffi_with(format!(
+                "failed to set name '{}' with flags {:?} at address {ea:#x}",
+                name.as_ref(), flags
+            )))
+        }
+    }
+
+    pub fn delete_name(&mut self, ea: Address) -> Result<(), IDAError> {
+        let success = unsafe { idalib_set_name(ea.into(), std::ptr::null(), c_int(0)) };
+        if success {
+            Ok(())
+        } else {
+            Err(IDAError::ffi_with(format!(
+                "failed to delete name at address {ea:#x}"
+            )))
+        }
+    }
+
+    pub fn set_function_name(&mut self, address: Address, name: impl AsRef<str>) -> Result<(), IDAError> {
+        let mut function = self.function_at(address).ok_or_else(|| {
+            IDAError::ffi_with(format!("no function found at address {address:#x}"))
+        })?;
+        function.set_name(name)
+    }
+
     pub fn bookmarks(&self) -> Bookmarks {
         Bookmarks::new(self)
     }
@@ -473,6 +535,35 @@ impl IDB {
     pub fn names(&self) -> crate::name::NameList {
         NameList::new(self)
     }
+
+    pub fn types(&self) -> TypeList {
+        TypeList::new(self)
+    }
+
+    pub fn parse_types_from_header<P: AsRef<Path>>(&self, header_path: P) -> Result<i32, IDAError> {
+        let path_str = header_path.as_ref().to_string_lossy();
+        let c_path = CString::new(path_str.as_ref()).map_err(IDAError::ffi)?;
+
+        let result = unsafe { idalib_parse_header_file(c_path.as_ptr()) };
+        let result_val: i32 = result.into();
+        if result_val < 0 {
+            Err(IDAError::ffi_with("Failed to parse header file"))
+        } else {
+            Ok(result_val)
+        }
+    }
+
+
+    /// Get the type at an address, if any
+    pub fn get_type_at_address(&self, address: Address) -> Option<Type> {
+        let ordinal = unsafe { idalib_get_type_ordinal_at_address(address.into()) };
+        if ordinal == 0 {
+            None
+        } else {
+            Some(Type::from_ordinal(ordinal))
+        }
+    }
+
 
     pub fn address_to_string(&self, ea: Address) -> Option<String> {
         let s = unsafe { idalib_ea2str(ea.into()) };

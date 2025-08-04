@@ -73,6 +73,7 @@ include_cpp! {
     #include "pro.h"
     #include "segment.hpp"
     #include "strlist.hpp"
+    #include "typeinf.hpp"
     #include "ua.hpp"
     #include "xref.hpp"
 
@@ -123,6 +124,7 @@ include_cpp! {
     generate!("func_t")
     generate!("lock_func")
     generate!("get_func")
+    generate!("get_fchunk")
     generate!("get_func_num")
     generate!("get_func_qty")
     generate!("getn_func")
@@ -384,6 +386,12 @@ include_cpp! {
     generate!("is_in_nlist")
     generate!("is_public_name")
     generate!("is_weak_name")
+
+    // types
+    generate!("parse_decls")
+    generate!("get_idati")
+    generate!("get_ordinal_limit")
+    generate!("get_numbered_type_name")
 }
 
 pub mod hexrays {
@@ -737,6 +745,7 @@ mod ffix {
         include!("segm_extras.h");
         include!("search_extras.h");
         include!("strings_extras.h");
+        include!("types_extras.h");
 
         type c_short = autocxx::c_short;
         type c_int = autocxx::c_int;
@@ -783,6 +792,8 @@ mod ffix {
 
         unsafe fn idalib_func_flags(f: *const func_t) -> u64;
         unsafe fn idalib_func_name(f: *const func_t) -> Result<String>;
+        unsafe fn idalib_func_set_name(f: *const func_t, name: *const c_char, flags: c_int) -> bool;
+        unsafe fn idalib_func_set_noret(f: *mut func_t, noret: bool);
 
         unsafe fn idalib_func_flow_chart(
             f: *mut func_t,
@@ -999,6 +1010,7 @@ mod ffix {
         unsafe fn idalib_segm_perm(s: *const segment_t) -> u8;
         unsafe fn idalib_segm_bitness(s: *const segment_t) -> u8;
         unsafe fn idalib_segm_type(s: *const segment_t) -> u8;
+        unsafe fn idalib_segm_set_perm(s: *mut segment_t, perm: u8);
 
         unsafe fn idalib_get_cmt(ea: c_ulonglong, rptble: bool) -> String;
 
@@ -1038,6 +1050,18 @@ mod ffix {
             minor: *mut c_int,
             build: *mut c_int,
         ) -> bool;
+        unsafe fn idalib_set_name(ea: c_ulonglong, name: *const c_char, flags: c_int) -> bool;
+
+        unsafe fn idalib_parse_header_file(filename: *const c_char) -> c_int;
+        unsafe fn idalib_tinfo_get_name_by_ordinal(ordinal: u32) -> Result<String>;
+        unsafe fn idalib_is_valid_type_ordinal(ordinal: u32) -> bool;
+        unsafe fn idalib_get_type_ordinal_limit() -> u32;
+
+        // Type assignment functions
+        unsafe fn idalib_apply_type_by_ordinal(ea: c_ulonglong, ordinal: u32, flags: u32) -> bool;
+        unsafe fn idalib_apply_type_by_decl(ea: c_ulonglong, decl: *const c_char) -> bool;
+        unsafe fn idalib_get_type_ordinal_at_address(ea: c_ulonglong) -> u32;
+        unsafe fn idalib_get_type_string_at_address(ea: c_ulonglong) -> Result<String>;
     }
 }
 
@@ -1112,11 +1136,11 @@ pub mod insn {
 
 pub mod func {
     pub use super::ffi::{
-        calc_thunk_func_target, fc_block_type_t, func_t, gdl_graph_t, get_func, get_func_num,
+        calc_thunk_func_target, fc_block_type_t, func_t, gdl_graph_t, get_func, get_fchunk, get_func_num,
         get_func_qty, getn_func, lock_func, qbasic_block_t, qflow_chart_t,
     };
     pub use super::ffix::{
-        idalib_func_flags, idalib_func_flow_chart, idalib_func_name, idalib_qbasic_block_preds,
+        idalib_func_flags, idalib_func_flow_chart, idalib_func_name, idalib_func_set_name, idalib_func_set_noret, idalib_qbasic_block_preds,
         idalib_qbasic_block_succs, idalib_qflow_graph_getn_block,
     };
 
@@ -1158,7 +1182,7 @@ pub mod segment {
 
     pub use super::ffix::{
         idalib_segm_align, idalib_segm_bitness, idalib_segm_bytes, idalib_segm_name,
-        idalib_segm_perm, idalib_segm_type,
+        idalib_segm_perm, idalib_segm_set_perm, idalib_segm_type,
     };
 }
 
@@ -1233,6 +1257,7 @@ pub mod name {
         get_nlist_ea, get_nlist_idx, get_nlist_name, get_nlist_size, is_in_nlist, is_public_name,
         is_weak_name,
     };
+    pub use super::ffix::idalib_set_name;
 }
 
 pub mod ida {
@@ -1415,4 +1440,16 @@ pub mod ida {
             Err(IDAError::GetVersion)
         }
     }
+}
+
+pub mod types {
+    pub use super::ffi::{
+        get_idati, get_ordinal_limit, get_numbered_type_name,
+    };
+    pub use super::ffix::{
+        idalib_get_type_ordinal_limit, idalib_parse_header_file,
+        idalib_tinfo_get_name_by_ordinal, idalib_is_valid_type_ordinal,
+        idalib_apply_type_by_ordinal, idalib_apply_type_by_decl,
+        idalib_get_type_ordinal_at_address, idalib_get_type_string_at_address,
+    };
 }

@@ -43,3 +43,9 @@ std::uint8_t idalib_segm_perm(const segment_t *s) {
 std::uint8_t idalib_segm_type(const segment_t *s) {
   return s->type;
 }
+
+void idalib_segm_set_perm(segment_t *s, std::uint8_t perm) {
+  if (s != nullptr) {
+    s->perm = perm;
+  }
+}

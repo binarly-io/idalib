@@ -1,16 +1,22 @@
+use std::ffi::CString;
 use std::marker::PhantomData;
 use std::mem;
 use std::pin::Pin;
 use std::ptr;
 
 use autocxx::moveit::Emplace;
+use autocxx::c_int;
 use bitflags::bitflags;
 use cxx::UniquePtr;
 
 use crate::ffi::func::*;
 use crate::ffi::xref::has_external_refs;
 use crate::ffi::{range_t, IDAError, BADADDR};
+use crate::ffi::types::{
+    idalib_get_type_ordinal_at_address,
+};
 use crate::idb::IDB;
+use crate::types::{Type, TypeFlags};
 use crate::Address;
 
 pub struct Function<'a> {
@@ -154,6 +160,29 @@ bitflags! {
 
 bitflags! {
     #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    pub struct NameFlags: i32 {
+        const CHECK = 0x00;
+        const NOCHECK = 0x01;
+        const PUBLIC = 0x02;
+        const NON_PUBLIC = 0x04;
+        const WEAK = 0x08;
+        const NON_WEAK = 0x10;
+        const AUTO = 0x20;
+        const NON_AUTO = 0x40;
+        const NOLIST = 0x80;
+        const NOWARN = 0x100;
+        const LOCAL = 0x200;
+        const IDBENC = 0x400;
+        const FORCE = 0x800;
+        const NODUMMY = 0x1000;
+        const DELTAIL = 0x2000;
+        const MULTI = 0x4000;
+        const MULTI_FORCE = 0x8000;
+    }
+}
+
+bitflags! {
+    #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
     pub struct FunctionCFGFlags: i32 {
         const PRINT = cfg_flags::FC_PRINT as i32;
         const NOEXT = cfg_flags::FC_NOEXT as i32;
@@ -214,6 +243,32 @@ impl<'a> Function<'a> {
         }
     }
 
+    pub fn set_name(&mut self, name: impl AsRef<str>) -> Result<(), IDAError> {
+        let c_name = CString::new(name.as_ref()).map_err(IDAError::ffi)?;
+        let success = unsafe { idalib_func_set_name(self.ptr, c_name.as_ptr(), c_int(0)) };
+        if success {
+            Ok(())
+        } else {
+            Err(IDAError::ffi_with(format!(
+                "failed to set function name to '{}'",
+                name.as_ref()
+            )))
+        }
+    }
+
+    pub fn set_name_with_flags(&mut self, name: impl AsRef<str>, flags: NameFlags) -> Result<(), IDAError> {
+        let c_name = CString::new(name.as_ref()).map_err(IDAError::ffi)?;
+        let success = unsafe { idalib_func_set_name(self.ptr, c_name.as_ptr(), c_int(flags.bits())) };
+        if success {
+            Ok(())
+        } else {
+            Err(IDAError::ffi_with(format!(
+                "failed to set function name to '{}' with flags {:?}",
+                name.as_ref(), flags
+            )))
+        }
+    }
+
     pub fn flags(&self) -> FunctionFlags {
         let bits = unsafe { idalib_func_flags(self.ptr) };
         FunctionFlags::from_bits_retain(bits)
@@ -225,6 +280,10 @@ impl<'a> Function<'a> {
 
     pub fn does_return(&self) -> bool {
         unsafe { (*self.ptr).does_return() }
+    }
+
+    pub fn set_noret(&mut self, noret: bool) {
+        unsafe { idalib_func_set_noret(self.ptr, noret) };
     }
 
     pub fn analyzed_sp(&self) -> bool {
@@ -261,6 +320,28 @@ impl<'a> Function<'a> {
             _marker: PhantomData,
         })
     }
+
+    /// Get the type assigned to this function, if any
+    pub fn get_type(&self) -> Option<Type> {
+        let ordinal = unsafe { idalib_get_type_ordinal_at_address(self.start_address().into()) };
+        if ordinal == 0 {
+            None
+        } else {
+            Some(Type::from_ordinal(ordinal))
+        }
+    }
+
+
+    /// Apply a type to this function using a Type object
+    pub fn set_type(&mut self, typ: &Type) -> Result<(), IDAError> {
+        typ.apply_to_address(self.start_address())
+    }
+
+    /// Apply a type to this function using a Type object with specific flags
+    pub fn set_type_with_flags(&mut self, typ: &Type, flags: TypeFlags) -> Result<(), IDAError> {
+        typ.apply_to_address_with_flags(self.start_address(), flags)
+    }
+
 }
 
 impl<'a> FunctionCFG<'a> {
