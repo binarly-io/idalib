@@ -7,8 +7,8 @@ use crate::ffi::xref::cref_t::*;
 use crate::ffi::xref::dref_t::*;
 use crate::ffi::xref::*;
 
-use crate::idb::IDB;
 use crate::Address;
+use crate::idb::IDB;
 
 pub struct XRef<'a> {
     inner: xrefblk_t,
@@ -125,24 +125,16 @@ impl<'a> XRef<'a> {
     pub fn next_to(&self) -> Option<Self> {
         let mut curr = self.clone();
 
-        let found = unsafe { xrefblk_t_next_to(&mut curr.inner as *mut _) };
+        let found = unsafe { curr.inner.next_to_bindgen_original_bindgen_original() };
 
-        if found {
-            Some(curr)
-        } else {
-            None
-        }
+        if found { Some(curr) } else { None }
     }
 
     pub fn next_from(&self) -> Option<Self> {
         let mut curr = self.clone();
 
-        let found = unsafe { xrefblk_t_next_from(&mut curr.inner as *mut _) };
+        let found = unsafe { curr.inner.next_from_bindgen_original_bindgen_original() };
 
-        if found {
-            Some(curr)
-        } else {
-            None
-        }
+        if found { Some(curr) } else { None }
     }
 }

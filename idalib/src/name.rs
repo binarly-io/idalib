@@ -92,11 +92,11 @@ impl<'a> NameList<'a> {
     }
 
     pub fn get_address_by_index(&self, index: NameIndex) -> Option<Address> {
-        let addr = unsafe { get_nlist_ea(index) };
+        let addr = unsafe { get_nlist_ea(index).into() };
         if addr == BADADDR {
             None
         } else {
-            Some(addr.into())
+            Some(addr)
         }
     }
 

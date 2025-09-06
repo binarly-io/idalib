@@ -408,38 +408,38 @@ impl<'a> Metadata<'a> {
     }
 
     pub fn base_address(&self) -> Option<Address> {
-        let ea = unsafe { idalib_inf_get_baseaddr() };
-        if ea != BADADDR { Some(ea.into()) } else { None }
+        let ea = unsafe { idalib_inf_get_baseaddr().into() };
+        if ea != BADADDR { Some(ea) } else { None }
     }
 
     pub fn start_stack_segment(&self) -> Option<Address> {
-        let ea = unsafe { idalib_inf_get_start_ss() };
-        if ea != BADADDR { Some(ea.into()) } else { None }
+        let ea = unsafe { idalib_inf_get_start_ss().into() };
+        if ea != BADADDR { Some(ea) } else { None }
     }
 
     pub fn start_code_segment(&self) -> Option<Address> {
-        let ea = unsafe { idalib_inf_get_start_cs() };
-        if ea != BADADDR { Some(ea.into()) } else { None }
+        let ea = unsafe { idalib_inf_get_start_cs().into() };
+        if ea != BADADDR { Some(ea) } else { None }
     }
 
     pub fn start_instruction_pointer(&self) -> Option<Address> {
-        let ea = unsafe { idalib_inf_get_start_ip() };
-        if ea != BADADDR { Some(ea.into()) } else { None }
+        let ea = unsafe { idalib_inf_get_start_ip().into() };
+        if ea != BADADDR { Some(ea) } else { None }
     }
 
     pub fn start_address(&self) -> Option<Address> {
-        let ea = unsafe { idalib_inf_get_start_ea() };
-        if ea != BADADDR { Some(ea.into()) } else { None }
+        let ea = unsafe { idalib_inf_get_start_ea().into() };
+        if ea != BADADDR { Some(ea) } else { None }
     }
 
     pub fn start_stack_pointer(&self) -> Option<Address> {
-        let ea = unsafe { idalib_inf_get_start_sp() };
-        if ea != BADADDR { Some(ea.into()) } else { None }
+        let ea = unsafe { idalib_inf_get_start_sp().into() };
+        if ea != BADADDR { Some(ea) } else { None }
     }
 
     pub fn main_address(&self) -> Option<Address> {
-        let ea = unsafe { idalib_inf_get_main() };
-        if ea != BADADDR { Some(ea.into()) } else { None }
+        let ea = unsafe { idalib_inf_get_main().into() };
+        if ea != BADADDR { Some(ea) } else { None }
     }
 
     pub fn min_address(&self) -> Address {
@@ -759,13 +759,13 @@ impl<'a> Metadata<'a> {
     }
 
     pub fn privrange_start_address(&self) -> Option<Address> {
-        let ea = unsafe { idalib_inf_get_privrange_start_ea() };
-        if ea != BADADDR { Some(ea.into()) } else { None }
+        let ea = unsafe { idalib_inf_get_privrange_start_ea().into() };
+        if ea != BADADDR { Some(ea) } else { None }
     }
 
     pub fn privrange_end_address(&self) -> Option<Address> {
-        let ea = unsafe { idalib_inf_get_privrange_end_ea() };
-        if ea != BADADDR { Some(ea.into()) } else { None }
+        let ea = unsafe { idalib_inf_get_privrange_end_ea().into() };
+        if ea != BADADDR { Some(ea) } else { None }
     }
 
     pub fn cc_id(&self) -> Compiler {

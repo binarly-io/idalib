@@ -49,11 +49,11 @@ impl<'a> StringList<'a> {
     }
 
     pub fn get_address_by_index(&self, index: StringIndex) -> Option<Address> {
-        let addr = unsafe { idalib_get_strlist_item_addr(index) };
+        let addr = unsafe { idalib_get_strlist_item_addr(index).into() };
         if addr == BADADDR {
             None
         } else {
-            Some(addr.into())
+            Some(addr)
         }
     }
 

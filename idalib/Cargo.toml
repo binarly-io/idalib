@@ -15,7 +15,7 @@ build = "build.rs"
 
 [dependencies]
 anyhow = "1"
-autocxx = "0.28"
+autocxx = "0.30"
 bitflags = "2"
 cxx = "1"
 idalib-sys = { version = "0.6", path = "../idalib-sys" }
