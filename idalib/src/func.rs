@@ -240,12 +240,12 @@ impl<'a> Function<'a> {
     }
 
     pub fn calc_thunk_target(&self) -> Option<Address> {
-        let addr = unsafe { calc_thunk_func_target(self.ptr, ptr::null_mut()) };
+        let addr = unsafe { calc_thunk_func_target(self.ptr, ptr::null_mut()).into() };
 
         if addr == BADADDR {
             None
         } else {
-            Some(addr.into())
+            Some(addr)
         }
     }
 

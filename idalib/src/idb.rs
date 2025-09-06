@@ -19,7 +19,7 @@ use crate::ffi::processor::get_ph;
 use crate::ffi::search::{idalib_find_defined, idalib_find_imm, idalib_find_text};
 use crate::ffi::segment::{get_segm_by_name, get_segm_qty, getnseg, getseg};
 use crate::ffi::util::{is_align_insn, next_head, prev_head, str2reg};
-use crate::ffi::xref::{xrefblk_t, xrefblk_t_first_from, xrefblk_t_first_to};
+use crate::ffi::xref::xrefblk_t;
 
 use crate::bookmarks::Bookmarks;
 use crate::decompiler::CFunction;
@@ -211,11 +211,11 @@ impl IDB {
     }
 
     pub fn next_head_with(&self, ea: Address, max_ea: Address) -> Option<Address> {
-        let next = unsafe { next_head(ea.into(), max_ea.into()) };
+        let next = unsafe { next_head(ea.into(), max_ea.into()).into() };
         if next == BADADDR {
             None
         } else {
-            Some(next.into())
+            Some(next)
         }
     }
 
@@ -224,11 +224,11 @@ impl IDB {
     }
 
     pub fn prev_head_with(&self, ea: Address, min_ea: Address) -> Option<Address> {
-        let prev = unsafe { prev_head(ea.into(), min_ea.into()) };
+        let prev = unsafe { prev_head(ea.into(), min_ea.into()).into() };
         if prev == BADADDR {
             None
         } else {
-            Some(prev.into())
+            Some(prev)
         }
     }
 
@@ -326,24 +326,28 @@ impl IDB {
     }
 
     pub fn first_xref_from(&self, ea: Address, flags: XRefQuery) -> Option<XRef> {
-        let mut xref = MaybeUninit::<xrefblk_t>::zeroed();
-        let found =
-            unsafe { xrefblk_t_first_from(xref.as_mut_ptr(), ea.into(), flags.bits().into()) };
+        let mut xref = unsafe { MaybeUninit::<xrefblk_t>::zeroed().assume_init() };
+
+        let found = unsafe {
+            xref.first_from_bindgen_original_bindgen_original(ea.into(), flags.bits().into())
+        };
 
         if found {
-            Some(XRef::from_repr(unsafe { xref.assume_init() }))
+            Some(XRef::from_repr(xref))
         } else {
             None
         }
     }
 
     pub fn first_xref_to(&self, ea: Address, flags: XRefQuery) -> Option<XRef> {
-        let mut xref = MaybeUninit::<xrefblk_t>::zeroed();
-        let found =
-            unsafe { xrefblk_t_first_to(xref.as_mut_ptr(), ea.into(), flags.bits().into()) };
+        let mut xref = unsafe { MaybeUninit::<xrefblk_t>::zeroed().assume_init() };
+
+        let found = unsafe {
+            xref.first_to_bindgen_original_bindgen_original(ea.into(), flags.bits().into())
+        };
 
         if found {
-            Some(XRef::from_repr(unsafe { xref.assume_init() }))
+            Some(XRef::from_repr(xref))
         } else {
             None
         }
@@ -420,11 +424,11 @@ impl IDB {
 
     pub fn find_text(&self, start_ea: Address, text: impl AsRef<str>) -> Option<Address> {
         let s = CString::new(text.as_ref()).ok()?;
-        let addr = unsafe { idalib_find_text(start_ea.into(), s.as_ptr()) };
+        let addr = unsafe { idalib_find_text(start_ea.into(), s.as_ptr()).into() };
         if addr == BADADDR {
             None
         } else {
-            Some(addr.into())
+            Some(addr)
         }
     }
 
@@ -441,11 +445,11 @@ impl IDB {
     }
 
     pub fn find_imm(&self, start_ea: Address, imm: u32) -> Option<Address> {
-        let addr = unsafe { idalib_find_imm(start_ea.into(), imm.into()) };
+        let addr = unsafe { idalib_find_imm(start_ea.into(), imm.into()).into() };
         if addr == BADADDR {
             None
         } else {
-            Some(addr.into())
+            Some(addr)
         }
     }
 
@@ -458,11 +462,11 @@ impl IDB {
     }
 
     pub fn find_defined(&self, start_ea: Address) -> Option<Address> {
-        let addr = unsafe { idalib_find_defined(start_ea.into()) };
+        let addr = unsafe { idalib_find_defined(start_ea.into()).into() };
         if addr == BADADDR {
             None
         } else {
-            Some(addr.into())
+            Some(addr)
         }
     }
 
@@ -481,7 +485,7 @@ impl IDB {
     }
 
     pub fn flags_at(&self, ea: Address) -> AddressFlags {
-        AddressFlags::new(unsafe { get_flags(ea.into()) })
+        AddressFlags::new(unsafe { get_flags(ea.into()).into() })
     }
 
     pub fn get_byte(&self, ea: Address) -> u8 {
@@ -563,7 +567,7 @@ impl<'a> Iterator for EntryPointIter<'a> {
         }
 
         let ordinal = unsafe { get_entry_ordinal(self.index) };
-        let addr = unsafe { get_entry(ordinal) };
+        let addr = unsafe { get_entry(ordinal).into() };
 
         // skip?
         if addr == BADADDR {
@@ -571,7 +575,7 @@ impl<'a> Iterator for EntryPointIter<'a> {
             return self.next();
         }
 
-        Some(addr.into())
+        Some(addr)
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {

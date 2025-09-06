@@ -3,6 +3,7 @@
 #![allow(clippy::identity_op)]
 #![allow(clippy::needless_lifetimes)]
 #![allow(unsafe_op_in_unsafe_fn)]
+#![allow(unused_imports)]
 
 use std::path::PathBuf;
 
@@ -217,15 +218,26 @@ include_cpp! {
 
     generate!("carg_t")
     generate!("carglist_t")
+    generate!("cblock_t")
+    generate!("cfunc_t")
+    generate!("citem_t")
+    generate!("cinsn_t")
+    generate!("cexpr_t")
+    generate!("cswitch_t")
+    generate!("ctry_t")
+    generate!("cthrow_t")
 
+    /*
     extern_cpp_type!("cblock_t", crate::hexrays::cblock_t)
     extern_cpp_type!("cfunc_t", crate::hexrays::cfunc_t)
+    // extern_cpp_type!("cfuncptr_t", crate::hexrays::cfuncptr_t)
     extern_cpp_type!("citem_t", crate::hexrays::citem_t)
     extern_cpp_type!("cinsn_t", crate::hexrays::cinsn_t)
     extern_cpp_type!("cexpr_t", crate::hexrays::cexpr_t)
     extern_cpp_type!("cswitch_t", crate::hexrays::cswitch_t)
     extern_cpp_type!("ctry_t", crate::hexrays::ctry_t)
     extern_cpp_type!("cthrow_t", crate::hexrays::cthrow_t)
+    */
 
     // idalib
     generate!("open_database")
@@ -326,10 +338,12 @@ include_cpp! {
     generate_pod!("xrefblk_t")
 
     // NOTE: autocxx fails to generate methods on xrefblk_t...
+    /*
     generate!("xrefblk_t_first_from")
     generate!("xrefblk_t_next_from")
     generate!("xrefblk_t_first_to")
     generate!("xrefblk_t_next_to")
+    */
 
     generate!("XREF_ALL")
     generate!("XREF_FAR")
@@ -523,17 +537,21 @@ pub mod hexrays {
         include!(concat!(env!("OUT_DIR"), "/hexrays.rs"));
     }
 
-    pub use __impl::{cblock_t, cexpr_t, cfunc_t, cinsn_t, citem_t, cswitch_t, cthrow_t, ctry_t};
-
+    // pub use __impl::{
     pub use super::ffi::{
-        carg_t, carglist_t, cfuncptr_t, init_hexrays_plugin, term_hexrays_plugin,
+        cblock_t, cexpr_t, cfunc_t, cinsn_t, citem_t, cswitch_t, cthrow_t, ctry_t,
+        qrefcnt_t_cfunc_t_AutocxxConcrete as cfuncptr_t,
     };
+
+    pub use super::ffi::{carg_t, carglist_t, init_hexrays_plugin, term_hexrays_plugin};
     pub use super::ffix::{
         cblock_iter, idalib_hexrays_cblock_iter, idalib_hexrays_cblock_iter_next,
-        idalib_hexrays_cblock_len, idalib_hexrays_cfunc_pseudocode, idalib_hexrays_cfuncptr_inner,
+        idalib_hexrays_cblock_len, idalib_hexrays_cfunc_get_body_cblock,
+        idalib_hexrays_cfunc_pseudocode, idalib_hexrays_cfuncptr_inner,
         idalib_hexrays_decompile_func,
     };
 
+    /*
     unsafe impl cxx::ExternType for cfunc_t {
         type Id = cxx::type_id!("cfunc_t");
         type Kind = cxx::kind::Opaque;
@@ -573,11 +591,12 @@ pub mod hexrays {
         type Id = cxx::type_id!("ctry_t");
         type Kind = cxx::kind::Opaque;
     }
+    */
 
     pub unsafe fn decompile_func(
         f: *mut super::ffi::func_t,
         all_blocks: bool,
-    ) -> Result<cxx::UniquePtr<cfuncptr_t>, HexRaysError> {
+    ) -> Result<cxx::UniquePtr<super::ffi::qrefcnt_t_cfunc_t_AutocxxConcrete>, HexRaysError> {
         let mut flags = __impl::DECOMP_NO_WAIT | __impl::DECOMP_NO_CACHE;
 
         if all_blocks {
@@ -759,9 +778,9 @@ mod ffix {
 
         // cfuncptr_t
         type qrefcnt_t_cfunc_t_AutocxxConcrete = super::ffi::qrefcnt_t_cfunc_t_AutocxxConcrete;
-        type cfunc_t = super::hexrays::cfunc_t;
-        type cblock_t = super::hexrays::cblock_t;
-        type cinsn_t = super::hexrays::cinsn_t;
+        type cfunc_t = super::ffi::cfunc_t;
+        type cblock_t = super::ffi::cblock_t;
+        type cinsn_t = super::ffi::cinsn_t;
 
         type cblock_iter;
 
@@ -793,6 +812,7 @@ mod ffix {
             f: *const qrefcnt_t_cfunc_t_AutocxxConcrete,
         ) -> *mut cfunc_t;
         unsafe fn idalib_hexrays_cfunc_pseudocode(f: *mut cfunc_t) -> String;
+        unsafe fn idalib_hexrays_cfunc_get_body_cblock(f: *mut cfunc_t) -> *mut cblock_t;
 
         unsafe fn idalib_hexrays_decompile_func(
             f: *mut func_t,
@@ -1046,12 +1066,12 @@ pub const BADADDR: ea_t = into_ea(0xffffffff_ffffffffu64);
 
 #[inline(always)]
 pub const fn into_ea(v: u64) -> ea_t {
-    c_ulonglong(v)
+    v
 }
 
 #[inline(always)]
 pub const fn from_ea(v: ea_t) -> u64 {
-    v.0
+    v
 }
 
 pub mod entry {
@@ -1069,7 +1089,7 @@ pub mod insn {
 
     pub fn decode(ea: ea_t) -> Option<insn_t> {
         let mut insn = MaybeUninit::<insn_t>::zeroed();
-        unsafe { (decode_insn(insn.as_mut_ptr(), ea).0 > 0).then(|| insn.assume_init()) }
+        unsafe { (decode_insn(insn.as_mut_ptr(), ea.into()).0 > 0).then(|| insn.assume_init()) }
     }
 
     pub mod op {
@@ -1179,8 +1199,9 @@ pub mod util {
 pub mod xref {
     pub use super::ffi::{
         XREF_ALL, XREF_BASE, XREF_DATA, XREF_FAR, XREF_MASK, XREF_PASTEND, XREF_TAIL, XREF_USER,
-        cref_t, dref_t, has_external_refs, xrefblk_t, xrefblk_t_first_from, xrefblk_t_first_to,
-        xrefblk_t_next_from, xrefblk_t_next_to,
+        cref_t, dref_t, has_external_refs,
+        xrefblk_t, /* xrefblk_t_first_from, xrefblk_t_first_to,
+                   xrefblk_t_next_from, xrefblk_t_next_to,*/
     };
 }
 
@@ -1317,7 +1338,7 @@ pub mod ida {
             "IDA cannot function correctly when not running on the main thread"
         );
 
-        unsafe { ffi::set_screen_ea(ea) }
+        unsafe { ffi::set_screen_ea(ea.into()) }
     }
 
     pub fn open_database(path: impl AsRef<Path>) -> Result<(), IDAError> {

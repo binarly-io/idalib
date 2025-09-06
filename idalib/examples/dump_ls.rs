@@ -62,10 +62,11 @@ fn main() -> anyhow::Result<()> {
 
         match decompiled.as_ref() {
             Ok(df) => {
+                let body = df.body().expect("valid body");
                 println!(
                     "statements: {} / {}",
-                    df.body().len(),
-                    df.body().iter().count()
+                    body.len(),
+                    body.iter().count()
                 );
                 println!("{}", df.pseudocode());
             }

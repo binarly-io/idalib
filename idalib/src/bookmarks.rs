@@ -60,12 +60,12 @@ impl<'a> Bookmarks<'a> {
 
     // Note: The `bookmarks_t::get` function is used here only to get the address
     pub fn get_address(&self, idx: BookmarkIndex) -> Option<Address> {
-        let addr = unsafe { idalib_bookmarks_t_get(idx.into()) };
+        let addr = unsafe { idalib_bookmarks_t_get(idx.into()).into() };
 
         if addr == BADADDR {
             None
         } else {
-            Some(addr.into())
+            Some(addr)
         }
     }
 

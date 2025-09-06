@@ -115,11 +115,11 @@ impl<'a> AddressFlags<'a> {
     }
 
     pub fn is_code(&self) -> bool {
-        unsafe { ffi::bytes::is_code(self.flags) }
+        unsafe { ffi::bytes::is_code(self.flags.into()) }
     }
 
     pub fn is_data(&self) -> bool {
-        unsafe { ffi::bytes::is_data(self.flags) }
+        unsafe { ffi::bytes::is_data(self.flags.into()) }
     }
 }
 

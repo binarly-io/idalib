@@ -146,20 +146,6 @@ fn main() {
                 .to_str()
                 .expect("path is valid string"),
         )
-        .opaque_type("std::.*")
-        .opaque_type("carglist_t")
-        .allowlist_item("cfunc_t")
-        .allowlist_item("citem_t")
-        .allowlist_item("cexpr_t")
-        .allowlist_item("cinsn_t")
-        .allowlist_item("cblock_t")
-        .allowlist_item("cswitch_t")
-        .allowlist_item("ctry_t")
-        .allowlist_item("cthrow_t")
-        .allowlist_item("cnumber_t")
-        .allowlist_item("lvar_t")
-        .allowlist_item("lvar_locator_t")
-        .allowlist_item("vdloc_t")
         .allowlist_item("CV_.*")
         .allowlist_item("DECOMP_.*");
 
