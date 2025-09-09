@@ -84,6 +84,7 @@ pub mod bookmarks;
 pub mod decompiler;
 pub mod func;
 pub mod idb;
+pub mod import;
 pub mod insn;
 pub mod license;
 pub mod meta;
@@ -93,6 +94,10 @@ pub mod processor;
 pub mod segment;
 pub mod strings;
 pub mod xref;
+
+// TODO: only include this when testing, like #[cfg(test)]
+// #[cfg(test)]
+pub mod tests;
 
 pub use idalib_sys as ffi;
 

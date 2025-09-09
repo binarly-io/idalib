@@ -281,6 +281,7 @@ include_cpp! {
 
     // ua (we use insn_t, op_t, etc. from pod)
     generate!("decode_insn")
+    generate!("print_insn_mnem")
 
     extern_cpp_type!("insn_t", crate::pod::insn_t)
     extern_cpp_type!("op_t", crate::pod::op_t)
@@ -734,6 +735,7 @@ mod ffix {
         include!("loader_extras.h");
         include!("nalt_extras.h");
         include!("ph_extras.h");
+        include!("name_extras.h");
         include!("segm_extras.h");
         include!("search_extras.h");
         include!("strings_extras.h");
@@ -985,6 +987,8 @@ mod ffix {
         unsafe fn idalib_ph_long_name(ph: *const processor_t) -> String;
         unsafe fn idalib_is_thumb_at(ph: *const processor_t, ea: c_ulonglong) -> bool;
 
+        unsafe fn idalib_get_insn_mnem(ea: c_ulonglong) -> String;
+
         unsafe fn idalib_qflow_graph_getn_block(
             f: *const qflow_chart_t,
             n: usize,
@@ -1016,9 +1020,15 @@ mod ffix {
         unsafe fn idalib_find_text(ea: c_ulonglong, text: *const c_char) -> c_ulonglong;
         unsafe fn idalib_find_imm(ea: c_ulonglong, imm: c_uint) -> c_ulonglong;
         unsafe fn idalib_find_defined(ea: c_ulonglong) -> c_ulonglong;
+        
+        unsafe fn idalib_bin_search(start_ea: c_ulonglong, end_ea: c_ulonglong, pattern: *const c_char, flags: c_int) -> c_ulonglong;
+        unsafe fn idalib_parse_binpat_str(pattern: *const c_char, out_bytes: &mut Vec<u8>, out_mask: &mut Vec<u8>) -> bool;
+        unsafe fn idalib_find_binary(start_ea: c_ulonglong, end_ea: c_ulonglong, bytes: *const u8, mask: *const u8, len: usize) -> c_ulonglong;
 
         unsafe fn idalib_get_strlist_item_addr(index: usize) -> c_ulonglong;
         unsafe fn idalib_get_strlist_item_length(index: usize) -> usize;
+        unsafe fn idalib_get_strlit_contents(ea: c_ulonglong, len: usize, strtype: i32) -> String;
+        unsafe fn idalib_get_max_strlit_length(ea: c_ulonglong, strtype: i32) -> usize;
 
         unsafe fn idalib_ea2str(ea: c_ulonglong) -> String;
 
@@ -1027,8 +1037,17 @@ mod ffix {
         unsafe fn idalib_get_dword(ea: c_ulonglong) -> u32;
         unsafe fn idalib_get_qword(ea: c_ulonglong) -> u64;
         unsafe fn idalib_get_bytes(ea: c_ulonglong, buf: &mut Vec<u8>) -> Result<usize>;
+        unsafe fn idalib_is_loaded(ea: c_ulonglong) -> bool;
+        unsafe fn idalib_is_mapped(ea: c_ulonglong) -> bool;
 
         unsafe fn idalib_get_input_file_path() -> String;
+
+        unsafe fn idalib_get_imports(
+            module_name: &mut Vec<String>,
+            import_names: &mut Vec<String>,
+            addresses: &mut Vec<u64>,
+            ordinals: &mut Vec<u32>,
+        ) -> bool;
 
         unsafe fn idalib_plugin_version(p: *const plugin_t) -> u64;
         unsafe fn idalib_plugin_flags(p: *const plugin_t) -> u64;
@@ -1038,6 +1057,7 @@ mod ffix {
             minor: *mut c_int,
             build: *mut c_int,
         ) -> bool;
+        unsafe fn idalib_get_ea_name(ea: c_ulonglong) -> String;
     }
 }
 
@@ -1166,14 +1186,16 @@ pub mod bytes {
     pub use super::ffi::{flags64_t, get_flags, is_code, is_data};
     pub use super::ffix::{
         idalib_get_byte, idalib_get_bytes, idalib_get_dword, idalib_get_qword, idalib_get_word,
+        idalib_is_loaded, idalib_is_mapped,
     };
 }
 
 pub mod util {
     pub use super::ffi::{
         is_align_insn, is_basic_block_end, is_call_insn, is_indirect_jump_insn, is_ret_insn,
-        next_head, prev_head, str2reg,
+        next_head, prev_head, print_insn_mnem, str2reg,
     };
+    pub use super::ffix::idalib_get_insn_mnem;
 }
 
 pub mod xref {
@@ -1201,12 +1223,18 @@ pub mod bookmarks {
 }
 
 pub mod search {
-    pub use super::ffix::{idalib_find_defined, idalib_find_imm, idalib_find_text};
+    pub use super::ffix::{
+        idalib_find_defined, idalib_find_imm, idalib_find_text,
+        idalib_bin_search, idalib_parse_binpat_str, idalib_find_binary,
+    };
 }
 
 pub mod strings {
     pub use super::ffi::{build_strlist, clear_strlist, get_strlist_qty};
-    pub use super::ffix::{idalib_get_strlist_item_addr, idalib_get_strlist_item_length};
+    pub use super::ffix::{
+        idalib_get_max_strlit_length, idalib_get_strlist_item_addr, idalib_get_strlist_item_length,
+        idalib_get_strlit_contents,
+    };
 }
 
 pub mod loader {
@@ -1225,7 +1253,7 @@ pub mod nalt {
     pub use super::ffi::{
         retrieve_input_file_md5, retrieve_input_file_sha256, retrieve_input_file_size,
     };
-    pub use super::ffix::idalib_get_input_file_path;
+    pub use super::ffix::{idalib_get_imports, idalib_get_input_file_path};
 }
 
 pub mod name {
@@ -1233,6 +1261,7 @@ pub mod name {
         get_nlist_ea, get_nlist_idx, get_nlist_name, get_nlist_size, is_in_nlist, is_public_name,
         is_weak_name,
     };
+    pub use super::ffix::idalib_get_ea_name;
 }
 
 pub mod ida {
