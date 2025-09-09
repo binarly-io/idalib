@@ -26,14 +26,17 @@ fn configure_and_generate(builder: BindgenBuilder, ida: &Path, output: impl AsRe
 }
 
 fn main() {
-    let sdk_path = PathBuf::from(env::var("IDASDKDIR").expect("IDASDKDIR should be set"));
+    // let sdk_path = PathBuf::from(env::var("IDASDKDIR").expect("IDASDKDIR should be set"));
+    let sdk_path =
+        PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR should be set"))
+            .join("sdk/src");
     let ida = sdk_path.join("include");
 
     cxx_build::CFG.exported_header_dirs.push(&ida);
 
-    let ffi_path = PathBuf::from("src");
+    let ffi_path = Path::new("src");
 
-    let mut builder = autocxx_build::Builder::new(ffi_path.join("lib.rs"), [&ffi_path, &ida])
+    let mut builder = autocxx_build::Builder::new(ffi_path.join("lib.rs"), [&ffi_path, &*ida])
         .extra_clang_args(
             #[cfg(target_os = "linux")]
             &["-std=c++17", "-D__LINUX__=1", "-D__EA64__=1"],
@@ -164,6 +167,8 @@ fn main() {
         .allowlist_item("DECOMP_.*");
 
     configure_and_generate(hexrays, &ida, "hexrays.rs");
+
+    println!("cargo::metadata=sdk={}", sdk_path.display());
 
     println!(
         "cargo::rerun-if-changed={}",

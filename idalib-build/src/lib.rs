@@ -17,14 +17,12 @@ pub fn idalib_sdk_paths() -> (PathBuf, PathBuf, PathBuf, PathBuf) {
 }
 
 pub fn idalib_sdk_paths_with(check: bool) -> (PathBuf, PathBuf, PathBuf, PathBuf) {
-    let sdk_path = PathBuf::from(env::var("IDASDKDIR").expect("IDASDKDIR should be set"));
+    let sdk_path = PathBuf::from(env::var("DEP_IDALIB_SDK").expect("DEP_IDALIB_SDK should be set"));
+    // let sdk_path = PathBuf::from(env::var("IDASDKDIR").expect("IDASDKDIR should be set"));
     let pro_h = sdk_path.join("include").join("pro.h");
 
     if check && !pro_h.exists() {
-        panic!(
-            "`{}` does not exist; SDK specified by `IDASDKDIR` is not usable",
-            pro_h.display()
-        );
+        panic!("`{}` does not exist; SDK is not usable", pro_h.display());
     }
 
     let (stubs_path, idalib, ida) = if cfg!(target_os = "linux") {

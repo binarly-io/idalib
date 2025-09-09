@@ -14,3 +14,4 @@ edition = "2024"
 
 [dependencies]
 anyhow = "1"
+idalib-sys = { version = "0.6", path = "../idalib-sys" }
