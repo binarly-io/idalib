@@ -93,9 +93,12 @@ struct config_t {
 #elif defined(__LINUX__)
   uint8_t _skip_a[0x590];
 #elif defined(__NT__)
-  uint8_t _skip_a[0x528];
+  uint8_t _skip_a[0x540];
 #endif
   license_location_t license_location;
+#if defined(__NT__)
+  uint8_t _skip_b[0x8];
+#endif
   license_info_t license_info;
 };
 
