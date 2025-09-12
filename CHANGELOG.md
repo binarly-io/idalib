@@ -2,11 +2,20 @@
 
 ## 0.7.0 (2025-09-12)
 
+Compatibility release for IDA 9.2.
+
 Features:
-- ...
+- Additional comment APIs (contributor:
+  [@Irate-Walrus](https://github.com/Irate-Walrus)).
+- File type selection via `IDBOpenOptions` (contributor:
+  [@withzombies](https://github.com/withzombies)).
 
 Miscellaneous:
 - Use open-source IDA SDK as a submodule.
+- Downgrade to autocxx 0.27.x due to build issues reported by
+  [@coleleavitt](https://github.com/coleleavitt).
+- License check structure updates (contributor:
+  [@yeggor](https://github.com/yeggor)).
 
 ## 0.6.1 (2025-07-15)
 

@@ -12,3 +12,4 @@
 - Willi Ballenthin / [@williballenthin](https://github.com/williballenthin)
 - Ryan Stortz / [@withzombies](https://github.com/withzombies)
 - Irate Walrus / [@Irate-Walrus](https://github.com/Irate-Walrus)
+- Cole Leavitt / [@coleleavitt](https://github.com/coleleavitt)
