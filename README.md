@@ -1,7 +1,7 @@
 # idalib
 
 [![crates.io](https://img.shields.io/crates/v/idalib)](https://crates.io/crates/idalib)
-[![documentation](https://img.shields.io/badge/documentation-0.6.1%2B9.1.250226-blue?link=https%3A%2F%2Fidalib.rs%2Fidalib)](https://idalib.rs/idalib/)
+[![documentation](https://img.shields.io/badge/documentation-0.7.0%2B9.2.250908-blue?link=https%3A%2F%2Fidalib.rs%2Fidalib)](https://idalib.rs/idalib/)
 [![license](https://img.shields.io/crates/l/idalib)](https://github.com/binarly-io/idalib)
 [![crates.io downloads](https://img.shields.io/crates/d/idalib)](https://crates.io/crates/idalib)
 
@@ -100,8 +100,8 @@ cargo run --example=dump_ls
 Windows:
 
 ```powershell
-$env:PATH="C:\Program Files\IDA Professional 9.1;$env:PATH"
-$env:IDADIR="C:\Program Files\IDA Professional 9.1"
+$env:PATH="C:\Program Files\IDA Professional 9.2;$env:PATH"
+$env:IDADIR="C:\Program Files\IDA Professional 9.2"
 
 cargo run --example=dump_ls
 ```
@@ -170,6 +170,13 @@ To expose unimplemented IDA SDK functionality, modify the `idasdk-sys` crate,
 add appropriate high-level wrappers in `idalib`, and submit a pull request.
 Ensure that the additions are portable and build with the latest SDK. We won't
 accept PRs to support older beta releases.
+
+⚠️ Warning: The IDA SDK submodule should be checked out prior to starting
+development, otherwise the build will fail, e.g.:
+
+```sh
+git submodule update --init --recursive
+```
 
 ## Contributors
 
