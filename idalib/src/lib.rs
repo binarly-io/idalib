@@ -74,7 +74,6 @@
 //!
 #![allow(clippy::needless_lifetimes)]
 
-use std::ffi::c_char;
 use std::marker::PhantomData;
 use std::sync::{Mutex, MutexGuard, OnceLock};
 
@@ -146,7 +145,7 @@ static INIT: OnceLock<Mutex<()>> = OnceLock::new();
 
 #[cfg(not(target_os = "windows"))]
 unsafe extern "C" {
-    static mut batch: c_char;
+    static mut batch: std::ffi::c_char;
 }
 
 pub(crate) type IDARuntimeHandle = MutexGuard<'static, ()>;
