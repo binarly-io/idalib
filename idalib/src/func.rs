@@ -7,11 +7,11 @@ use autocxx::moveit::Emplace;
 use bitflags::bitflags;
 use cxx::UniquePtr;
 
+use crate::Address;
 use crate::ffi::func::*;
 use crate::ffi::xref::has_external_refs;
-use crate::ffi::{range_t, IDAError, BADADDR};
+use crate::ffi::{BADADDR, IDAError, range_t};
 use crate::idb::IDB;
-use crate::Address;
 
 pub struct Function<'a> {
     ptr: *mut func_t,
@@ -207,11 +207,17 @@ impl<'a> Function<'a> {
     pub fn name(&self) -> Option<String> {
         let name = unsafe { idalib_func_name(self.ptr) }.ok()?;
 
-        if name.is_empty() {
-            None
-        } else {
-            Some(name)
-        }
+        if name.is_empty() { None } else { Some(name) }
+    }
+
+    pub fn get_cmt(&self) -> Option<String> {
+        self.get_cmt_with(false)
+    }
+
+    pub fn get_cmt_with(&self, rptble: bool) -> Option<String> {
+        let cmt = unsafe { idalib_get_func_cmt(self.ptr, rptble) }.ok()?;
+
+        if cmt.is_empty() { None } else { Some(cmt) }
     }
 
     pub fn flags(&self) -> FunctionFlags {

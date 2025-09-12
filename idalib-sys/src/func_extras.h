@@ -24,6 +24,16 @@ rust::String idalib_func_name(const func_t *f) {
   }
 }
 
+rust::String idalib_get_func_cmt(const func_t *f, bool rptble) {
+  auto cmt = qstring();
+
+  if (get_func_cmt(&cmt, f, rptble) != 0) {
+    return rust::String(cmt.c_str());
+  } else {
+    return rust::String();
+  }
+}
+
 std::unique_ptr<qflow_chart_t> idalib_func_flow_chart(func_t *f, int fc_options) {
   if (auto cfg = std::make_unique<qflow_chart_t>(nullptr, f, BADADDR, BADADDR, fc_options); cfg != nullptr) {
     return cfg;

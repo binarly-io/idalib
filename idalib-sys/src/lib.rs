@@ -783,6 +783,7 @@ mod ffix {
 
         unsafe fn idalib_func_flags(f: *const func_t) -> u64;
         unsafe fn idalib_func_name(f: *const func_t) -> Result<String>;
+        unsafe fn idalib_get_func_cmt(f: *const func_t, rptble: bool) -> Result<String>;
 
         unsafe fn idalib_func_flow_chart(
             f: *mut func_t,
@@ -1116,8 +1117,8 @@ pub mod func {
         get_func_qty, getn_func, lock_func, qbasic_block_t, qflow_chart_t,
     };
     pub use super::ffix::{
-        idalib_func_flags, idalib_func_flow_chart, idalib_func_name, idalib_qbasic_block_preds,
-        idalib_qbasic_block_succs, idalib_qflow_graph_getn_block,
+        idalib_func_flags, idalib_func_flow_chart, idalib_func_name, idalib_get_func_cmt,
+        idalib_qbasic_block_preds, idalib_qbasic_block_succs, idalib_qflow_graph_getn_block,
     };
 
     pub mod flags {
