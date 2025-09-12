@@ -45,7 +45,8 @@ pub struct IDB {
 #[derive(Debug, Clone)]
 pub struct IDBOpenOptions {
     idb: Option<PathBuf>,
-    // ftype: Option<String>,
+    ftype: Option<String>,
+
     save: bool,
     auto_analyse: bool,
 }
@@ -54,7 +55,7 @@ impl Default for IDBOpenOptions {
     fn default() -> Self {
         Self {
             idb: None,
-            // ftype: None,
+            ftype: None,
             save: false,
             auto_analyse: true,
         }
@@ -76,17 +77,10 @@ impl IDBOpenOptions {
         self
     }
 
-    // NOTE: as of IDA 9.1, the file type switch does not work as documented;
-    // we get the following log output:
-    //
-    // ```
-    // Unknown switch '-T' -> OK
-    // ```
-    //
-    // pub fn file_type(&mut self, ftype: impl AsRef<str>) -> &mut Self {
-    //   self.ftype = Some(ftype.as_ref().to_owned());
-    //   self
-    // }
+    pub fn file_type(&mut self, ftype: impl AsRef<str>) -> &mut Self {
+        self.ftype = Some(ftype.as_ref().to_owned());
+        self
+    }
 
     pub fn auto_analyse(&mut self, auto_analyse: bool) -> &mut Self {
         self.auto_analyse = auto_analyse;
@@ -96,11 +90,9 @@ impl IDBOpenOptions {
     pub fn open(&self, path: impl AsRef<Path>) -> Result<IDB, IDAError> {
         let mut args = Vec::new();
 
-        // NOTE: for now, we will disable this functionality (see comment on file_type above).
-        //
-        // if let Some(ftype) = self.ftype.as_ref() {
-        //    args.push(format!("-T{}", ftype));
-        // }
+        if let Some(ftype) = self.ftype.as_ref() {
+            args.push(format!("-T{}", ftype));
+        }
 
         if let Some(idb_path) = self.idb.as_ref() {
             args.push("-c".to_owned());
@@ -174,20 +166,20 @@ impl IDB {
         self.decompiler
     }
 
-    pub fn meta(&self) -> Metadata {
+    pub fn meta(&self) -> Metadata<'_> {
         Metadata::new()
     }
 
-    pub fn meta_mut(&mut self) -> MetadataMut {
+    pub fn meta_mut(&mut self) -> MetadataMut<'_> {
         MetadataMut::new()
     }
 
-    pub fn processor(&self) -> Processor {
+    pub fn processor(&self) -> Processor<'_> {
         let ptr = unsafe { get_ph() };
         Processor::from_ptr(ptr)
     }
 
-    pub fn entries(&self) -> EntryPointIter {
+    pub fn entries(&self) -> EntryPointIter<'_> {
         let limit = unsafe { get_entry_qty() };
         EntryPointIter {
             index: 0,
@@ -196,7 +188,7 @@ impl IDB {
         }
     }
 
-    pub fn function_at(&self, ea: Address) -> Option<Function> {
+    pub fn function_at(&self, ea: Address) -> Option<Function<'_>> {
         let ptr = unsafe { get_func(ea.into()) };
 
         if ptr.is_null() {
@@ -256,7 +248,7 @@ impl IDB {
         })
     }
 
-    pub fn function_by_id(&self, id: FunctionId) -> Option<Function> {
+    pub fn function_by_id(&self, id: FunctionId) -> Option<Function<'_>> {
         let ptr = unsafe { getn_func(id) };
 
         if ptr.is_null() {
@@ -274,7 +266,7 @@ impl IDB {
         unsafe { get_func_qty() }
     }
 
-    pub fn segment_at(&self, ea: Address) -> Option<Segment> {
+    pub fn segment_at(&self, ea: Address) -> Option<Segment<'_>> {
         let ptr = unsafe { getseg(ea.into()) };
 
         if ptr.is_null() {
@@ -284,7 +276,7 @@ impl IDB {
         Some(Segment::from_ptr(ptr))
     }
 
-    pub fn segment_by_id(&self, id: SegmentId) -> Option<Segment> {
+    pub fn segment_by_id(&self, id: SegmentId) -> Option<Segment<'_>> {
         let ptr = unsafe { getnseg((id as i32).into()) };
 
         if ptr.is_null() {
@@ -294,7 +286,7 @@ impl IDB {
         Some(Segment::from_ptr(ptr))
     }
 
-    pub fn segment_by_name(&self, name: impl AsRef<str>) -> Option<Segment> {
+    pub fn segment_by_name(&self, name: impl AsRef<str>) -> Option<Segment<'_>> {
         let s = CString::new(name.as_ref()).ok()?;
         let ptr = unsafe { get_segm_by_name(s.as_ptr()) };
 
@@ -325,7 +317,7 @@ impl IDB {
         if align == 0 { None } else { Some(align as _) }
     }
 
-    pub fn first_xref_from(&self, ea: Address, flags: XRefQuery) -> Option<XRef> {
+    pub fn first_xref_from(&self, ea: Address, flags: XRefQuery) -> Option<XRef<'_>> {
         let mut xref = MaybeUninit::<xrefblk_t>::zeroed();
         let found =
             unsafe { xrefblk_t_first_from(xref.as_mut_ptr(), ea.into(), flags.bits().into()) };
@@ -337,7 +329,7 @@ impl IDB {
         }
     }
 
-    pub fn first_xref_to(&self, ea: Address, flags: XRefQuery) -> Option<XRef> {
+    pub fn first_xref_to(&self, ea: Address, flags: XRefQuery) -> Option<XRef<'_>> {
         let mut xref = MaybeUninit::<xrefblk_t>::zeroed();
         let found =
             unsafe { xrefblk_t_first_to(xref.as_mut_ptr(), ea.into(), flags.bits().into()) };
@@ -414,7 +406,7 @@ impl IDB {
         }
     }
 
-    pub fn bookmarks(&self) -> Bookmarks {
+    pub fn bookmarks(&self) -> Bookmarks<'_> {
         Bookmarks::new(self)
     }
 
@@ -466,11 +458,11 @@ impl IDB {
         }
     }
 
-    pub fn strings(&self) -> StringList {
+    pub fn strings(&self) -> StringList<'_> {
         StringList::new(self)
     }
 
-    pub fn names(&self) -> crate::name::NameList {
+    pub fn names(&self) -> crate::name::NameList<'_> {
         NameList::new(self)
     }
 
@@ -480,7 +472,7 @@ impl IDB {
         if s.is_empty() { None } else { Some(s) }
     }
 
-    pub fn flags_at(&self, ea: Address) -> AddressFlags {
+    pub fn flags_at(&self, ea: Address) -> AddressFlags<'_> {
         AddressFlags::new(unsafe { get_flags(ea.into()) })
     }
 
@@ -518,7 +510,7 @@ impl IDB {
         &self,
         name: impl AsRef<str>,
         load_if_needed: bool,
-    ) -> Result<Plugin, IDAError> {
+    ) -> Result<Plugin<'_>, IDAError> {
         let plugin = CString::new(name.as_ref()).map_err(IDAError::ffi)?;
         let ptr = unsafe { find_plugin(plugin.as_ptr(), load_if_needed) };
 
@@ -532,7 +524,7 @@ impl IDB {
         }
     }
 
-    pub fn load_plugin(&self, name: impl AsRef<str>) -> Result<Plugin, IDAError> {
+    pub fn load_plugin(&self, name: impl AsRef<str>) -> Result<Plugin<'_>, IDAError> {
         self.find_plugin(name, true)
     }
 }

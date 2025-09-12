@@ -89,11 +89,11 @@ struct license_manager_t {
 
 struct config_t {
 #if defined(__MACOS__)
-  uint8_t _skip_a[0x530];
+  uint8_t _skip_a[0x548];
 #elif defined(__LINUX__)
-  uint8_t _skip_a[0x578];
+  uint8_t _skip_a[0x590];
 #elif defined(__NT__)
-  uint8_t _skip_a[0x528];
+  uint8_t _skip_a[0x540];
 #endif
   license_location_t license_location;
   license_info_t license_info;
