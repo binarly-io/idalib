@@ -10,13 +10,14 @@ analysis tools using IDA v9.x’s idalib.
 
 ## IDA support and dependencies
 
-The bindings and examples have been tested against IDA Pro v9.1 on Windows
+The bindings and examples have been tested against IDA Pro v9.2 on Windows
 (11), Linux (Ubuntu 24.04 LTS), and macOS Sequoia (Apple Silicon). The latest
 bindings are only guaranteed compatible with the latest official IDA Pro/SDK
 release. See the table below for compatibility:
 
 | IDA Pro version | Latest compatible idalib |
 | --------------- | ------------------------ |
+| v9.2            | 0.7.0                    |
 | v9.1            | 0.6.1                    |
 | v9.0sp1         | 0.4.1                    |
 | v9.0            | 0.3.0                    |
@@ -32,9 +33,8 @@ extended instructions for each supported operating system/environment.
 
 For development, only the IDA SDK is required, whereas to run tests, an IDA
 installation (with a valid license) is required. During build, the crates
-locate the SDK and IDA installation using the following environment variables:
+can locate an IDA installation using the following environment variable:
 
-- `IDASDKDIR` set to the IDA Pro v9.x SDK
 - `IDADIR` (optional) set to the directory containing the `ida` executable
   (e.g., `/Applications/IDA Professional v9.x/Contents/macOS` for macOS, or
   `$HOME/ida-pro-9.x` for Linux). If not set, the build script will check
@@ -60,10 +60,10 @@ name = "example-analyser"
 # ...
 
 [dependencies]
-idalib = "0.6"
+idalib = "0.7"
 
 [build-dependencies]
-idalib-build = "0.6"
+idalib-build = "0.7"
 ```
 
 `build.rs`:
@@ -92,7 +92,6 @@ More comprehensive examples can be found in `idalib/examples`. To run them:
 Linux/macOS:
 
 ```sh
-export IDASDKDIR=...
 export IDADIR=...
 
 cargo run --example=dump_ls
@@ -103,7 +102,6 @@ Windows:
 ```powershell
 $env:PATH="C:\Program Files\IDA Professional 9.1;$env:PATH"
 $env:IDADIR="C:\Program Files\IDA Professional 9.1"
-$env:IDASDKDIR=...
 
 cargo run --example=dump_ls
 ```
@@ -138,10 +136,8 @@ libraries in the IDA installation directory will result in
 [crashes](https://github.com/binarly-io/idalib/issues/24).
 
 For users wanting to use the `build.rs` from `idalib/examples`, e.g., so builds
-succeed via [GitHub
-Actions](https://github.com/binarly-io/idalib/blob/master/GITHUB-ACTIONS.md)
-without an IDA installation, we recommend using the following `build.rs` which
-will help debug issues related to linking:
+succeed via GitHub Actions without an IDA installation, we recommend using the
+following `build.rs` which will help debug issues related to linking:
 
 ```rust
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -167,16 +163,6 @@ in [the cargo documentation](https://doc.rust-lang.org/cargo/reference/build-scr
 > (that is, those you’re working on locally), so for example warnings printed
 > out in crates.io crates are not emitted by default. The -vv “very verbose”
 > flag may be used to have Cargo display warnings for all crates.
-
-### Testing and documentation generation via GitHub Actions
-
-Since redistribution of the IDA SDK alongside `idalib` isn't possible,
-configuring GitHub Actions or similar technologies to perform build testing
-and/or documentation generation/deployment can be tricky; we therefore include
-a [guide](https://github.com/binarly-io/idalib/blob/master/GITHUB-ACTIONS.md)
-explaining how we test `idalib`'s build compatibility across all supported
-operating systems and environments, and how we perform documentation generation
-and deployment via GitHub Pages.
 
 ## Extending idalib
 
