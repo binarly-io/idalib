@@ -19,16 +19,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: true
-      - name: prepare IDA SDK
-        env:
-          IDASDK91_URL: ${{ secrets.IDASDK91_URL }}
-          IDASDK91_PASSWORD: ${{ secrets.IDASDK91_PASSWORD }}
-        run: |
-          curl -o "${{ runner.temp }}/idasdk91.zip" -L "$IDASDK91_URL"
-          unzip -d "${{ runner.temp }}" -P "$IDASDK91_PASSWORD" "${{ runner.temp }}/idasdk91.zip"
       - name: build
-        env:
-          IDASDKDIR: "${{ runner.temp }}/idasdk91"
         run: cargo build
 
   build-macos:
@@ -38,16 +29,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: true
-      - name: prepare IDA SDK
-        env:
-          IDASDK91_URL: ${{ secrets.IDASDK91_URL }}
-          IDASDK91_PASSWORD: ${{ secrets.IDASDK91_PASSWORD }}
-        run: |
-          curl -o "${{ runner.temp }}/idasdk91.zip" -L "$IDASDK91_URL"
-          unzip -d "${{ runner.temp }}" -P "$IDASDK91_PASSWORD" "${{ runner.temp }}/idasdk91.zip"
       - name: build
-        env:
-          IDASDKDIR: "${{ runner.temp }}/idasdk91"
         run: cargo build
 
   build-windows:
@@ -64,14 +46,5 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: true
-      - name: prepare IDA SDK
-        env:
-          IDASDK91_URL: ${{ secrets.IDASDK91_URL }}
-          IDASDK91_PASSWORD: ${{ secrets.IDASDK91_PASSWORD }}
-        run: |
-          curl -o "${{ runner.temp }}/idasdk91.zip" -L $env:IDASDK91_URL
-          unzip -d "${{ runner.temp }}" -P $env:IDASDK91_PASSWORD "${{ runner.temp }}/idasdk91.zip"
       - name: build
-        env:
-          IDASDKDIR: "${{ runner.temp }}/idasdk91"
         run: cargo build

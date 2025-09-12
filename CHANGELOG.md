@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7.0 (2025-09-12)
+
+Features:
+- ...
+
+Miscellaneous:
+- Use open-source IDA SDK as a submodule.
+
 ## 0.6.1 (2025-07-15)
 
 Features:
