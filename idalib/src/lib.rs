@@ -10,10 +10,10 @@
 //!
 //! ```toml
 //! [dependencies]
-//! idalib = "0.6"
+//! idalib = "0.7"
 //!
 //! [build-dependencies]
-//! idalib-build = "0.6"
+//! idalib-build = "0.7"
 //! ```
 //!
 //! Here is a basic example of a `build.rs` file:
@@ -26,8 +26,9 @@
 //! ```
 //!
 //! This script uses the `idalib-build` crate to automatically configure the linkage against IDA.
-//! Ensure that the environment variables `IDASDKDIR` and optionally `IDADIR` are set to point to
-//! your IDA SDK and installation directories, respectively.
+//! If IDA is installed in a non-default location, ensure that `IDADIR` is set to point to your
+//! installation directory, if you are linking against IDA's shared libraries, as opposed to the
+//! stub libraries distributed with the SDK.
 //!
 //! ## Setting Environment Variables
 //!
@@ -37,7 +38,6 @@
 //! configuration file (e.g., `.bashrc`, `.zshrc`):
 //!
 //! ```sh,ignore
-//! export IDASDKDIR=/path/to/ida/sdk
 //! export IDADIR=/path/to/ida/installation
 //! ```
 //!
@@ -47,18 +47,16 @@
 //!
 //! **Command Prompt:**
 //! ```cmd
-//! set IDASDKDIR=C:\path\to\ida\sdk
 //! set IDADIR=C:\path\to\ida\installation
 //! ```
 //!
 //! **PowerShell:**
 //! ```powershell,ignore
-//! $env:IDASDKDIR = "C:\path\to\ida\sdk"
 //! $env:IDADIR = "C:\path\to\ida\installation"
 //! ```
 //!
 //! **System Properties:**
-//! Go to "Environment Variables" in System Properties and add `IDASDKDIR` and `IDADIR`.
+//! Go to "Environment Variables" in System Properties and add `IDADIR`.
 //!
 //! ## Example
 //!
