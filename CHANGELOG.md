@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.1 (2025-09-13)
+
+Bugfix:
+- Fix idalib-build so it correctly references the SDK.
+
 ## 0.7.0 (2025-09-12)
 
 Compatibility release for IDA 9.2.
