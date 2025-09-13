@@ -17,7 +17,7 @@
 <a href=#17 id=17 data-nosnippet>17</a>}
 <a href=#18 id=18 data-nosnippet>18</a>
 <a href=#19 id=19 data-nosnippet>19</a><span class="kw">pub fn </span>idalib_sdk_paths_with(check: bool) -&gt; (PathBuf, PathBuf, PathBuf, PathBuf) {
-<a href=#20 id=20 data-nosnippet>20</a>    <span class="kw">let </span>sdk_path = PathBuf::from(env::var(<span class="string">"DEP_IDALIB_SDK"</span>).expect(<span class="string">"DEP_IDALIB_SDK should be set"</span>));
+<a href=#20 id=20 data-nosnippet>20</a>    <span class="kw">let </span>sdk_path = PathBuf::from(<span class="macro">env!</span>(<span class="string">"IDALIB_SDK"</span>));
 <a href=#21 id=21 data-nosnippet>21</a>    <span class="kw">let </span>pro_h = sdk_path.join(<span class="string">"include"</span>).join(<span class="string">"pro.h"</span>);
 <a href=#22 id=22 data-nosnippet>22</a>
 <a href=#23 id=23 data-nosnippet>23</a>    <span class="kw">if </span>check &amp;&amp; !pro_h.exists() {
