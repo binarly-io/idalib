@@ -34,6 +34,10 @@ rust::String idalib_get_func_cmt(const func_t *f, bool rptble) {
   }
 }
 
+bool idalib_set_func_cmt(const func_t *f, const char *cmt, bool rptble) {
+  return set_func_cmt(f, cmt, rptble);
+}
+
 std::unique_ptr<qflow_chart_t> idalib_func_flow_chart(func_t *f, int fc_options) {
   if (auto cfg = std::make_unique<qflow_chart_t>(nullptr, f, BADADDR, BADADDR, fc_options); cfg != nullptr) {
     return cfg;
