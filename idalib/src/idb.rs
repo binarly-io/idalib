@@ -461,7 +461,7 @@ impl IDB {
         StringList::new(self)
     }
 
-    pub const fn names(&self) -> crate::name::NameList<'_> {
+    pub const fn names(&self) -> NameList<'_> {
         NameList::new(self)
     }
 

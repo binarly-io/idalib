@@ -1330,7 +1330,7 @@ pub mod ida {
 
         let path = CString::new(path.as_ref().to_string_lossy().as_ref()).map_err(IDAError::ffi)?;
 
-        let res = unsafe { ffi::open_database(path.as_ptr(), auto_analysis, std::ptr::null()) };
+        let res = unsafe { ffi::open_database(path.as_ptr(), auto_analysis, ptr::null()) };
 
         if res != c_int(0) {
             Err(IDAError::OpenDb(res))

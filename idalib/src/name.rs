@@ -3,13 +3,12 @@ use std::marker::PhantomData;
 
 use bitflags::bitflags;
 
+use crate::Address;
 use crate::ffi::BADADDR;
 use crate::ffi::name::{
     get_nlist_ea, get_nlist_idx, get_nlist_name, get_nlist_size, is_in_nlist, is_public_name,
     is_weak_name,
 };
-
-use crate::Address;
 use crate::idb::IDB;
 
 pub type NameIndex = usize;
@@ -66,7 +65,9 @@ impl<'a> NameList<'a> {
             return None;
         }
 
-        let name = unsafe { CStr::from_ptr(name) }.to_string_lossy().into_owned();
+        let name = unsafe { CStr::from_ptr(name) }
+            .to_string_lossy()
+            .into_owned();
 
         let mut properties = NameProperties::empty();
 
