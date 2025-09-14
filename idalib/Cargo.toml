@@ -19,7 +19,6 @@ autocxx = "0.27"
 bitflags = "2"
 cxx = "1"
 idalib-sys = { version = "0.7", path = "../idalib-sys" }
-thiserror = "1"
 
 [build-dependencies]
 idalib-build = { version = "0.7", path = "../idalib-build" }
