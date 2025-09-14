@@ -36,7 +36,7 @@ impl<'a> Plugin<'a> {
     }
 
     pub fn run(&self, arg: usize) -> bool {
-        unsafe { run_plugin(&*self.ptr, arg) }
+        unsafe { run_plugin(&raw const *self.ptr, arg) }
     }
 
     pub fn version(&self) -> u64 {

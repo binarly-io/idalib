@@ -145,7 +145,7 @@ impl SegmentType {
         matches!(self, Self::NORM)
     }
 
-    pub fn is_norm(&self) -> bool {
+    pub const fn is_norm(&self) -> bool {
         self.is_normal()
     }
 
@@ -153,7 +153,7 @@ impl SegmentType {
         matches!(self, Self::XTRN)
     }
 
-    pub fn is_xtrn(&self) -> bool {
+    pub const fn is_xtrn(&self) -> bool {
         self.is_extern()
     }
 
@@ -169,7 +169,7 @@ impl SegmentType {
         matches!(self, Self::IMP)
     }
 
-    pub fn is_imp(&self) -> bool {
+    pub const fn is_imp(&self) -> bool {
         self.is_import()
     }
 
@@ -177,7 +177,7 @@ impl SegmentType {
         matches!(self, Self::GRP)
     }
 
-    pub fn is_grp(&self) -> bool {
+    pub const fn is_grp(&self) -> bool {
         self.is_group()
     }
 
@@ -205,7 +205,7 @@ impl SegmentType {
         matches!(self, Self::UNDF)
     }
 
-    pub fn is_undf(&self) -> bool {
+    pub const fn is_undf(&self) -> bool {
         self.is_undefined()
     }
 }

@@ -113,7 +113,7 @@ impl<'a> XRef<'a> {
         self.inner.iscode
     }
 
-    pub fn is_data(&self) -> bool {
+    pub const fn is_data(&self) -> bool {
         !self.is_code()
     }
 
@@ -124,7 +124,7 @@ impl<'a> XRef<'a> {
     pub fn next_to(&self) -> Option<Self> {
         let mut curr = self.clone();
 
-        let found = unsafe { xrefblk_t_next_to(&mut curr.inner as *mut _) };
+        let found = unsafe { xrefblk_t_next_to(&raw mut curr.inner) };
 
         if found { Some(curr) } else { None }
     }
@@ -132,7 +132,7 @@ impl<'a> XRef<'a> {
     pub fn next_from(&self) -> Option<Self> {
         let mut curr = self.clone();
 
-        let found = unsafe { xrefblk_t_next_from(&mut curr.inner as *mut _) };
+        let found = unsafe { xrefblk_t_next_from(&raw mut curr.inner) };
 
         if found { Some(curr) } else { None }
     }

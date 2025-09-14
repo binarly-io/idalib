@@ -20,9 +20,11 @@ pub fn idalib_sdk_paths_with(check: bool) -> (PathBuf, PathBuf, PathBuf, PathBuf
     let sdk_path = PathBuf::from(env!("IDALIB_SDK"));
     let pro_h = sdk_path.join("include").join("pro.h");
 
-    if check && !pro_h.exists() {
-        panic!("`{}` does not exist; SDK is not usable", pro_h.display());
-    }
+    assert!(
+        !check || pro_h.exists(),
+        "`{}` does not exist; SDK is not usable",
+        pro_h.display()
+    );
 
     let (stubs_path, idalib, ida) = if cfg!(target_os = "linux") {
         let path = sdk_path.join("lib/x64_linux_gcc_64");
@@ -67,12 +69,11 @@ pub fn idalib_install_paths_with(check: bool) -> (PathBuf, PathBuf, PathBuf) {
         panic!("unsupported platform")
     };
 
-    if check && !idalib.exists() {
-        panic!(
-            "`{}` does not exist; cannot find a compatible IDA Pro installation",
-            idalib.display()
-        );
-    }
+    assert!(
+        !check || idalib.exists(),
+        "`{}` does not exist; cannot find a compatible IDA Pro installation",
+        idalib.display()
+    );
 
     (path, idalib, ida)
 }

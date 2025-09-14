@@ -585,11 +585,7 @@ pub mod hexrays {
         }
 
         let mut failure = super::ffix::hexrays_error_t::default();
-        let result = super::ffix::idalib_hexrays_decompile_func(
-            f,
-            &mut failure as *mut _,
-            (flags as i32).into(),
-        );
+        let result = idalib_hexrays_decompile_func(f, &raw mut failure, (flags as i32).into());
 
         let code = HexRaysErrorCode::from(mem::transmute::<i32, merror_t>(failure.code));
 
@@ -1406,7 +1402,9 @@ pub mod ida {
         let mut minor = c_int(0);
         let mut build = c_int(0);
 
-        if unsafe { ffix::idalib_get_library_version(&mut major, &mut minor, &mut build) } {
+        if unsafe {
+            ffix::idalib_get_library_version(&raw mut major, &raw mut minor, &raw mut build)
+        } {
             Ok((major.0 as _, minor.0 as _, build.0 as _))
         } else {
             Err(IDAError::GetVersion)

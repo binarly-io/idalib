@@ -1,5 +1,4 @@
 use std::marker::PhantomData;
-use std::mem;
 use std::pin::Pin;
 use std::ptr;
 
@@ -273,7 +272,7 @@ impl<'a> FunctionCFG<'a> {
     unsafe fn as_gdl_graph(&self) -> Option<&gdl_graph_t> {
         self.flow_chart
             .as_ref()
-            .map(|r| unsafe { mem::transmute::<&qflow_chart_t, &gdl_graph_t>(r) })
+            .map(|r| unsafe { &*ptr::from_ref::<qflow_chart_t>(r).cast::<gdl_graph_t>() })
     }
 
     pub fn block_by_id(&self, id: BasicBlockId) -> Option<BasicBlock<'_>> {
