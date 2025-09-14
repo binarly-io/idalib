@@ -404,11 +404,11 @@ pub mod hexrays {
     }
 
     impl HexRaysError {
-        pub fn code(&self) -> HexRaysErrorCode {
+        pub const fn code(&self) -> HexRaysErrorCode {
             self.code
         }
 
-        pub fn address(&self) -> u64 {
+        pub const fn address(&self) -> u64 {
             self.addr
         }
 
@@ -460,11 +460,11 @@ pub mod hexrays {
     }
 
     impl HexRaysErrorCode {
-        pub fn is_ok(&self) -> bool {
+        pub const fn is_ok(&self) -> bool {
             matches!(self, Self::Ok | Self::Block)
         }
 
-        pub fn is_err(&self) -> bool {
+        pub const fn is_err(&self) -> bool {
             !self.is_ok()
         }
     }

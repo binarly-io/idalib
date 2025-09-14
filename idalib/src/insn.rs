@@ -2,13 +2,11 @@ use std::mem;
 
 use bitflags::bitflags;
 
+use crate::Address;
 use crate::ffi::insn::insn_t;
 use crate::ffi::insn::op::*;
-use crate::ffi::util::{is_basic_block_end, is_call_insn, is_indirect_jump_insn, is_ret_insn};
-
 pub use crate::ffi::insn::{arm, mips, x86};
-
-use crate::Address;
+use crate::ffi::util::{is_basic_block_end, is_call_insn, is_indirect_jump_insn, is_ret_insn};
 
 pub type Register = u16;
 pub type Phrase = u16;
@@ -91,15 +89,15 @@ bitflags! {
 pub type InsnType = u16;
 
 impl Insn {
-    pub(crate) fn from_repr(inner: insn_t) -> Self {
+    pub(crate) const fn from_repr(inner: insn_t) -> Self {
         Self { inner }
     }
 
-    pub fn address(&self) -> Address {
+    pub const fn address(&self) -> Address {
         self.inner.ea
     }
 
-    pub fn itype(&self) -> InsnType {
+    pub const fn itype(&self) -> InsnType {
         self.inner.itype as _
     }
 
@@ -121,11 +119,11 @@ impl Insn {
             .unwrap_or(self.inner.ops.len())
     }
 
-    pub fn len(&self) -> usize {
+    pub const fn len(&self) -> usize {
         self.inner.size as _
     }
 
-    pub fn is_empty(&self) -> bool {
+    pub const fn is_empty(&self) -> bool {
         self.len() == 0
     }
 
@@ -151,23 +149,23 @@ impl Insn {
 }
 
 impl Operand {
-    pub fn flags(&self) -> OperandFlags {
+    pub const fn flags(&self) -> OperandFlags {
         OperandFlags::from_bits_retain(self.inner.flags)
     }
 
-    pub fn offb(&self) -> i8 {
+    pub const fn offb(&self) -> i8 {
         self.inner.offb
     }
 
-    pub fn offo(&self) -> i8 {
+    pub const fn offo(&self) -> i8 {
         self.inner.offo
     }
 
-    pub fn n(&self) -> usize {
+    pub const fn n(&self) -> usize {
         self.inner.n as _
     }
 
-    pub fn number(&self) -> usize {
+    pub const fn number(&self) -> usize {
         self.n()
     }
 
@@ -209,7 +207,7 @@ impl Operand {
         }
     }
 
-    pub fn outer_displacement(&self) -> Option<u64> {
+    pub const fn outer_displacement(&self) -> Option<u64> {
         if self.flags().contains(OperandFlags::OUTER_DISP) {
             Some(unsafe { self.inner.__bindgen_anon_2.value })
         } else {

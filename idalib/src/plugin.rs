@@ -3,9 +3,8 @@ use std::marker::PhantomData;
 use bitflags::bitflags;
 
 use crate::ffi::loader::*;
-use crate::idb::IDB;
-
 pub use crate::ffi::processor::ids as id;
+use crate::idb::IDB;
 
 bitflags! {
     #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -29,7 +28,7 @@ pub struct Plugin<'a> {
 }
 
 impl<'a> Plugin<'a> {
-    pub(crate) fn from_ptr(ptr: *const plugin_t) -> Self {
+    pub(crate) const fn from_ptr(ptr: *const plugin_t) -> Self {
         Self {
             ptr,
             _marker: PhantomData,

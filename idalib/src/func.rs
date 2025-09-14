@@ -31,11 +31,11 @@ pub struct BasicBlock<'a> {
 }
 
 impl<'a> BasicBlock<'a> {
-    fn as_range_t(&self) -> *const range_t {
+    const fn as_range_t(&self) -> *const range_t {
         self.block.cast()
     }
 
-    pub(crate) fn from_parts(ptr: *const qbasic_block_t, kind: fc_block_type_t) -> Self {
+    pub(crate) const fn from_parts(ptr: *const qbasic_block_t, kind: fc_block_type_t) -> Self {
         BasicBlock {
             block: ptr,
             kind,
@@ -63,35 +63,35 @@ impl<'a> BasicBlock<'a> {
         self.len() == 0
     }
 
-    pub fn is_normal(&self) -> bool {
+    pub const fn is_normal(&self) -> bool {
         matches!(self.kind, fc_block_type_t::fcb_normal)
     }
 
-    pub fn is_indjump(&self) -> bool {
+    pub const fn is_indjump(&self) -> bool {
         matches!(self.kind, fc_block_type_t::fcb_indjump)
     }
 
-    pub fn is_ret(&self) -> bool {
+    pub const fn is_ret(&self) -> bool {
         matches!(self.kind, fc_block_type_t::fcb_ret)
     }
 
-    pub fn is_cndret(&self) -> bool {
+    pub const fn is_cndret(&self) -> bool {
         matches!(self.kind, fc_block_type_t::fcb_cndret)
     }
 
-    pub fn is_noret(&self) -> bool {
+    pub const fn is_noret(&self) -> bool {
         matches!(self.kind, fc_block_type_t::fcb_noret)
     }
 
-    pub fn is_enoret(&self) -> bool {
+    pub const fn is_enoret(&self) -> bool {
         matches!(self.kind, fc_block_type_t::fcb_enoret)
     }
 
-    pub fn is_extern(&self) -> bool {
+    pub const fn is_extern(&self) -> bool {
         matches!(self.kind, fc_block_type_t::fcb_extern)
     }
 
-    pub fn is_error(&self) -> bool {
+    pub const fn is_error(&self) -> bool {
         matches!(self.kind, fc_block_type_t::fcb_error)
     }
 
@@ -176,11 +176,11 @@ impl<'a> Function<'a> {
         }
     }
 
-    pub(crate) fn as_ptr(&self) -> *mut func_t {
+    pub(crate) const fn as_ptr(&self) -> *mut func_t {
         self.ptr
     }
 
-    fn as_range_t(&self) -> *const range_t {
+    const fn as_range_t(&self) -> *const range_t {
         self.ptr.cast()
     }
 

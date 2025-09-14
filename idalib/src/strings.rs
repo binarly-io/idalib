@@ -1,14 +1,13 @@
 use std::marker::PhantomData;
 
+use crate::Address;
+use crate::ffi::BADADDR;
 use crate::ffi::bytes::idalib_get_bytes;
 use crate::ffi::strings::{
     build_strlist, clear_strlist, get_strlist_qty, idalib_get_strlist_item_addr,
     idalib_get_strlist_item_length,
 };
-use crate::ffi::BADADDR;
-
 use crate::idb::IDB;
-use crate::Address;
 
 pub type StringIndex = usize;
 
@@ -17,7 +16,7 @@ pub struct StringList<'a> {
 }
 
 impl<'a> StringList<'a> {
-    pub(crate) fn new(_: &'a IDB) -> Self {
+    pub(crate) const fn new(_: &'a IDB) -> Self {
         Self {
             _marker: PhantomData,
         }
@@ -69,7 +68,7 @@ impl<'a> StringList<'a> {
         self.len() == 0
     }
 
-    pub fn iter(&self) -> StringListIter<'_, 'a> {
+    pub const fn iter(&self) -> StringListIter<'_, 'a> {
         StringListIter {
             string_list: self,
             current_index: 0,
@@ -94,7 +93,7 @@ impl<'s, 'a> Iterator for StringListIter<'s, 'a> {
 
             if let (Some(addr), Some(string)) = (addr, string) {
                 return Some((addr, string));
-            };
+            }
             // skip invalid strings, such as:
             // - the index became invalid, such as if a string was undefined
             // - the string failed to decode (today: not UTF-8)

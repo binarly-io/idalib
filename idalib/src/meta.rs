@@ -125,7 +125,7 @@ pub struct Metadata<'a> {
 }
 
 impl<'a> Metadata<'a> {
-    pub(crate) fn new() -> Self {
+    pub(crate) const fn new() -> Self {
         Self {
             _marker: PhantomData,
         }
@@ -846,7 +846,7 @@ pub struct MetadataMut<'a> {
 }
 
 impl<'a> MetadataMut<'a> {
-    pub(crate) fn new() -> Self {
+    pub(crate) const fn new() -> Self {
         Self {
             _marker: PhantomData,
         }

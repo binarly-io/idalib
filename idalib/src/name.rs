@@ -35,7 +35,7 @@ pub struct Name {
 }
 
 impl Name {
-    pub fn address(&self) -> Address {
+    pub const fn address(&self) -> Address {
         self.address
     }
 
@@ -43,17 +43,17 @@ impl Name {
         &self.name
     }
 
-    pub fn is_public(&self) -> bool {
+    pub const fn is_public(&self) -> bool {
         self.properties.contains(NameProperties::PUBLIC)
     }
 
-    pub fn is_weak(&self) -> bool {
+    pub const fn is_weak(&self) -> bool {
         self.properties.contains(NameProperties::WEAK)
     }
 }
 
 impl<'a> NameList<'a> {
-    pub(crate) fn new(_: &'a IDB) -> Self {
+    pub(crate) const fn new(_: &'a IDB) -> Self {
         Self {
             _marker: PhantomData,
         }
@@ -112,7 +112,7 @@ impl<'a> NameList<'a> {
         self.len() == 0
     }
 
-    pub fn iter(&self) -> NameListIter<'_, 'a> {
+    pub const fn iter(&self) -> NameListIter<'_, 'a> {
         NameListIter {
             name_list: self,
             current_index: 0,

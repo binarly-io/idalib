@@ -104,7 +104,7 @@ pub struct AddressFlags<'a> {
 }
 
 impl<'a> AddressFlags<'a> {
-    pub(crate) fn new(flags: ffi::bytes::flags64_t) -> Self {
+    pub(crate) const fn new(flags: ffi::bytes::flags64_t) -> Self {
         Self {
             flags,
             _marker: PhantomData,
@@ -128,15 +128,15 @@ pub struct IDAVersion {
 }
 
 impl IDAVersion {
-    pub fn major(&self) -> i32 {
+    pub const fn major(&self) -> i32 {
         self.major
     }
 
-    pub fn minor(&self) -> i32 {
+    pub const fn minor(&self) -> i32 {
         self.minor
     }
 
-    pub fn build(&self) -> i32 {
+    pub const fn build(&self) -> i32 {
         self.build
     }
 }

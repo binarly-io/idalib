@@ -2,8 +2,8 @@
 // e8cdc0697748e702cf2916a2c5670325a891402ee38c98d91873a0f03e3f9025
 
 use idalib::idb::*;
-use idalib::insn::x86::{NN_lea, NN_mov};
 use idalib::insn::OperandType;
+use idalib::insn::x86::{NN_lea, NN_mov};
 use idalib::xref::{XRef, XRefQuery};
 
 const RCX: u16 = 1;
@@ -16,25 +16,21 @@ struct EncString {
 }
 
 impl EncString {
-    fn set_address(&mut self, address: u64) {
+    const fn set_address(&mut self, address: u64) {
         self.address = Some(address);
     }
 
-    fn set_size(&mut self, size: usize) {
+    const fn set_size(&mut self, size: usize) {
         self.size = Some(size);
     }
 
-    fn ready(self) -> bool {
+    const fn ready(self) -> bool {
         self.address.is_some() && self.size.is_some()
     }
 
     #[inline]
-    fn shrink_byte(b: u8) -> u8 {
-        if b > 0x7F {
-            b - 0x60
-        } else {
-            b
-        }
+    const fn shrink_byte(b: u8) -> u8 {
+        if b > 0x7F { b - 0x60 } else { b }
     }
 
     fn decrypt(&self, idb: &IDB) -> Option<String> {
