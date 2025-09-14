@@ -1065,7 +1065,6 @@ pub mod insn {
 
     use super::ea_t;
     use super::ffi::decode_insn;
-
     pub use super::pod::insn_t;
 
     pub fn decode(ea: ea_t) -> Option<insn_t> {
@@ -1143,7 +1142,6 @@ pub mod processor {
     pub use super::ffix::{
         idalib_is_thumb_at, idalib_ph_id, idalib_ph_long_name, idalib_ph_short_name,
     };
-
     pub use super::idp as ids;
 }
 
@@ -1156,7 +1154,6 @@ pub mod segment {
         saRel512Bytes, saRel1024Bytes, saRel2048Bytes, saRelByte, saRelDble, saRelPage, saRelPara,
         saRelQword, saRelWord, segment_t,
     };
-
     pub use super::ffix::{
         idalib_segm_align, idalib_segm_bitness, idalib_segm_bytes, idalib_segm_name,
         idalib_segm_perm, idalib_segm_type,
@@ -1238,16 +1235,15 @@ pub mod name {
 
 pub mod ida {
     use std::env;
-    use std::ffi::{CStr, CString};
+    use std::ffi::CString;
     use std::path::Path;
     use std::ptr;
 
     use autocxx::prelude::*;
+    pub use ffi::auto_wait;
 
     use super::platform::is_main_thread;
     use super::{IDAError, ea_t, ffi, ffix};
-
-    pub use ffi::auto_wait;
 
     pub fn is_license_valid() -> bool {
         assert!(
@@ -1369,7 +1365,7 @@ pub mod ida {
         let path = CString::new(path.as_ref().to_string_lossy().as_ref()).map_err(IDAError::ffi)?;
         args.push(path);
 
-        let idalib0 = CStr::from_bytes_with_nul(b"idalib\0").map_err(IDAError::ffi)?;
+        let idalib0 = c"idalib";
 
         let argv = std::iter::once(idalib0.as_ptr())
             .chain(args.iter().map(|s| s.as_ptr()))
