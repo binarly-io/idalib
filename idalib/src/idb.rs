@@ -457,7 +457,7 @@ impl IDB {
         }
     }
 
-    pub fn strings(&self) -> StringList<'_> {
+    pub const fn strings(&self) -> StringList<'_> {
         StringList::new(self)
     }
 
