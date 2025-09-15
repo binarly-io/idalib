@@ -22,17 +22,3 @@ idalib-sys = { version = "0.7", path = "../idalib-sys" }
 
 [build-dependencies]
 idalib-build = { version = "0.7", path = "../idalib-build" }
-
-[lints.clippy]
-all = { level = "warn", priority = -1 }
-pedantic = { level = "warn", priority = -1 }
-nursery = { level = "warn", priority = -1 }
-cargo = { level = "warn", priority = -1 }
-missing_errors_doc = "allow"
-missing_panics_doc = "allow"
-wildcard_imports = "allow"
-enum_glob_use = "allow"
-unreadable_literal = "allow"
-multiple_crate_versions = "allow"
-significant_drop_tightening = "allow"
-must_use_candidate = "allow"
