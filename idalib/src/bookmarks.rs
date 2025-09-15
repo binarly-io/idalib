@@ -1,12 +1,11 @@
 use std::ffi::CString;
 use std::marker::PhantomData;
 
+use crate::ffi::BADADDR;
 use crate::ffi::bookmarks::{
     idalib_bookmarks_t_erase, idalib_bookmarks_t_find_index, idalib_bookmarks_t_get,
     idalib_bookmarks_t_get_desc, idalib_bookmarks_t_mark, idalib_bookmarks_t_size,
 };
-use crate::ffi::BADADDR;
-
 use crate::idb::IDB;
 use crate::{Address, IDAError};
 
@@ -19,7 +18,7 @@ pub struct Bookmarks<'a> {
 }
 
 impl<'a> Bookmarks<'a> {
-    pub(crate) fn new(_: &'a IDB) -> Self {
+    pub(crate) const fn new(_: &'a IDB) -> Self {
         Self {
             _marker: PhantomData,
         }
@@ -73,17 +72,13 @@ impl<'a> Bookmarks<'a> {
     pub fn get_description_by_index(&self, idx: BookmarkIndex) -> Option<String> {
         let s = unsafe { idalib_bookmarks_t_get_desc(idx.into()) };
 
-        if s.is_empty() {
-            None
-        } else {
-            Some(s)
-        }
+        if s.is_empty() { None } else { Some(s) }
     }
 
     pub fn erase(&self, ea: Address) -> Result<(), IDAError> {
-        self.erase_by_index(self.find_index(ea).ok_or(IDAError::ffi_with(format!(
-            "failed to find bookmark index for address {ea:#x}"
-        )))?)
+        self.erase_by_index(self.find_index(ea).ok_or_else(|| {
+            IDAError::ffi_with(format!("failed to find bookmark index for address {ea:#x}"))
+        })?)
     }
 
     // Notes:

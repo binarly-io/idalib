@@ -36,7 +36,7 @@ fn main() {
 
     let ffi_path = Path::new("src");
 
-    let mut builder = autocxx_build::Builder::new(ffi_path.join("lib.rs"), [&ffi_path, &*ida])
+    let mut builder = autocxx_build::Builder::new(ffi_path.join("lib.rs"), [ffi_path, &*ida])
         .extra_clang_args(
             #[cfg(target_os = "linux")]
             &["-std=c++17", "-D__LINUX__=1", "-D__EA64__=1"],

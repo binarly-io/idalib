@@ -404,11 +404,11 @@ pub mod hexrays {
     }
 
     impl HexRaysError {
-        pub fn code(&self) -> HexRaysErrorCode {
+        pub const fn code(&self) -> HexRaysErrorCode {
             self.code
         }
 
-        pub fn address(&self) -> u64 {
+        pub const fn address(&self) -> u64 {
             self.addr
         }
 
@@ -460,11 +460,11 @@ pub mod hexrays {
     }
 
     impl HexRaysErrorCode {
-        pub fn is_ok(&self) -> bool {
+        pub const fn is_ok(&self) -> bool {
             matches!(self, Self::Ok | Self::Block)
         }
 
-        pub fn is_err(&self) -> bool {
+        pub const fn is_err(&self) -> bool {
             !self.is_ok()
         }
     }
@@ -585,11 +585,7 @@ pub mod hexrays {
         }
 
         let mut failure = super::ffix::hexrays_error_t::default();
-        let result = super::ffix::idalib_hexrays_decompile_func(
-            f,
-            &mut failure as *mut _,
-            (flags as i32).into(),
-        );
+        let result = idalib_hexrays_decompile_func(f, &raw mut failure, (flags as i32).into());
 
         let code = HexRaysErrorCode::from(mem::transmute::<i32, merror_t>(failure.code));
 
@@ -1065,7 +1061,6 @@ pub mod insn {
 
     use super::ea_t;
     use super::ffi::decode_insn;
-
     pub use super::pod::insn_t;
 
     pub fn decode(ea: ea_t) -> Option<insn_t> {
@@ -1143,7 +1138,6 @@ pub mod processor {
     pub use super::ffix::{
         idalib_is_thumb_at, idalib_ph_id, idalib_ph_long_name, idalib_ph_short_name,
     };
-
     pub use super::idp as ids;
 }
 
@@ -1156,7 +1150,6 @@ pub mod segment {
         saRel512Bytes, saRel1024Bytes, saRel2048Bytes, saRelByte, saRelDble, saRelPage, saRelPara,
         saRelQword, saRelWord, segment_t,
     };
-
     pub use super::ffix::{
         idalib_segm_align, idalib_segm_bitness, idalib_segm_bytes, idalib_segm_name,
         idalib_segm_perm, idalib_segm_type,
@@ -1238,16 +1231,15 @@ pub mod name {
 
 pub mod ida {
     use std::env;
-    use std::ffi::{CStr, CString};
+    use std::ffi::CString;
     use std::path::Path;
     use std::ptr;
 
     use autocxx::prelude::*;
+    pub use ffi::auto_wait;
 
     use super::platform::is_main_thread;
     use super::{IDAError, ea_t, ffi, ffix};
-
-    pub use ffi::auto_wait;
 
     pub fn is_license_valid() -> bool {
         assert!(
@@ -1338,7 +1330,7 @@ pub mod ida {
 
         let path = CString::new(path.as_ref().to_string_lossy().as_ref()).map_err(IDAError::ffi)?;
 
-        let res = unsafe { ffi::open_database(path.as_ptr(), auto_analysis, std::ptr::null()) };
+        let res = unsafe { ffi::open_database(path.as_ptr(), auto_analysis, ptr::null()) };
 
         if res != c_int(0) {
             Err(IDAError::OpenDb(res))
@@ -1369,7 +1361,7 @@ pub mod ida {
         let path = CString::new(path.as_ref().to_string_lossy().as_ref()).map_err(IDAError::ffi)?;
         args.push(path);
 
-        let idalib0 = CStr::from_bytes_with_nul(b"idalib\0").map_err(IDAError::ffi)?;
+        let idalib0 = c"idalib";
 
         let argv = std::iter::once(idalib0.as_ptr())
             .chain(args.iter().map(|s| s.as_ptr()))
@@ -1410,7 +1402,9 @@ pub mod ida {
         let mut minor = c_int(0);
         let mut build = c_int(0);
 
-        if unsafe { ffix::idalib_get_library_version(&mut major, &mut minor, &mut build) } {
+        if unsafe {
+            ffix::idalib_get_library_version(&raw mut major, &raw mut minor, &raw mut build)
+        } {
             Ok((major.0 as _, minor.0 as _, build.0 as _))
         } else {
             Err(IDAError::GetVersion)

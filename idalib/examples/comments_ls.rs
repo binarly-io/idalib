@@ -71,8 +71,8 @@ fn main() -> anyhow::Result<()> {
     }
 
     println!("Testing find_text_iter()");
-    let results: Vec<_> = idb.find_text_iter("added by idalib").collect();
-    assert!(results.is_empty());
+    let len = idb.find_text_iter("added by idalib").count();
+    assert_eq!(len, 0);
 
     Ok(())
 }

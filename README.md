@@ -16,7 +16,7 @@ bindings are only guaranteed compatible with the latest official IDA Pro/SDK
 release. See the table below for compatibility:
 
 | IDA Pro version | Latest compatible idalib |
-| --------------- | ------------------------ |
+|-----------------|--------------------------|
 | v9.2            | 0.7.1                    |
 | v9.1            | 0.6.1                    |
 | v9.0sp1         | 0.4.1                    |

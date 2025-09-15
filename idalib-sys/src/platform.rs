@@ -1,6 +1,6 @@
 #[cfg(target_os = "linux")]
 pub fn is_main_thread() -> bool {
-    use libc::{c_long, getpid, syscall, SYS_gettid};
+    use libc::{SYS_gettid, c_long, getpid, syscall};
 
     unsafe { syscall(SYS_gettid) == getpid() as c_long }
 }
@@ -10,7 +10,9 @@ pub fn is_main_thread() -> bool {
     use objc::*;
 
     #[allow(unexpected_cfgs)]
-    unsafe { msg_send![class!(NSThread), isMainThread] }
+    unsafe {
+        msg_send![class!(NSThread), isMainThread]
+    }
 }
 
 #[cfg(target_os = "windows")]

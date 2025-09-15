@@ -3,6 +3,8 @@ use std::marker::PhantomData;
 use std::mem::MaybeUninit;
 use std::path::{Path, PathBuf};
 
+use crate::bookmarks::Bookmarks;
+use crate::decompiler::CFunction;
 use crate::ffi::BADADDR;
 use crate::ffi::bytes::*;
 use crate::ffi::comments::{append_cmt, idalib_get_cmt, set_cmt};
@@ -20,9 +22,6 @@ use crate::ffi::search::{idalib_find_defined, idalib_find_imm, idalib_find_text}
 use crate::ffi::segment::{get_segm_by_name, get_segm_qty, getnseg, getseg};
 use crate::ffi::util::{is_align_insn, next_head, prev_head, str2reg};
 use crate::ffi::xref::{xrefblk_t, xrefblk_t_first_from, xrefblk_t_first_to};
-
-use crate::bookmarks::Bookmarks;
-use crate::decompiler::CFunction;
 use crate::func::{Function, FunctionId};
 use crate::insn::{Insn, Register};
 use crate::meta::{Metadata, MetadataMut};
@@ -72,7 +71,7 @@ impl IDBOpenOptions {
         self
     }
 
-    pub fn save(&mut self, save: bool) -> &mut Self {
+    pub const fn save(&mut self, save: bool) -> &mut Self {
         self.save = save;
         self
     }
@@ -82,7 +81,7 @@ impl IDBOpenOptions {
         self
     }
 
-    pub fn auto_analyse(&mut self, auto_analyse: bool) -> &mut Self {
+    pub const fn auto_analyse(&mut self, auto_analyse: bool) -> &mut Self {
         self.auto_analyse = auto_analyse;
         self
     }
@@ -91,7 +90,7 @@ impl IDBOpenOptions {
         let mut args = Vec::new();
 
         if let Some(ftype) = self.ftype.as_ref() {
-            args.push(format!("-T{}", ftype));
+            args.push(format!("-T{ftype}"));
         }
 
         if let Some(idb_path) = self.idb.as_ref() {
@@ -146,7 +145,7 @@ impl IDB {
         &self.path
     }
 
-    pub fn save_on_close(&mut self, status: bool) {
+    pub const fn save_on_close(&mut self, status: bool) {
         self.save = status;
     }
 
@@ -162,15 +161,15 @@ impl IDB {
         make_signatures(only_pat)
     }
 
-    pub fn decompiler_available(&self) -> bool {
+    pub const fn decompiler_available(&self) -> bool {
         self.decompiler
     }
 
-    pub fn meta(&self) -> Metadata<'_> {
+    pub const fn meta(&self) -> Metadata<'_> {
         Metadata::new()
     }
 
-    pub fn meta_mut(&mut self) -> MetadataMut<'_> {
+    pub const fn meta_mut(&mut self) -> MetadataMut<'_> {
         MetadataMut::new()
     }
 
@@ -406,7 +405,7 @@ impl IDB {
         }
     }
 
-    pub fn bookmarks(&self) -> Bookmarks<'_> {
+    pub const fn bookmarks(&self) -> Bookmarks<'_> {
         Bookmarks::new(self)
     }
 
@@ -427,7 +426,7 @@ impl IDB {
         let mut cur = 0u64;
         std::iter::from_fn(move || {
             let found = self.find_text(cur, text.as_ref())?;
-            cur = self.find_defined(found).unwrap_or(BADADDR.into());
+            cur = self.find_defined(found).unwrap_or_else(|| BADADDR.into());
             Some(found)
         })
     }
@@ -458,11 +457,11 @@ impl IDB {
         }
     }
 
-    pub fn strings(&self) -> StringList<'_> {
+    pub const fn strings(&self) -> StringList<'_> {
         StringList::new(self)
     }
 
-    pub fn names(&self) -> crate::name::NameList<'_> {
+    pub const fn names(&self) -> NameList<'_> {
         NameList::new(self)
     }
 

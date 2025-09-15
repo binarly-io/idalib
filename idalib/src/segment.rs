@@ -5,10 +5,10 @@ use std::pin::Pin;
 use autocxx::moveit::Emplace;
 use bitflags::bitflags;
 
+use crate::Address;
 use crate::ffi::range_t;
 use crate::ffi::segment::*;
 use crate::idb::IDB;
-use crate::Address;
 
 pub struct Segment<'a> {
     ptr: *mut segment_t,
@@ -28,16 +28,16 @@ bitflags! {
 }
 
 impl SegmentPermissions {
-    pub fn is_executable(&self) -> bool {
-        self.contains(SegmentPermissions::EXEC)
+    pub const fn is_executable(&self) -> bool {
+        self.contains(Self::EXEC)
     }
 
-    pub fn is_writable(&self) -> bool {
-        self.contains(SegmentPermissions::WRITE)
+    pub const fn is_writable(&self) -> bool {
+        self.contains(Self::WRITE)
     }
 
-    pub fn is_readable(&self) -> bool {
-        self.contains(SegmentPermissions::READ)
+    pub const fn is_readable(&self) -> bool {
+        self.contains(Self::READ)
     }
 }
 
@@ -62,63 +62,63 @@ pub enum SegmentAlignment {
 }
 
 impl SegmentAlignment {
-    pub fn is_abs(&self) -> bool {
+    pub const fn is_abs(&self) -> bool {
         matches!(self, Self::Abs)
     }
 
-    pub fn is_rel_byte(&self) -> bool {
+    pub const fn is_rel_byte(&self) -> bool {
         matches!(self, Self::RelByte)
     }
 
-    pub fn is_rel_word(&self) -> bool {
+    pub const fn is_rel_word(&self) -> bool {
         matches!(self, Self::RelWord)
     }
 
-    pub fn is_rel_para(&self) -> bool {
+    pub const fn is_rel_para(&self) -> bool {
         matches!(self, Self::RelPara)
     }
 
-    pub fn is_rel_page(&self) -> bool {
+    pub const fn is_rel_page(&self) -> bool {
         matches!(self, Self::RelPage)
     }
 
-    pub fn is_rel_dble(&self) -> bool {
+    pub const fn is_rel_dble(&self) -> bool {
         matches!(self, Self::RelDble)
     }
 
-    pub fn is_rel_4k(&self) -> bool {
+    pub const fn is_rel_4k(&self) -> bool {
         matches!(self, Self::Rel4K)
     }
 
-    pub fn is_group(&self) -> bool {
+    pub const fn is_group(&self) -> bool {
         matches!(self, Self::Group)
     }
 
-    pub fn is_rel_32_bytes(&self) -> bool {
+    pub const fn is_rel_32_bytes(&self) -> bool {
         matches!(self, Self::Rel32Bytes)
     }
 
-    pub fn is_rel_64_bytes(&self) -> bool {
+    pub const fn is_rel_64_bytes(&self) -> bool {
         matches!(self, Self::Rel64Bytes)
     }
 
-    pub fn is_rel_qword(&self) -> bool {
+    pub const fn is_rel_qword(&self) -> bool {
         matches!(self, Self::RelQword)
     }
 
-    pub fn is_rel_128_bytes(&self) -> bool {
+    pub const fn is_rel_128_bytes(&self) -> bool {
         matches!(self, Self::Rel128Bytes)
     }
 
-    pub fn is_rel_512_bytes(&self) -> bool {
+    pub const fn is_rel_512_bytes(&self) -> bool {
         matches!(self, Self::Rel512Bytes)
     }
 
-    pub fn is_rel_1024_bytes(&self) -> bool {
+    pub const fn is_rel_1024_bytes(&self) -> bool {
         matches!(self, Self::Rel1024Bytes)
     }
 
-    pub fn is_rel_2048_bytes(&self) -> bool {
+    pub const fn is_rel_2048_bytes(&self) -> bool {
         matches!(self, Self::Rel2048Bytes)
     }
 }
@@ -141,71 +141,71 @@ pub enum SegmentType {
 }
 
 impl SegmentType {
-    pub fn is_normal(&self) -> bool {
+    pub const fn is_normal(&self) -> bool {
         matches!(self, Self::NORM)
     }
 
-    pub fn is_norm(&self) -> bool {
+    pub const fn is_norm(&self) -> bool {
         self.is_normal()
     }
 
-    pub fn is_extern(&self) -> bool {
+    pub const fn is_extern(&self) -> bool {
         matches!(self, Self::XTRN)
     }
 
-    pub fn is_xtrn(&self) -> bool {
+    pub const fn is_xtrn(&self) -> bool {
         self.is_extern()
     }
 
-    pub fn is_code(&self) -> bool {
+    pub const fn is_code(&self) -> bool {
         matches!(self, Self::CODE)
     }
 
-    pub fn is_data(&self) -> bool {
+    pub const fn is_data(&self) -> bool {
         matches!(self, Self::DATA)
     }
 
-    pub fn is_import(&self) -> bool {
+    pub const fn is_import(&self) -> bool {
         matches!(self, Self::IMP)
     }
 
-    pub fn is_imp(&self) -> bool {
+    pub const fn is_imp(&self) -> bool {
         self.is_import()
     }
 
-    pub fn is_group(&self) -> bool {
+    pub const fn is_group(&self) -> bool {
         matches!(self, Self::GRP)
     }
 
-    pub fn is_grp(&self) -> bool {
+    pub const fn is_grp(&self) -> bool {
         self.is_group()
     }
 
-    pub fn is_bss(&self) -> bool {
+    pub const fn is_bss(&self) -> bool {
         matches!(self, Self::BSS)
     }
 
-    pub fn is_null(&self) -> bool {
+    pub const fn is_null(&self) -> bool {
         matches!(self, Self::NULL)
     }
 
-    pub fn is_absym(&self) -> bool {
+    pub const fn is_absym(&self) -> bool {
         matches!(self, Self::ABSSYM)
     }
 
-    pub fn is_comm(&self) -> bool {
+    pub const fn is_comm(&self) -> bool {
         matches!(self, Self::COMM)
     }
 
-    pub fn is_imem(&self) -> bool {
+    pub const fn is_imem(&self) -> bool {
         matches!(self, Self::IMEM)
     }
 
-    pub fn is_undefined(&self) -> bool {
+    pub const fn is_undefined(&self) -> bool {
         matches!(self, Self::UNDF)
     }
 
-    pub fn is_undf(&self) -> bool {
+    pub const fn is_undf(&self) -> bool {
         self.is_undefined()
     }
 }
@@ -220,7 +220,7 @@ impl<'a> Segment<'a> {
         }
     }
 
-    fn as_range_t(&self) -> *const range_t {
+    const fn as_range_t(&self) -> *const range_t {
         self.ptr.cast()
     }
 
@@ -247,11 +247,7 @@ impl<'a> Segment<'a> {
     pub fn name(&self) -> Option<String> {
         let name = unsafe { idalib_segm_name(self.ptr) }.ok()?;
 
-        if name.is_empty() {
-            None
-        } else {
-            Some(name)
-        }
+        if name.is_empty() { None } else { Some(name) }
     }
 
     pub fn alignment(&self) -> SegmentAlignment {

@@ -1,7 +1,7 @@
 use std::fmt::Display;
 use std::ops::Deref;
 
-use crate::{ffi, init_library, IDAError};
+use crate::{IDAError, ffi, init_library};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct LicenseId([u8; 6]);

@@ -3,12 +3,11 @@ use std::mem;
 
 use bitflags::bitflags;
 
+use crate::Address;
 use crate::ffi::xref::cref_t::*;
 use crate::ffi::xref::dref_t::*;
 use crate::ffi::xref::*;
-
 use crate::idb::IDB;
-use crate::Address;
 
 pub struct XRef<'a> {
     inner: xrefblk_t,
@@ -80,7 +79,7 @@ bitflags! {
 }
 
 impl<'a> XRef<'a> {
-    pub(crate) fn from_repr(inner: xrefblk_t) -> Self {
+    pub(crate) const fn from_repr(inner: xrefblk_t) -> Self {
         Self {
             inner,
             _marker: PhantomData,
@@ -95,7 +94,7 @@ impl<'a> XRef<'a> {
         self.inner.to.into()
     }
 
-    pub fn flags(&self) -> XRefFlags {
+    pub const fn flags(&self) -> XRefFlags {
         let flags = self.inner.type_ & !(XREF_MASK as u8);
         XRefFlags::from_bits_retain(flags)
     }
@@ -110,39 +109,31 @@ impl<'a> XRef<'a> {
         }
     }
 
-    pub fn is_code(&self) -> bool {
+    pub const fn is_code(&self) -> bool {
         self.inner.iscode
     }
 
-    pub fn is_data(&self) -> bool {
+    pub const fn is_data(&self) -> bool {
         !self.is_code()
     }
 
-    pub fn is_user_defined(&self) -> bool {
+    pub const fn is_user_defined(&self) -> bool {
         self.inner.user
     }
 
     pub fn next_to(&self) -> Option<Self> {
         let mut curr = self.clone();
 
-        let found = unsafe { xrefblk_t_next_to(&mut curr.inner as *mut _) };
+        let found = unsafe { xrefblk_t_next_to(&raw mut curr.inner) };
 
-        if found {
-            Some(curr)
-        } else {
-            None
-        }
+        if found { Some(curr) } else { None }
     }
 
     pub fn next_from(&self) -> Option<Self> {
         let mut curr = self.clone();
 
-        let found = unsafe { xrefblk_t_next_from(&mut curr.inner as *mut _) };
+        let found = unsafe { xrefblk_t_next_from(&raw mut curr.inner) };
 
-        if found {
-            Some(curr)
-        } else {
-            None
-        }
+        if found { Some(curr) } else { None }
     }
 }

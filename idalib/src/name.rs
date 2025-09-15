@@ -3,13 +3,12 @@ use std::marker::PhantomData;
 
 use bitflags::bitflags;
 
+use crate::Address;
 use crate::ffi::BADADDR;
 use crate::ffi::name::{
     get_nlist_ea, get_nlist_idx, get_nlist_name, get_nlist_size, is_in_nlist, is_public_name,
     is_weak_name,
 };
-
-use crate::Address;
 use crate::idb::IDB;
 
 pub type NameIndex = usize;
@@ -35,7 +34,7 @@ pub struct Name {
 }
 
 impl Name {
-    pub fn address(&self) -> Address {
+    pub const fn address(&self) -> Address {
         self.address
     }
 
@@ -43,17 +42,17 @@ impl Name {
         &self.name
     }
 
-    pub fn is_public(&self) -> bool {
+    pub const fn is_public(&self) -> bool {
         self.properties.contains(NameProperties::PUBLIC)
     }
 
-    pub fn is_weak(&self) -> bool {
+    pub const fn is_weak(&self) -> bool {
         self.properties.contains(NameProperties::WEAK)
     }
 }
 
 impl<'a> NameList<'a> {
-    pub(crate) fn new(_: &'a IDB) -> Self {
+    pub(crate) const fn new(_: &'a IDB) -> Self {
         Self {
             _marker: PhantomData,
         }
@@ -66,7 +65,9 @@ impl<'a> NameList<'a> {
             return None;
         }
 
-        let name = unsafe { CStr::from_ptr(name) }.to_string_lossy().into_owned();
+        let name = unsafe { CStr::from_ptr(name) }
+            .to_string_lossy()
+            .into_owned();
 
         let mut properties = NameProperties::empty();
 
@@ -112,7 +113,7 @@ impl<'a> NameList<'a> {
         self.len() == 0
     }
 
-    pub fn iter(&self) -> NameListIter<'_, 'a> {
+    pub const fn iter(&self) -> NameListIter<'_, 'a> {
         NameListIter {
             name_list: self,
             current_index: 0,

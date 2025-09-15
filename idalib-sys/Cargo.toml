@@ -14,19 +14,18 @@ edition = "2024"
 build = "build.rs"
 links = "idalib"
 include = [
-  "/build.rs",
-  "/src",
-  "/sdk/src/include",
-  "/sdk/src/lib/x64_linux_gcc_64/*.so",
-  "/sdk/src/lib/x64_mac_clang_64/*.dylib",
-  "/sdk/src/lib/arm64_mac_clang_64/*.dylib",
-  "/sdk/src/lib/x64_win_vc_64/*.lib",
+    "/build.rs",
+    "/src",
+    "/sdk/src/include",
+    "/sdk/src/lib/x64_linux_gcc_64/*.so",
+    "/sdk/src/lib/x64_mac_clang_64/*.dylib",
+    "/sdk/src/lib/arm64_mac_clang_64/*.dylib",
+    "/sdk/src/lib/x64_win_vc_64/*.lib",
 ]
 
 [dependencies]
 anyhow = "1"
 autocxx = "0.27"
-bitflags = "2"
 cxx = "1"
 thiserror = "1"
 
