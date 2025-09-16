@@ -1240,7 +1240,7 @@ pub mod name {
 
 pub mod ida {
     use std::env;
-    use std::ffi::{CStr, CString};
+    use std::ffi::CString;
     use std::path::Path;
     use std::ptr;
 
@@ -1371,9 +1371,7 @@ pub mod ida {
         let path = CString::new(path.as_ref().to_string_lossy().as_ref()).map_err(IDAError::ffi)?;
         args.push(path);
 
-        let idalib0 = CStr::from_bytes_with_nul(b"idalib\0").map_err(IDAError::ffi)?;
-
-        let argv = std::iter::once(idalib0.as_ptr())
+        let argv = std::iter::once(c"idalib".as_ptr())
             .chain(args.iter().map(|s| s.as_ptr()))
             .collect::<Vec<_>>();
         let argc = argv.len();

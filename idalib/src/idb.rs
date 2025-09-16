@@ -93,7 +93,7 @@ impl IDBOpenOptions {
         let mut args = Vec::new();
 
         if let Some(ftype) = self.ftype.as_ref() {
-            args.push(format!("-T{}", ftype));
+            args.push(format!("-T{ftype}"));
         }
 
         if let Some(idb_path) = self.idb.as_ref() {
