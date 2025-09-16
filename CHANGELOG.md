@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.2 (2025-09-16)
+
+Bugfix:
+- Fix comments API and example.
+
 ## 0.7.1 (2025-09-13)
 
 Bugfix:

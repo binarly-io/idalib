@@ -8,7 +8,9 @@ use crate::ffi::bytes::*;
 use crate::ffi::comments::{append_cmt, idalib_get_cmt, set_cmt};
 use crate::ffi::conversions::idalib_ea2str;
 use crate::ffi::entry::{get_entry, get_entry_ordinal, get_entry_qty};
-use crate::ffi::func::{get_func, get_func_qty, getn_func};
+use crate::ffi::func::{
+    get_func, get_func_qty, getn_func, idalib_get_func_cmt, idalib_set_func_cmt,
+};
 use crate::ffi::hexrays::{decompile_func, init_hexrays_plugin, term_hexrays_plugin};
 use crate::ffi::ida::{
     auto_wait, close_database_with, make_signatures, open_database_quiet, set_screen_ea,
@@ -91,7 +93,7 @@ impl IDBOpenOptions {
         let mut args = Vec::new();
 
         if let Some(ftype) = self.ftype.as_ref() {
-            args.push(format!("-T{}", ftype));
+            args.push(format!("-T{ftype}"));
         }
 
         if let Some(idb_path) = self.idb.as_ref() {
@@ -351,6 +353,17 @@ impl IDB {
         if s.is_empty() { None } else { Some(s) }
     }
 
+    pub fn get_func_cmt(&self, ea: Address) -> Option<String> {
+        self.get_func_cmt_with(ea, false)
+    }
+
+    pub fn get_func_cmt_with(&self, ea: Address, rptble: bool) -> Option<String> {
+        let f = self.function_at(ea)?;
+        let s = unsafe { idalib_get_func_cmt(f.as_ptr() as _, rptble) }.ok()?;
+
+        if s.is_empty() { None } else { Some(s) }
+    }
+
     pub fn set_cmt(&self, ea: Address, comm: impl AsRef<str>) -> Result<(), IDAError> {
         self.set_cmt_with(ea, comm, false)
     }
@@ -367,6 +380,29 @@ impl IDB {
         } else {
             Err(IDAError::ffi_with(format!(
                 "failed to set comment at {ea:#x}"
+            )))
+        }
+    }
+
+    pub fn set_func_cmt(&self, ea: Address, comm: impl AsRef<str>) -> Result<(), IDAError> {
+        self.set_func_cmt_with(ea, comm, false)
+    }
+
+    pub fn set_func_cmt_with(
+        &self,
+        ea: Address,
+        comm: impl AsRef<str>,
+        rptble: bool,
+    ) -> Result<(), IDAError> {
+        let f = self
+            .function_at(ea)
+            .ok_or_else(|| IDAError::ffi_with(format!("no function found at address {ea:#x}")))?;
+        let s = CString::new(comm.as_ref()).map_err(IDAError::ffi)?;
+        if unsafe { idalib_set_func_cmt(f.as_ptr() as _, s.as_ptr(), rptble) } {
+            Ok(())
+        } else {
+            Err(IDAError::ffi_with(format!(
+                "failed to set function comment at {ea:#x}"
             )))
         }
     }
@@ -396,8 +432,24 @@ impl IDB {
     }
 
     pub fn remove_cmt_with(&self, ea: Address, rptble: bool) -> Result<(), IDAError> {
-        let s = CString::new("").map_err(IDAError::ffi)?;
-        if unsafe { set_cmt(ea.into(), s.as_ptr(), rptble) } {
+        if unsafe { set_cmt(ea.into(), c"".as_ptr(), rptble) } {
+            Ok(())
+        } else {
+            Err(IDAError::ffi_with(format!(
+                "failed to remove comment at {ea:#x}"
+            )))
+        }
+    }
+
+    pub fn remove_func_cmt(&self, ea: Address) -> Result<(), IDAError> {
+        self.remove_func_cmt_with(ea, false)
+    }
+
+    pub fn remove_func_cmt_with(&self, ea: Address, rptble: bool) -> Result<(), IDAError> {
+        let f = self
+            .function_at(ea)
+            .ok_or_else(|| IDAError::ffi_with(format!("no function found at address {ea:#x}")))?;
+        if unsafe { idalib_set_func_cmt(f.as_ptr(), c"".as_ptr(), rptble) } {
             Ok(())
         } else {
             Err(IDAError::ffi_with(format!(
