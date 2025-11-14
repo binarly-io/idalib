@@ -1,12 +1,22 @@
 {
   "IDAMetadataDescriptorVersion": 1,
   "plugin": {
-    "name": "idalib Rust bindings",
-    "entryPoint": "idalib",
+    "name": "idalib-rust-bindings",
+    "entryPoint": "ida_plugin_stub.py",
     "categories": ["api-scripting-and-automation", "integration-with-third-parties-interoperability"],
     "logoPath": "resources/logo.png",
-    "idaVersions": ">=9.0",
+    "idaVersions": ["9.0", "9.1", "9.2"],
     "description" : "Idiomatic Rust bindings to IDA SDK",
-    "version": "0.7.2"
+    "license": "MIT OR Apache-2.0",
+    "version": "0.7.2",
+    "urls": {
+      "repository": "https://github.com/binarly-io/idalib",
+      "documentation": "https://idalib.rs"
+    },
+    "authors": [{
+      "name": "Sam L. Thomas",
+      "email": "s@ghost.sh"
+    }],
+    "keywords": ["rust", "idalib", "bindings"]
   }
 }
