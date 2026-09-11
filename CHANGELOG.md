@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.10.1 (2026-09-11)
+
+Features:
+- Add support for modifying the Hex-Rays decompiler configuration (contributor:
+  [@0xdea](https://github.com/0xdea)).
+- Add image base, instruction mnemonic, and data type accessors (contributor:
+  [@amaanq](https://github.com/amaanq)).
+- Add APIs for creating and removing functions, iterating over function tails,
+  and additional address flags predicates (contributor:
+  [@amaanq](https://github.com/amaanq)).
+
+Bugfix:
+- Safely handle processor-specific operand types (contributor:
+  [@amaanq](https://github.com/amaanq)).
+
+Miscellaneous:
+- Correct spelling in the Rust contribution guidance (contributor:
+  [@mcbbugu](https://github.com/mcbbugu)).
+
 ## 0.10.0 (2026-07-26)
 
 - Compatibility with IDA 9.4.
