@@ -109,10 +109,6 @@ include_cpp! {
     generate!("is_strlit")
     generate!("is_off")
 
-    // funcs
-    generate!("add_func")
-    generate!("del_func")
-
     // entry
     generate!("get_entry")
     generate!("get_entry_ordinal")
@@ -138,6 +134,8 @@ include_cpp! {
     generate!("str2reg")
 
     // funcs
+    generate!("add_func")
+    generate!("del_func")
     generate!("func_t")
     generate!("lock_func")
     generate!("get_func")

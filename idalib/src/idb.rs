@@ -271,8 +271,6 @@ impl IDB {
         Some(Function::from_ptr(ptr))
     }
 
-    /// These take &mut self, unlike the other database mutators, because they
-    /// invalidate every func_t the database has handed out.
     pub fn add_function(&mut self, start: Address) -> Result<(), IDAError> {
         self.add_function_with(start, BADADDR.into())
     }

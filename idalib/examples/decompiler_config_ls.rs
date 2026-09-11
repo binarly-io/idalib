@@ -17,8 +17,6 @@ fn main() -> anyhow::Result<()> {
     };
     let main_ea = main.start_address();
 
-    // Each step (re)decompiles `main`, showing how a Hex-Rays config
-    // directive changes the generated pseudocode.
     let steps = [
         ("default config", None),
         (
