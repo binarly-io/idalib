@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["get_flags","idalib_get_byte","idalib_get_bytes","idalib_get_dword","idalib_get_qword","idalib_get_word","is_code","is_data"],"type":["flags64_t"]};
+window.SIDEBAR_ITEMS = {"fn":["get_flags","idalib_get_byte","idalib_get_bytes","idalib_get_dword","idalib_get_qword","idalib_get_word","is_byte","is_code","is_data","is_double","is_dword","is_float","is_off","is_oword","is_qword","is_strlit","is_word"],"type":["flags64_t"]};

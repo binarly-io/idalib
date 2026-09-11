@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["decode"],"mod":["arm","mips","op","x86"]};
+window.SIDEBAR_ITEMS = {"fn":["decode","idalib_print_insn_mnem"],"mod":["arm","mips","op","x86"]};
