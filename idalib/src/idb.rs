@@ -10,11 +10,11 @@ use crate::ffi::comments::{append_cmt, idalib_get_cmt, set_cmt};
 use crate::ffi::conversions::idalib_ea2str;
 use crate::ffi::entry::{get_entry, get_entry_ordinal, get_entry_qty};
 use crate::ffi::func::{
-    get_func, get_func_qty, getn_func, idalib_get_func_cmt, idalib_set_func_cmt,
+    add_func, del_func, get_func, get_func_qty, getn_func, idalib_get_func_cmt, idalib_set_func_cmt,
 };
 #[cfg(not(feature = "plugin"))]
 use crate::ffi::hexrays::term_hexrays_plugin;
-use crate::ffi::hexrays::{decompile_func, init_hexrays_plugin};
+use crate::ffi::hexrays::{change_hexrays_config, decompile_function, init_hexrays_plugin};
 #[cfg(not(feature = "plugin"))]
 use crate::ffi::ida::{auto_wait, close_database_with, open_database_quiet};
 use crate::ffi::ida::{make_signatures, set_screen_ea};
@@ -24,7 +24,7 @@ use crate::ffi::processor::get_ph;
 use crate::ffi::search::{idalib_find_defined, idalib_find_imm, idalib_find_text};
 use crate::ffi::segment::{get_segm_by_name, get_segm_qty, getnseg, getseg};
 use crate::ffi::typeinf::{idalib_format_cfunc_decls, idalib_format_decls};
-use crate::ffi::util::{is_align_insn, next_head, prev_head, str2reg};
+use crate::ffi::util::{get_imagebase, is_align_insn, next_head, prev_head, str2reg};
 use crate::ffi::xref::{xrefblk_t, xrefblk_t_first_from, xrefblk_t_first_to};
 
 use crate::bookmarks::Bookmarks;
@@ -222,6 +222,23 @@ impl IDB {
         self.decompiler
     }
 
+    pub fn modify_decompiler_config(&mut self, directive: impl AsRef<str>) -> Result<(), IDAError> {
+        if !self.decompiler {
+            return Err(IDAError::ffi_with("no decompiler available"));
+        }
+
+        let directive = directive.as_ref();
+        let s = CString::new(directive).map_err(IDAError::ffi)?;
+
+        if unsafe { change_hexrays_config(s.as_ptr()) } {
+            Ok(())
+        } else {
+            Err(IDAError::ffi_with(format!(
+                "failed to apply hexrays config directive `{directive}`"
+            )))
+        }
+    }
+
     pub fn meta(&self) -> Metadata<'_> {
         Metadata::new()
     }
@@ -252,6 +269,30 @@ impl IDB {
         }
 
         Some(Function::from_ptr(ptr))
+    }
+
+    pub fn add_function(&mut self, start: Address) -> Result<(), IDAError> {
+        self.add_function_with(start, BADADDR.into())
+    }
+
+    pub fn add_function_with(&mut self, start: Address, end: Address) -> Result<(), IDAError> {
+        if unsafe { add_func(start.into(), end.into()) } {
+            Ok(())
+        } else {
+            Err(IDAError::ffi_with(format!(
+                "failed to add function at {start:#x}"
+            )))
+        }
+    }
+
+    pub fn remove_function(&mut self, start: Address) -> Result<(), IDAError> {
+        if unsafe { del_func(start.into()) } {
+            Ok(())
+        } else {
+            Err(IDAError::ffi_with(format!(
+                "failed to delete function at {start:#x}"
+            )))
+        }
     }
 
     pub fn next_head(&self, ea: Address) -> Option<Address> {
@@ -299,7 +340,7 @@ impl IDB {
         }
 
         Ok(unsafe {
-            decompile_func(f.as_ptr(), all_blocks)
+            decompile_function(f.start_address().into(), all_blocks)
                 .map(|f| CFunction::new(f).expect("null pointer checked"))?
         })
     }
@@ -580,6 +621,10 @@ impl IDB {
 
     pub fn flags_at(&self, ea: Address) -> AddressFlags<'_> {
         AddressFlags::new(unsafe { get_flags(ea.into()) })
+    }
+
+    pub fn image_base(&self) -> Address {
+        unsafe { get_imagebase() }.into()
     }
 
     pub fn get_byte(&self, ea: Address) -> u8 {

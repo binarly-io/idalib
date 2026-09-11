@@ -99,6 +99,15 @@ include_cpp! {
     generate!("is_data")
     generate!("is_code")
     generate!("get_flags")
+    generate!("is_byte")
+    generate!("is_word")
+    generate!("is_dword")
+    generate!("is_qword")
+    generate!("is_oword")
+    generate!("is_float")
+    generate!("is_double")
+    generate!("is_strlit")
+    generate!("is_off")
 
     // entry
     generate!("get_entry")
@@ -125,6 +134,8 @@ include_cpp! {
     generate!("str2reg")
 
     // funcs
+    generate!("add_func")
+    generate!("del_func")
     generate!("func_t")
     generate!("lock_func")
     generate!("get_func")
@@ -172,6 +183,7 @@ include_cpp! {
     // hexrays
     generate!("init_hexrays_plugin")
     generate!("term_hexrays_plugin")
+    generate!("change_hexrays_config")
 
     // generate!("decompile_func")
     generate!("cfuncptr_t")
@@ -378,6 +390,7 @@ include_cpp! {
     extern_cpp_type!("plugin_t", crate::plugin::plugin_t)
     generate!("find_plugin")
     generate!("run_plugin")
+    generate!("get_imagebase")
 
     generate!("PLUGIN_MOD")
     generate!("PLUGIN_DRAW")
@@ -543,18 +556,18 @@ pub mod hexrays {
     }
 
     pub use super::ffi::{
-        carg_t, carglist_t, cblock_t, cexpr_t, cfunc_t, cinsn_t, citem_t, cswitch_t, cthrow_t,
-        ctry_t, init_hexrays_plugin, qrefcnt_t_cfunc_t_AutocxxConcrete as cfuncptr_t,
-        term_hexrays_plugin,
+        carg_t, carglist_t, cblock_t, cexpr_t, cfunc_t, change_hexrays_config, cinsn_t, citem_t,
+        cswitch_t, cthrow_t, ctry_t, init_hexrays_plugin,
+        qrefcnt_t_cfunc_t_AutocxxConcrete as cfuncptr_t, term_hexrays_plugin,
     };
     pub use super::ffix::{
         cblock_iter, idalib_hexrays_cblock_iter, idalib_hexrays_cblock_iter_next,
         idalib_hexrays_cblock_len, idalib_hexrays_cfunc_body, idalib_hexrays_cfunc_pseudocode,
-        idalib_hexrays_cfuncptr_inner, idalib_hexrays_decompile_func,
+        idalib_hexrays_cfuncptr_inner, idalib_hexrays_decompile_function,
     };
 
-    pub unsafe fn decompile_func(
-        f: *mut super::ffi::func_t,
+    pub unsafe fn decompile_function(
+        func_ea: super::ea_t,
         all_blocks: bool,
     ) -> Result<cxx::UniquePtr<cfuncptr_t>, HexRaysError> {
         let mut flags = __impl::DECOMP_NO_WAIT | __impl::DECOMP_NO_CACHE;
@@ -564,8 +577,8 @@ pub mod hexrays {
         }
 
         let mut failure = super::ffix::hexrays_error_t::default();
-        let result = super::ffix::idalib_hexrays_decompile_func(
-            f,
+        let result = super::ffix::idalib_hexrays_decompile_function(
+            func_ea,
             &mut failure as *mut _,
             (flags as i32).into(),
         );
@@ -756,6 +769,12 @@ mod ffix {
         desc: String,
     }
 
+    #[derive(Default)]
+    struct func_tail_t {
+        start_ea: u64,
+        end_ea: u64,
+    }
+
     extern "Rust" {
         type PlugMod;
 
@@ -784,6 +803,7 @@ mod ffix {
         include!("search_extras.h");
         include!("strings_extras.h");
         include!("typeinf_extras.h");
+        include!("ua_extras.h");
         include!("plugin_extras.h");
 
         type c_short = autocxx::c_short;
@@ -837,6 +857,8 @@ mod ffix {
         unsafe fn idalib_get_func_cmt(f: *const func_t, rptble: bool) -> Result<String>;
         unsafe fn idalib_set_func_cmt(f: *const func_t, cmt: *const c_char, rptble: bool) -> bool;
 
+        unsafe fn idalib_func_tails(f: *const func_t, out: &mut Vec<func_tail_t>);
+
         unsafe fn idalib_func_flow_chart(
             f: *mut func_t,
             flags: c_int,
@@ -847,8 +869,8 @@ mod ffix {
         ) -> *mut cfunc_t;
         unsafe fn idalib_hexrays_cfunc_pseudocode(f: *mut cfunc_t) -> String;
 
-        unsafe fn idalib_hexrays_decompile_func(
-            f: *mut func_t,
+        unsafe fn idalib_hexrays_decompile_function(
+            func_ea: c_ulonglong,
             err: *mut hexrays_error_t,
             flags: c_int,
         ) -> UniquePtr<qrefcnt_t_cfunc_t_AutocxxConcrete>;
@@ -1076,6 +1098,8 @@ mod ffix {
 
         unsafe fn idalib_ea2str(ea: c_ulonglong) -> String;
 
+        unsafe fn idalib_print_insn_mnem(ea: c_ulonglong) -> String;
+
         unsafe fn idalib_msg(msg: *const c_char);
 
         unsafe fn idalib_get_byte(ea: c_ulonglong) -> u8;
@@ -1127,6 +1151,7 @@ pub mod insn {
     use super::ea_t;
     use super::ffi::decode_insn;
 
+    pub use super::ffix::idalib_print_insn_mnem;
     pub use super::pod::insn_t;
 
     pub fn decode(ea: ea_t) -> Option<insn_t> {
@@ -1174,13 +1199,13 @@ pub mod insn {
 
 pub mod func {
     pub use super::ffi::{
-        calc_thunk_func_target, fc_block_type_t, func_t, gdl_graph_t, get_func, get_func_num,
-        get_func_qty, getn_func, lock_func, qbasic_block_t, qflow_chart_t,
+        add_func, calc_thunk_func_target, del_func, fc_block_type_t, func_t, gdl_graph_t, get_func,
+        get_func_num, get_func_qty, getn_func, lock_func, qbasic_block_t, qflow_chart_t,
     };
     pub use super::ffix::{
-        idalib_func_flags, idalib_func_flow_chart, idalib_func_name, idalib_get_func_cmt,
-        idalib_qbasic_block_preds, idalib_qbasic_block_succs, idalib_qflow_graph_getn_block,
-        idalib_set_func_cmt,
+        func_tail_t, idalib_func_flags, idalib_func_flow_chart, idalib_func_name,
+        idalib_func_tails, idalib_get_func_cmt, idalib_qbasic_block_preds,
+        idalib_qbasic_block_succs, idalib_qflow_graph_getn_block, idalib_set_func_cmt,
     };
 
     pub mod flags {
@@ -1228,7 +1253,10 @@ pub mod segment {
 pub mod bytes {
     #[allow(non_camel_case_types)]
     pub type flags64_t = autocxx::c_ulonglong;
-    pub use super::ffi::{get_flags, is_code, is_data};
+    pub use super::ffi::{
+        get_flags, is_byte, is_code, is_data, is_double, is_dword, is_float, is_off, is_oword,
+        is_qword, is_strlit, is_word,
+    };
     pub use super::ffix::{
         idalib_get_byte, idalib_get_bytes, idalib_get_dword, idalib_get_qword, idalib_get_word,
     };
@@ -1236,8 +1264,8 @@ pub mod bytes {
 
 pub mod util {
     pub use super::ffi::{
-        is_align_insn, is_basic_block_end, is_call_insn, is_indirect_jump_insn, is_ret_insn,
-        next_head, prev_head, str2reg,
+        get_imagebase, is_align_insn, is_basic_block_end, is_call_insn, is_indirect_jump_insn,
+        is_ret_insn, next_head, prev_head, str2reg,
     };
 }
 
