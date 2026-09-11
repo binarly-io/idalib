@@ -13,3 +13,5 @@
 - Ryan Stortz / [@withzombies](https://github.com/withzombies)
 - Irate Walrus / [@Irate-Walrus](https://github.com/Irate-Walrus)
 - Cole Leavitt / [@coleleavitt](https://github.com/coleleavitt)
+- Amaan Qureshi / [@amaanq](https://github.com/amaanq)
+- mcbbugu / [@mcbbugu](https://github.com/mcbbugu)
